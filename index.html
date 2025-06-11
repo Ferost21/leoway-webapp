@@ -114,11 +114,11 @@
             const arrival = document.getElementById('arrival').value.trim();
             const date = document.getElementById('date').value.trim();
             if (!departure || !arrival || !date) {
-                webApp.showAlert('Заповніть усі поля!');
+                alert('Заповніть усі поля!');
                 return;
             }
             if (departure.length > 255 || arrival.length > 255) {
-                webApp.showAlert('Місце відправлення або прибуття занадто довге (до 255 символів)!');
+                alert('Місце відправлення або прибуття занадто довге (до 255 символів)!');
                 return;
             }
             webApp.sendData(JSON.stringify({ departure, arrival, date }));
