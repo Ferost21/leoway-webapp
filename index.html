@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LeoWay Пошук Поїздки</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background: #f0f0f0;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        input, button {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        button {
+            background: #0088cc;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #006699;
+        }
+        .suggestions {
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            max-height: 150px;
+            overflow-y: auto;
+            background: white;
+            position: absolute;
+            width: calc(100% - 22px);
+            z-index: 10;
+        }
+        .suggestion-item {
+            padding: 10px;
+            cursor: pointer;
+        }
+        .suggestion-item:hover {
+            background: #f0f0f0;
+        }
+    </style>
+</head>
+<body>
+    <h1>Пошук поїздки</h1>
+    <input id="departure" placeholder="Місце відправлення" autocomplete="off">
+    <div id="departure-suggestions" class="suggestions" style="display: none;"></div>
+    <input id="arrival" placeholder="Місце прибуття" autocomplete="off">
+    <div id="arrival-suggestions" class="suggestions" style="display: none;"></div>
+    <input id="date" placeholder="Дата (ДД-ММ-РРРР)">
+    <button onclick="submitSearch()">Пошук</button>
+    <script>
+        const webApp = window.Telegram.WebApp;
+        webApp.ready();
+
+        // Ініціалізація календаря
+        flatpickr("#date", {
+            dateFormat: "d-m-Y",
+            minDate: "today",
+            locale: {
+                firstDayOfWeek: 1,
+                weekdays: { shorthand: ['Нд', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб'] },
+                months: {
+                    shorthand: ['Січ', 'Лют', 'Бер', 'Кві', 'Тра', 'Чер', 'Лип', 'Сер', 'Вер', 'Жов', 'Лис', 'Гру']
+                }
+            }
+        });
+
+        // Автодоповнення для міст
+        async function fetchCities(query, field) {
+            if (query.length < 2) {
+                document.getElementById(`${field}-suggestions`).style.display = 'none';
+                return;
+            }
+            try {
+                const response = await fetch(`https://3efd-194-44-220-198.ngrok-free.app/api/cities?query=${encodeURIComponent(query)}`);
+                const cities = await response.json();
+                const suggestions = document.getElementById(`${field}-suggestions`);
+                suggestions.innerHTML = '';
+                cities.forEach(city => {
+                    const item = document.createElement('div');
+                    item.className = 'suggestion-item';
+                    item.textContent = `${city.name} (${city.category === 'M' ? 'Місто' : city.category === 'T' ? 'Селище' : city.category === 'C' ? 'Село' : 'Поселення'})`;
+                    item.onclick = () => {
+                        document.getElementById(field).value = city.name;
+                        suggestions.style.display = 'none';
+                    };
+                    suggestions.appendChild(item);
+                });
+                suggestions.style.display = cities.length ? 'block' : 'none';
+            } catch (e) {
+                console.error('Error fetching cities:', e);
+            }
+        }
+
+        // Обробка вводу
+        document.getElementById('departure').addEventListener('input', (e) => fetchCities(e.target.value, 'departure'));
+        document.getElementById('arrival').addEventListener('input', (e) => fetchCities(e.target.value, 'arrival'));
+
+        // Відправка даних
+        function submitSearch() {
+            const departure = document.getElementById('departure').value.trim();
+            const arrival = document.getElementById('arrival').value.trim();
+            const date = document.getElementById('date').value.trim();
+            if (!departure || !arrival || !date) {
+                webApp.showAlert('Заповніть усі поля!');
+                return;
+            }
+            if (departure.length > 255 || arrival.length > 255) {
+                webApp.showAlert('Місце відправлення або прибуття занадто довге (до 255 символів)!');
+                return;
+            }
+            webApp.sendData(JSON.stringify({ departure, arrival, date }));
+            webApp.close();
+        }
+    </script>
+</body>
+</html>
