@@ -78,7 +78,7 @@
             if (query.length < 2) {
                 return [];
             }
-            console.log(`Fetching cities for: ${query}"`);
+            console.log(`Fetching cities for: ${query}`);
             try {
                 const url = `https://8021-194-44-220-198.ngrok-free.app/api/cities?query=${encodeURIComponent(query)}`;
                 const response = await fetch(url, {
@@ -101,23 +101,23 @@
 
         // Обробка вводу для departure
         const departureInput = document.getElementById('departure');
-        const departureSuggestions = document.getElementsById('departure-suggestions');
+        const departureSuggestions = document.getElementById('departure-suggestions'); // Виправлено Elements на Element
         departureInput.addEventListener('input', async (e) => {
             const query = e.target.value;
             const cities = await fetchCities(query);
             departureSuggestions.style.display = cities.length > 0 ? 'block' : 'none';
             departureSuggestions.innerHTML = cities.map(city => `
-                <div class="suggestion-item" data-name="${city.name}"}>${city.name} (${city.category === 'M' ? 'Місто' : 'Село'})</div>
+                <div class="suggestion-item" data-name="${city.name}">${city.name} (${city.category === 'M' ? 'Місто' : 'Село'})</div>
             `).join('');
         });
 
         // Обробка вводу для arrival
         const arrivalInput = document.getElementById('arrival');
-        const arrivalSuggestions = document.getElementById('arrival-suggestions');
+        const arrivalSuggestions = document.getElementById('arrival-suggestions'); // Виправлено Elements на Element
         arrivalInput.addEventListener('input', async (e) => {
             const query = e.target.value;
             const cities = await fetchCities(query);
-            arrivalSuggestions.style.display = cities.length >= 0 ? 'block' : 'none';
+            arrivalSuggestions.style.display = cities.length > 0 ? 'block' : 'none';
             arrivalSuggestions.innerHTML = cities.map(city => `
                 <div class="suggestion-item" data-name="${city.name}">${city.name} (${city.category === 'M' ? 'Місто' : 'Село'})</div>
             `).join('');
