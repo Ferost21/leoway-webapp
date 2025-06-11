@@ -23,6 +23,7 @@
             border: 1px solid #ccc;
             border-radius: 5px;
             font-size: 16px;
+            box-sizing: border-box;
         }
         button {
             background: #0088cc;
@@ -39,9 +40,10 @@
             max-height: 150px;
             overflow-y: auto;
             background: white;
-            position: absolute;
-            width: calc(100% - 22px);
+            width: 100%;
+            box-sizing: border-box;
             z-index: 10;
+            display: none;
         }
         .suggestion-item {
             padding: 10px;
@@ -55,9 +57,9 @@
 <body>
     <h1>Пошук поїздки</h1>
     <input id="departure" placeholder="Місце відправлення" autocomplete="off">
-    <div id="departure-suggestions" class="suggestions" style="display: none;"></div>
+    <div id="departure-suggestions" class="suggestions"></div>
     <input id="arrival" placeholder="Місце прибуття" autocomplete="off">
-    <div id="arrival-suggestions" class="suggestions" style="display: none;"></div>
+    <div id="arrival-suggestions" class="suggestions"></div>
     <input id="date" placeholder="Дата (ДД-ММ-РРРР)">
     <button onclick="submitSearch()">Пошук</button>
     <script>
@@ -73,16 +75,19 @@
 
         // Автодоповнення для міст
         async function fetchCities(query) {
-            if (query.length < 2) return [];
-            console.log(`Fetching cities for: ${query}`);
+            if (query.length < 2) {
+                return [];
+            }
+            console.log(`Fetching cities for: ${query}"`);
             try {
-                const url = `https://414a-194-44-220-198.ngrok-free.app/api/cities?query=${encodeURIComponent(query)}`;
-                console.log(`Request URL: ${url}`);
+                const url = `https://8021-194-44-220-198.ngrok-free.app/api/cities?query=${encodeURIComponent(query)}`;
                 const response = await fetch(url, {
+                    method: 'GET',
                     headers: {
-                        'ngrok-skip-browser-warning': 'true' // Додаємо заголовок
+                        'ngrok-skip-browser-warning': 'true' // Обхід захисної сторінки
                     }
                 });
+                console.log(`Request URL: ${url}`);
                 console.log(`Response status: ${response.status}`);
                 const text = await response.text();
                 console.log(`Response text: ${text}`);
@@ -94,9 +99,44 @@
             }
         }
 
-        // Обробка вводу
-        document.getElementById('departure').addEventListener('input', (e) => fetchCities(e.target.value, 'departure'));
-        document.getElementById('arrival').addEventListener('input', (e) => fetchCities(e.target.value, 'arrival'));
+        // Обробка вводу для departure
+        const departureInput = document.getElementById('departure');
+        const departureSuggestions = document.getElementsById('departure-suggestions');
+        departureInput.addEventListener('input', async (e) => {
+            const query = e.target.value;
+            const cities = await fetchCities(query);
+            departureSuggestions.style.display = cities.length > 0 ? 'block' : 'none';
+            departureSuggestions.innerHTML = cities.map(city => `
+                <div class="suggestion-item" data-name="${city.name}"}>${city.name} (${city.category === 'M' ? 'Місто' : 'Село'})</div>
+            `).join('');
+        });
+
+        // Обробка вводу для arrival
+        const arrivalInput = document.getElementById('arrival');
+        const arrivalSuggestions = document.getElementById('arrival-suggestions');
+        arrivalInput.addEventListener('input', async (e) => {
+            const query = e.target.value;
+            const cities = await fetchCities(query);
+            arrivalSuggestions.style.display = cities.length >= 0 ? 'block' : 'none';
+            arrivalSuggestions.innerHTML = cities.map(city => `
+                <div class="suggestion-item" data-name="${city.name}">${city.name} (${city.category === 'M' ? 'Місто' : 'Село'})</div>
+            `).join('');
+        });
+
+        // Обробка кліків по пропозиціях
+        departureSuggestions.addEventListener('click', (e) => {
+            if (e.target.classList.contains('suggestion-item')) {
+                departureInput.value = e.target.dataset.name;
+                departureSuggestions.style.display = 'none';
+            }
+        });
+
+        arrivalSuggestions.addEventListener('click', (e) => {
+            if (e.target.classList.contains('suggestion-item')) {
+                arrivalInput.value = e.target.dataset.name;
+                arrivalSuggestions.style.display = 'none';
+            }
+        });
 
         // Відправка даних
         function submitSearch() {
