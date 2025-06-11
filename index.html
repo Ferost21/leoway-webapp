@@ -72,35 +72,25 @@
         });
 
         // Автодоповнення для міст
-        async function fetchCities(query, field) {
-            console.log('Fetching cities for:', query);
-            if (query.length < 2) {
-                document.getElementById(`${field}-suggestions`).style.display = 'none';
-                return;
-            }
+        async function fetchCities(query) {
+            if (query.length < 2) return [];
+            console.log(`Fetching cities for: ${query}`);
             try {
-                const url = `https://4cd2-194-44-220-198.ngrok-free.app/api/cities?query=${encodeURIComponent(query)}`;
-                console.log('Request URL:', url);
-                const response = await fetch(url);
-                console.log('Response status:', response.status);
-                const text = await response.text();
-                console.log('Response text:', text);
-                const cities = JSON.parse(text);
-                const suggestions = document.getElementById(`${field}-suggestions`);
-                suggestions.innerHTML = '';
-                cities.forEach(city => {
-                    const item = document.createElement('div');
-                    item.className = 'suggestion-item';
-                    item.textContent = `${city.name} (${city.category === 'M' ? 'Місто' : city.category === 'T' ? 'Селище' : city.category === 'C' ? 'Село' : 'Поселення'})`;
-                    item.onclick = () => {
-                        document.getElementById(field).value = city.name;
-                        suggestions.style.display = 'none';
-                    };
-                    suggestions.appendChild(item);
+                const url = `https://414a-194-44-220-198.ngrok-free.app/api/cities?query=${encodeURIComponent(query)}`;
+                console.log(`Request URL: ${url}`);
+                const response = await fetch(url, {
+                    headers: {
+                        'ngrok-skip-browser-warning': 'true' // Додаємо заголовок
+                    }
                 });
-                suggestions.style.display = cities.length ? 'block' : 'none';
-            } catch (e) {
-                console.error('Error fetching cities:', e);
+                console.log(`Response status: ${response.status}`);
+                const text = await response.text();
+                console.log(`Response text: ${text}`);
+                const data = JSON.parse(text);
+                return data;
+            } catch (error) {
+                console.error(`Error fetching cities: ${error}`);
+                return [];
             }
         }
 
