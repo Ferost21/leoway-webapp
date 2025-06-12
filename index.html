@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Пошук поїздки</title>
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <script src="https://telegram.org/js/telegram-web-app.js?v=6.9"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/uk.js"></script>
@@ -75,6 +75,21 @@
             width: 100%;
             margin: 10px 0;
         }
+        .flatpickr-calendar {
+            background: #ffffff !important;
+            border: 2px solid #ccc !important;
+            border-radius: 5px !important;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1) !important;
+            z-index: 10000 !important;
+        }
+        .flatpickr-day {
+            background: #ffffff !important;
+            color: #000000 !important;
+        }
+        .flatpickr-day.selected {
+            background: #0088cc !important;
+            color: #ffffff !important;
+        }
         .flatpickr-input {
             background-color: #ffffff !important;
             border: 2px solid #ccc !important;
@@ -94,17 +109,16 @@
     <script>
         const webApp = window.Telegram.WebApp;
         webApp.ready();
-        webApp.setHeaderColor('#ffffff');
-        webApp.setBackgroundColor('#f0f0f0');
 
-        // Apply theme colors
+        // Apply theme colors manually
         document.addEventListener('DOMContentLoaded', () => {
-            const themeParams = webApp.themeParams;
-            document.body.style.backgroundColor = themeParams.bg_color || '#f0f0f0';
+            const themeParams = webApp.themeParams || { bg_color: '#f0f0f0', text_color: '#000000' };
+            document.body.style.backgroundColor = themeParams.bg_color;
             const inputs = document.querySelectorAll('input');
             inputs.forEach(input => {
-                input.style.backgroundColor = themeParams.bg_color || '#ffffff';
-                input.style.color = themeParams.text_color || '#000000';
+                input.style.backgroundColor = themeParams.bg_color === '#000000' ? '#333333' : '#ffffff';
+                input.style.color = themeParams.text_color;
+                input.style.border = '2px solid #ccc';
             });
 
             // Ініціалізація календаря
@@ -120,6 +134,8 @@
                 if (!fp) {
                     console.error("flatpickr failed to initialize");
                     alert("Помилка ініціалізації календаря. Спробуйте ще раз.");
+                } else {
+                    dateInput.addEventListener('focus', () => fp.open()); // Force open on focus
                 }
             } else {
                 console.error("Date input element not found");
