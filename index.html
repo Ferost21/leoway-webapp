@@ -65,6 +65,20 @@
         }
         #date {
             appearance: auto;
+            background-color: #ffffff;
+            border: 2px solid #ccc;
+            border-radius: 5px;
+            padding: 10px;
+            color: #000000;
+            font-size: 16px;
+            box-sizing: border-box;
+            width: 100%;
+            margin: 10px 0;
+        }
+        .flatpickr-input {
+            background-color: #ffffff !important;
+            border: 2px solid #ccc !important;
+            border-radius: 5px !important;
         }
     </style>
 </head>
@@ -80,15 +94,36 @@
     <script>
         const webApp = window.Telegram.WebApp;
         webApp.ready();
+        webApp.setHeaderColor('#ffffff');
+        webApp.setBackgroundColor('#f0f0f0');
 
-        // Ініціалізація календаря
+        // Apply theme colors
         document.addEventListener('DOMContentLoaded', () => {
-            flatpickr("#date", {
-                dateFormat: "d-m-Y",
-                minDate: "today",
-                locale: "uk",
-                onReady: () => console.log("Date picker initialized")
+            const themeParams = webApp.themeParams;
+            document.body.style.backgroundColor = themeParams.bg_color || '#f0f0f0';
+            const inputs = document.querySelectorAll('input');
+            inputs.forEach(input => {
+                input.style.backgroundColor = themeParams.bg_color || '#ffffff';
+                input.style.color = themeParams.text_color || '#000000';
             });
+
+            // Ініціалізація календаря
+            const dateInput = document.getElementById('date');
+            if (dateInput) {
+                const fp = flatpickr("#date", {
+                    dateFormat: "d-m-Y",
+                    minDate: "today",
+                    locale: "uk",
+                    onReady: () => console.log("Date picker initialized"),
+                    onChange: (selectedDates, dateStr, instance) => console.log("Date selected:", dateStr)
+                });
+                if (!fp) {
+                    console.error("flatpickr failed to initialize");
+                    alert("Помилка ініціалізації календаря. Спробуйте ще раз.");
+                }
+            } else {
+                console.error("Date input element not found");
+            }
         });
 
         // Функція для отримання міст з API
@@ -175,7 +210,8 @@
                 alert('Місце відправлення або прибуття занадто довге (до 255 символів)!');
                 return;
             }
-            const formattedDate = date.split('-').reverse().join('-'); // Adjust if native date format is YYYY-MM-DD
+            const [year, month, day] = date.split('-');
+            const formattedDate = `${day}-${month}-${year}`; // Convert YYYY-MM-DD to DD-MM-YYYY
             webApp.sendData(JSON.stringify({ departure, arrival, date: formattedDate }));
             webApp.close();
         }
