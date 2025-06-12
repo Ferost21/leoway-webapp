@@ -12,7 +12,8 @@
         body {
             font-family: Arial, sans-serif;
             padding: 20px;
-            background: #f0f0f0;
+            background: #ffffff; /* Force light background */
+            color: #000000; /* Force black text */
             max-width: 600px;
             margin: 0 auto;
         }
@@ -24,7 +25,8 @@
             border-radius: 5px;
             font-size: 16px;
             box-sizing: border-box;
-            color: #000000;
+            background-color: #ffffff; /* Ensure light background for inputs */
+            color: #000000; /* Ensure black text in inputs */
         }
         input::placeholder {
             color: #666666;
@@ -70,6 +72,21 @@
         #date {
             appearance: auto;
         }
+        .date-container {
+            position: relative;
+        }
+        #datePrompt {
+            position: absolute;
+            top: 12px;
+            left: 15px;
+            color: #666666;
+            font-size: 14px;
+            pointer-events: none; /* Prevent interaction with label */
+        }
+        #date:focus + #datePrompt,
+        #date:not(:placeholder-shown) + #datePrompt {
+            display: none; /* Hide label when input is focused or has value */
+        }
         .flatpickr-calendar {
             background: #ffffff !important;
             border: 2px solid #ccc !important;
@@ -90,14 +107,6 @@
             border: 2px solid #ccc !important;
             border-radius: 5px !important;
         }
-        body[style*="background-color: #000000"],
-        body[style*="background-color: #1c1c1c"] input {
-            color: #ffffff !important;
-        }
-        body[style*="background-color: #000000"],
-        body[style*="background-color: #1c1c1c"] input::placeholder {
-            color: #999999 !important;
-        }
     </style>
 </head>
 <body>
@@ -106,8 +115,10 @@
     <div id="departure-suggestions" class="suggestions"></div>
     <input id="arrival" placeholder="Місце прибуття" autocomplete="off">
     <div id="arrival-suggestions" class="suggestions"></div>
-    <input id="date" type="date">
-    <span id="datePrompt" style="display: block; margin-top: 5px; color: #666666;">Змінити дату</span>
+    <div class="date-container">
+        <input id="date" type="date">
+        <span id="datePrompt">Змінити дату</span>
+    </div>
     <button onclick="submitSearch()">Пошук</button>
 
     <script>
@@ -115,37 +126,25 @@
         webApp.ready();
 
         document.addEventListener('DOMContentLoaded', () => {
-            const themeParams = webApp.themeParams || { bg_color: '#000000', text_color: '#ffffff' };
-            const isDark = themeParams.bg_color === '#000000' || themeParams.bg_color === '#1c1c1c';
-            document.body.style.backgroundColor = themeParams.bg_color || '#f0f0f0';
+            document.body.style.backgroundColor = '#ffffff'; // Override any dark theme
+            document.body.style.color = '#000000';
 
             const inputs = document.querySelectorAll('input');
             inputs.forEach(input => {
-                input.style.backgroundColor = isDark ? '#333333' : '#ffffff';
-                input.style.color = isDark ? '#ffffff' : '#000000';
+                input.style.backgroundColor = '#ffffff';
+                input.style.color = '#000000';
                 input.style.border = '2px solid #ccc';
-                input.style.caretColor = isDark ? '#ffffff' : '#000000';
+                input.style.caretColor = '#000000';
             });
 
             const dateInput = document.getElementById('date');
-            const datePrompt = document.getElementById('datePrompt');
-            if (dateInput && datePrompt) {
-                dateInput.addEventListener('input', () => {
-                    datePrompt.style.display = dateInput.value ? 'none' : 'block';
-                    datePrompt.style.color = isDark ? '#999999' : '#666666';
-                });
-                datePrompt.style.display = dateInput.value ? 'none' : 'block';
-                datePrompt.style.color = isDark ? '#999999' : '#666666';
-
+            if (dateInput) {
                 const fp = flatpickr("#date", {
                     dateFormat: "d-m-Y",
                     minDate: "today",
                     locale: "uk",
                     onReady: () => console.log("Date picker initialized"),
-                    onChange: (selectedDates, dateStr, instance) => {
-                        console.log("Date selected:", dateStr);
-                        datePrompt.style.display = dateStr ? 'none' : 'block';
-                    }
+                    onChange: (selectedDates, dateStr, instance) => console.log("Date selected:", dateStr)
                 });
                 if (!fp) {
                     console.error("flatpickr failed to initialize");
@@ -154,7 +153,7 @@
                     dateInput.addEventListener('focus', () => fp.open());
                 }
             } else {
-                console.error("Date input or prompt element not found");
+                console.error("Date input element not found");
             }
         });
 
