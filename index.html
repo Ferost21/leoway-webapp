@@ -89,7 +89,7 @@
         async function fetchCities(query) {
             if (query.length < 2) return [];
             try {
-                const response = await fetch(`/api/cities?query=${encodeURIComponent(query)}`, {
+                const response = await fetch(`http://localhost:8000/api/cities?query=${encodeURIComponent(query)}`, {
                     method: 'GET',
                     headers: {
                         'ngrok-skip-browser-warning': 'true'
