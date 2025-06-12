@@ -20,10 +20,14 @@
             width: 100%;
             padding: 10px;
             margin: 10px 0;
-            border: 1px solid #ccc;
+            border: 2px solid #ccc;
             border-radius: 5px;
             font-size: 16px;
             box-sizing: border-box;
+            color: #000000;
+        }
+        input::placeholder {
+            color: #666666;
         }
         button {
             width: 100%;
@@ -65,15 +69,6 @@
         }
         #date {
             appearance: auto;
-            background-color: #ffffff;
-            border: 2px solid #ccc;
-            border-radius: 5px;
-            padding: 10px;
-            color: #000000;
-            font-size: 16px;
-            box-sizing: border-box;
-            width: 100%;
-            margin: 10px 0;
         }
         .flatpickr-calendar {
             background: #ffffff !important;
@@ -95,6 +90,14 @@
             border: 2px solid #ccc !important;
             border-radius: 5px !important;
         }
+        body[style*="background-color: #000000"],
+        body[style*="background-color: #1c1c1c"] input {
+            color: #ffffff !important;
+        }
+        body[style*="background-color: #000000"],
+        body[style*="background-color: #1c1c1c"] input::placeholder {
+            color: #999999 !important;
+        }
     </style>
 </head>
 <body>
@@ -103,46 +106,58 @@
     <div id="departure-suggestions" class="suggestions"></div>
     <input id="arrival" placeholder="Місце прибуття" autocomplete="off">
     <div id="arrival-suggestions" class="suggestions"></div>
-    <input id="date" type="date" placeholder="Дата (ДД-ММ-РРРР)">
+    <input id="date" type="date">
+    <span id="datePrompt" style="display: block; margin-top: 5px; color: #666666;">Змінити дату</span>
     <button onclick="submitSearch()">Пошук</button>
 
     <script>
         const webApp = window.Telegram.WebApp;
         webApp.ready();
 
-        // Apply theme colors manually
         document.addEventListener('DOMContentLoaded', () => {
-            const themeParams = webApp.themeParams || { bg_color: '#f0f0f0', text_color: '#000000' };
-            document.body.style.backgroundColor = themeParams.bg_color;
+            const themeParams = webApp.themeParams || { bg_color: '#000000', text_color: '#ffffff' };
+            const isDark = themeParams.bg_color === '#000000' || themeParams.bg_color === '#1c1c1c';
+            document.body.style.backgroundColor = themeParams.bg_color || '#f0f0f0';
+
             const inputs = document.querySelectorAll('input');
             inputs.forEach(input => {
-                input.style.backgroundColor = themeParams.bg_color === '#000000' ? '#333333' : '#ffffff';
-                input.style.color = themeParams.text_color;
+                input.style.backgroundColor = isDark ? '#333333' : '#ffffff';
+                input.style.color = isDark ? '#ffffff' : '#000000';
                 input.style.border = '2px solid #ccc';
+                input.style.caretColor = isDark ? '#ffffff' : '#000000';
             });
 
-            // Ініціалізація календаря
             const dateInput = document.getElementById('date');
-            if (dateInput) {
+            const datePrompt = document.getElementById('datePrompt');
+            if (dateInput && datePrompt) {
+                dateInput.addEventListener('input', () => {
+                    datePrompt.style.display = dateInput.value ? 'none' : 'block';
+                    datePrompt.style.color = isDark ? '#999999' : '#666666';
+                });
+                datePrompt.style.display = dateInput.value ? 'none' : 'block';
+                datePrompt.style.color = isDark ? '#999999' : '#666666';
+
                 const fp = flatpickr("#date", {
                     dateFormat: "d-m-Y",
                     minDate: "today",
                     locale: "uk",
                     onReady: () => console.log("Date picker initialized"),
-                    onChange: (selectedDates, dateStr, instance) => console.log("Date selected:", dateStr)
+                    onChange: (selectedDates, dateStr, instance) => {
+                        console.log("Date selected:", dateStr);
+                        datePrompt.style.display = dateStr ? 'none' : 'block';
+                    }
                 });
                 if (!fp) {
                     console.error("flatpickr failed to initialize");
                     alert("Помилка ініціалізації календаря. Спробуйте ще раз.");
                 } else {
-                    dateInput.addEventListener('focus', () => fp.open()); // Force open on focus
+                    dateInput.addEventListener('focus', () => fp.open());
                 }
             } else {
-                console.error("Date input element not found");
+                console.error("Date input or prompt element not found");
             }
         });
 
-        // Функція для отримання міст з API
         async function fetchCities(query) {
             if (query.length < 2) return [];
             try {
@@ -166,7 +181,6 @@
             }
         }
 
-        // Обробка вводу для departure
         const departureInput = document.getElementById('departure');
         const departureSuggestions = document.getElementById('departure-suggestions');
         departureInput.addEventListener('input', async (e) => {
@@ -182,7 +196,6 @@
             `).join('');
         });
 
-        // Обробка вводу для arrival
         const arrivalInput = document.getElementById('arrival');
         const arrivalSuggestions = document.getElementById('arrival-suggestions');
         arrivalInput.addEventListener('input', async (e) => {
@@ -198,7 +211,6 @@
             `).join('');
         });
 
-        // Обробка кліків по пропозиціях
         departureSuggestions.addEventListener('click', (e) => {
             if (e.target.classList.contains('suggestion-item')) {
                 departureInput.value = e.target.dataset.name;
@@ -213,7 +225,6 @@
             }
         });
 
-        // Відправка даних
         function submitSearch() {
             const departure = document.getElementById('departure').value.trim();
             const arrival = document.getElementById('arrival').value.trim();
