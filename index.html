@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LeoWay Пошук Поїздки</title>
+    <title>Пошук поїздки</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
@@ -16,7 +16,7 @@
             max-width: 600px;
             margin: 0 auto;
         }
-        input, button {
+        input {
             width: 100%;
             padding: 10px;
             margin: 10px 0;
@@ -26,10 +26,15 @@
             box-sizing: border-box;
         }
         button {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
             background: #0088cc;
             color: white;
             border: none;
+            border-radius: 5px;
             cursor: pointer;
+            font-size: 16px;
         }
         button:hover {
             background: #006699;
@@ -48,9 +53,15 @@
         .suggestion-item {
             padding: 10px;
             cursor: pointer;
+            display: flex;
+            align-items: center;
         }
         .suggestion-item:hover {
             background: #f0f0f0;
+        }
+        .icon {
+            margin-right: 10px;
+            font-size: 14px;
         }
     </style>
 </head>
@@ -62,6 +73,7 @@
     <div id="arrival-suggestions" class="suggestions"></div>
     <input id="date" placeholder="Дата (ДД-ММ-РРРР)">
     <button onclick="submitSearch()">Пошук</button>
+
     <script>
         const webApp = window.Telegram.WebApp;
         webApp.ready();
@@ -73,26 +85,23 @@
             locale: "uk"
         });
 
-        // Автодоповнення для міст
+        // Функція для отримання міст з API
         async function fetchCities(query) {
-            if (query.length < 2) {
-                return [];
-            }
-            console.log(`Fetching cities for: ${query}`);
+            if (query.length < 2) return [];
             try {
-                const url = `https://8021-194-44-220-198.ngrok-free.app/api/cities?query=${encodeURIComponent(query)}`;
-                const response = await fetch(url, {
+                const response = await fetch(`/api/cities?query=${encodeURIComponent(query)}`, {
                     method: 'GET',
                     headers: {
-                        'ngrok-skip-browser-warning': 'true' // Обхід захисної сторінки
+                        'ngrok-skip-browser-warning': 'true'
                     }
                 });
-                console.log(`Request URL: ${url}`);
-                console.log(`Response status: ${response.status}`);
-                const text = await response.text();
-                console.log(`Response text: ${text}`);
-                const data = JSON.parse(text);
-                return data;
+                if (!response.ok) throw new Error('Network response was not ok');
+                const data = await response.json();
+                return data.map(city => ({
+                    code: city.code,
+                    name: city.name,
+                    category: city.category
+                }));
             } catch (error) {
                 console.error(`Error fetching cities: ${error}`);
                 return [];
@@ -101,25 +110,33 @@
 
         // Обробка вводу для departure
         const departureInput = document.getElementById('departure');
-        const departureSuggestions = document.getElementById('departure-suggestions'); // Виправлено Elements на Element
+        const departureSuggestions = document.getElementById('departure-suggestions');
         departureInput.addEventListener('input', async (e) => {
             const query = e.target.value;
             const cities = await fetchCities(query);
             departureSuggestions.style.display = cities.length > 0 ? 'block' : 'none';
             departureSuggestions.innerHTML = cities.map(city => `
-                <div class="suggestion-item" data-name="${city.name}">${city.name} (${city.category === 'M' ? 'Місто' : 'Село'})</div>
+                <div class="suggestion-item" data-name="${city.name}">
+                    <span class="icon">⏰</span> ${city.name} (${city.category === 'M' ? 'Місто' : 
+                        city.category === 'S' ? 'Село' : 
+                        city.category === 'C' ? 'Селище' : 'Інше'})
+                </div>
             `).join('');
         });
 
         // Обробка вводу для arrival
         const arrivalInput = document.getElementById('arrival');
-        const arrivalSuggestions = document.getElementById('arrival-suggestions'); // Виправлено Elements на Element
+        const arrivalSuggestions = document.getElementById('arrival-suggestions');
         arrivalInput.addEventListener('input', async (e) => {
             const query = e.target.value;
             const cities = await fetchCities(query);
             arrivalSuggestions.style.display = cities.length > 0 ? 'block' : 'none';
             arrivalSuggestions.innerHTML = cities.map(city => `
-                <div class="suggestion-item" data-name="${city.name}">${city.name} (${city.category === 'M' ? 'Місто' : 'Село'})</div>
+                <div class="suggestion-item" data-name="${city.name}">
+                    <span class="icon">⏰</span> ${city.name} (${city.category === 'M' ? 'Місто' : 
+                        city.category === 'S' ? 'Село' : 
+                        city.category === 'C' ? 'Селище' : 'Інше'})
+                </div>
             `).join('');
         });
 
