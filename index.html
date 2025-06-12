@@ -75,6 +75,7 @@
     <input id="arrival" placeholder="Місце прибуття" autocomplete="off">
     <div id="arrival-suggestions" class="suggestions"></div>
     <input id="date" type="date" placeholder="Дата (ДД-ММ-РРРР)">
+    <input id="seats" type="number" placeholder="Кількість місць" min="1" max="10">
     <button onclick="submitSearch()">Пошук</button>
 
     <script>
@@ -161,7 +162,8 @@
             const departure = document.getElementById('departure').value.trim();
             const arrival = document.getElementById('arrival').value.trim();
             const date = document.getElementById('date').value.trim();
-            if (!departure || !arrival || !date) {
+            const seats = document.getElementById('seats').value.trim();
+            if (!departure || !arrival || !date || !seats) {
                 alert('Заповніть усі поля!');
                 return;
             }
@@ -171,7 +173,7 @@
             }
             const [year, month, day] = date.split('-');
             const formattedDate = `${day}-${month}-${year}`; // Convert YYYY-MM-DD to DD-MM-YYYY
-            webApp.sendData(JSON.stringify({ departure, arrival, date: formattedDate }));
+            webApp.sendData(JSON.stringify({ departure, arrival, date: formattedDate, seats }));
             webApp.close();
         }
     </script>
