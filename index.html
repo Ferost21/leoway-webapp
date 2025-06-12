@@ -158,11 +158,12 @@
             }
         });
 
-        function submitSearch() {
+        async function submitSearch() {
             const departure = document.getElementById('departure').value.trim();
             const arrival = document.getElementById('arrival').value.trim();
             const date = document.getElementById('date').value.trim();
             const seats = document.getElementById('seats').value.trim();
+
             if (!departure || !arrival || !date || !seats) {
                 alert('Заповніть усі поля!');
                 return;
@@ -171,10 +172,71 @@
                 alert('Місце відправлення або прибуття занадто довге (до 255 символів)!');
                 return;
             }
-            const [year, month, day] = date.split('-');
-            const formattedDate = `${day}-${month}-${year}`; // Convert YYYY-MM-DD to DD-MM-YYYY
-            webApp.sendData(JSON.stringify({ departure, arrival, date: formattedDate, seats }));
-            webApp.close();
+
+            try {
+                const response = await fetch(`https://015f-194-44-220-198.ngrok-free.app/api/search-rides`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'ngrok-skip-browser-warning': 'true'
+                    },
+                    body: JSON.stringify({ departure, arrival, date, seats })
+                });
+                if (!response.ok) throw new Error('Network response was not ok');
+                const rides = await response.json();
+
+                const resultsDiv = document.getElementById('results');
+                resultsDiv.innerHTML = '';
+
+                if (rides.length === 0) {
+                    resultsDiv.innerHTML = '<p>Поїздок не знайдено.</p>';
+                } else {
+                    rides.forEach(ride => {
+                        const rideDiv = document.createElement('div');
+                        rideDiv.className = 'ride-item';
+                        const dt = new Date(ride.departure_time);
+                        const timeStr = dt.toLocaleTimeString('uk-UA', { hour: '2-digit', minute: '2-digit' });
+                        const dateStr = dt.toLocaleDateString('uk-UA', { day: '2-digit', month: '2-digit' });
+                        rideDiv.innerHTML = `
+                            <p>${ride.departure} → ${ride.arrival}</p>
+                            <p>${timeStr}, ${dateStr}</p>
+                            <p>Місць: ${ride.seats_available}/${ride.seats_total} | Ціна: ${ride.price} грн</p>
+                            <p>Водій: ${ride.driver_name} (Рейтинг: ${ride.driver_rating.toFixed(1)})</p>
+                            ${ride.description ? `<p>Опис: ${ride.description}</p>` : ''}
+                            <button class="book-button" onclick="bookRide(${ride.id}, ${seats})">Забронювати</button>
+                        `;
+                        resultsDiv.appendChild(rideDiv);
+                    });
+                }
+            } catch (error) {
+                console.error('Error fetching rides:', error);
+                alert('Помилка при пошуку поїздок: ' + error.message);
+            }
+        }
+
+        async function bookRide(rideId, seats) {
+            const tgId = webApp.initDataUnsafe.user?.id;
+            if (!tgId) {
+                alert('Не вдалося отримати ваш Telegram ID!');
+                return;
+            }
+
+            try {
+                const response = await fetch(`https://015f-194-44-220-198.ngrok-free.app/api/book-ride`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'ngrok-skip-browser-warning': 'true'
+                    },
+                    body: JSON.stringify({ rideId, tgId, seats })
+                });
+                if (!response.ok) throw new Error('Booking failed');
+                const result = await response.json();
+                alert(`Бронювання успішно створено! Номер бронювання: ${result.bookingId}`);
+            } catch (error) {
+                console.error('Error booking ride:', error);
+                alert('Помилка при бронюванні: ' + error.message);
+            }
         }
     </script>
 </body>
