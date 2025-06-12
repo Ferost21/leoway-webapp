@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Пошук поїздки</title>
-    <script src="https://telegram.org/js/telegram-web-app.js?v=6.9"></script>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/uk.js"></script>
@@ -12,8 +12,7 @@
         body {
             font-family: Arial, sans-serif;
             padding: 20px;
-            background: #ffffff; /* Force light background */
-            color: #000000; /* Force black text */
+            background: #f0f0f0;
             max-width: 600px;
             margin: 0 auto;
         }
@@ -21,15 +20,10 @@
             width: 100%;
             padding: 10px;
             margin: 10px 0;
-            border: 2px solid #ccc;
+            border: 1px solid #ccc;
             border-radius: 5px;
             font-size: 16px;
             box-sizing: border-box;
-            background-color: #ffffff; /* Ensure light background for inputs */
-            color: #000000; /* Ensure black text in inputs */
-        }
-        input::placeholder {
-            color: #666666;
         }
         button {
             width: 100%;
@@ -72,32 +66,6 @@
         #date {
             appearance: auto;
         }
-        .date-label {
-            display: block;
-            margin-bottom: 5px;
-            font-size: 14px;
-            color: #666666;
-        }
-        .flatpickr-calendar {
-            background: #ffffff !important;
-            border: 2px solid #ccc !important;
-            border-radius: 5px !important;
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1) !important;
-            z-index: 10000 !important;
-        }
-        .flatpickr-day {
-            background: #ffffff !important;
-            color: #000000 !important;
-        }
-        .flatpickr-day.selected {
-            background: #0088cc !important;
-            color: #ffffff !important;
-        }
-        .flatpickr-input {
-            background-color: #ffffff !important;
-            border: 2px solid #ccc !important;
-            border-radius: 5px !important;
-        }
     </style>
 </head>
 <body>
@@ -106,8 +74,7 @@
     <div id="departure-suggestions" class="suggestions"></div>
     <input id="arrival" placeholder="Місце прибуття" autocomplete="off">
     <div id="arrival-suggestions" class="suggestions"></div>
-    <label class="date-label">Змінити дату</label>
-    <input id="date" type="date">
+    <input id="date" type="date" placeholder="Дата (ДД-ММ-РРРР)">
     <button onclick="submitSearch()">Пошук</button>
 
     <script>
@@ -115,35 +82,12 @@
         webApp.ready();
 
         document.addEventListener('DOMContentLoaded', () => {
-            document.body.style.backgroundColor = '#ffffff'; // Override any dark theme
-            document.body.style.color = '#000000';
-
-            const inputs = document.querySelectorAll('input');
-            inputs.forEach(input => {
-                input.style.backgroundColor = '#ffffff';
-                input.style.color = '#000000';
-                input.style.border = '2px solid #ccc';
-                input.style.caretColor = '#000000';
+            flatpickr("#date", {
+                dateFormat: "d-m-Y",
+                minDate: "today",
+                locale: "uk",
+                onReady: () => console.log("Date picker initialized")
             });
-
-            const dateInput = document.getElementById('date');
-            if (dateInput) {
-                const fp = flatpickr("#date", {
-                    dateFormat: "d-m-Y",
-                    minDate: "today",
-                    locale: "uk",
-                    onReady: () => console.log("Date picker initialized"),
-                    onChange: (selectedDates, dateStr, instance) => console.log("Date selected:", dateStr)
-                });
-                if (!fp) {
-                    console.error("flatpickr failed to initialize");
-                    alert("Помилка ініціалізації календаря. Спробуйте ще раз.");
-                } else {
-                    dateInput.addEventListener('focus', () => fp.open());
-                }
-            } else {
-                console.error("Date input element not found");
-            }
         });
 
         async function fetchCities(query) {
