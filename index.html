@@ -106,6 +106,19 @@
             padding: 10px;
             margin: 10px 0;
             background: white;
+            position: relative; /* Додано для позиціонування ціни */
+            display: flex;
+            flex-direction: column;
+        }
+        .price-tag {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: #28a745;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-weight: bold;
         }
         .book-button {
             background: #28a745;
@@ -265,11 +278,16 @@
                         const timeStr = dt.toLocaleTimeString('uk-UA', { hour: '2-digit', minute: '2-digit' });
                         const dateStr = dt.toLocaleDateString('uk-UA', { day: '2-digit', month: '2-digit' });
                         rideDiv.innerHTML = `
-                            <p>${ride.departure} → ${ride.arrival}</p>
-                            <p>${timeStr}, ${dateStr}</p>
-                            <p>Місць: ${ride.seats_available}/${ride.seats_total} | Ціна: ${ride.price} грн</p>
-                            ${ride.description ? `<p>Опис: ${ride.description}</p>` : ''}
-                            <p>Водій: ${ride.driver_name} ★ ${ride.driver_rating.toFixed(1)}</p>
+                            <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                                <div>
+                                    <p>${ride.departure} → ${ride.arrival}</p>
+                                    <p>${timeStr}, ${dateStr}</p>
+                                    <p>Місць: ${ride.seats_available}/${ride.seats_total}</p>
+                                    ${ride.description ? `<p>Опис: ${ride.description}</p>` : ''}
+                                    <p>Водій: ${ride.driver_name} ★ ${ride.driver_rating.toFixed(1)}</p>
+                                </div>
+                                <div class="price-tag">${ride.price} грн</div>
+                            </div>
                             <button class="book-button" onclick="bookRide(${ride.id}, ${seats})">Забронювати</button>
                         `;
                         modalResults.appendChild(rideDiv);
