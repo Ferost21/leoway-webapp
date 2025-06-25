@@ -91,14 +91,19 @@
         }
         .close {
             color: #aaa;
-            float: right;
-            font-size: 28px;
+            font-size: 24px;
             font-weight: bold;
             cursor: pointer;
-            margin-bottom: 10px;
+            margin-right: 10px;
         }
         .close:hover {
             color: #000;
+        }
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
         }
         .ride-item {
             border: 1px solid #ccc;
@@ -106,7 +111,7 @@
             padding: 10px;
             margin: 10px 0;
             background: white;
-            position: relative; /* Додано для позиціонування ціни */
+            position: relative;
             display: flex;
             flex-direction: column;
         }
@@ -114,8 +119,7 @@
             position: absolute;
             top: 10px;
             right: 10px;
-            background: #28a745;
-            color: white;
+            color: #000;
             padding: 5px 10px;
             border-radius: 5px;
             font-weight: bold;
@@ -142,8 +146,10 @@
     <!-- Модальне вікно для результатів -->
     <div id="modal" class="modal">
         <div class="modal-content">
-            <span class="close" onclick="closeModal()">×</span>
-            <h2>Результати пошуку</h2>
+            <div class="modal-header">
+                <h2 id="modal-title"></h2>
+                <span class="close" onclick="closeModal()">←</span>
+            </div>
             <div id="modal-results"></div>
         </div>
     </div>
@@ -268,6 +274,9 @@
                 const modalResults = document.getElementById('modal-results');
                 modalResults.innerHTML = '';
 
+                const modalTitle = document.getElementById('modal-title');
+                modalTitle.textContent = `${departure} → ${arrival} ${date}`;
+
                 if (rides.length === 0) {
                     modalResults.innerHTML = '<p>Поїздок не знайдено.</p>';
                 } else {
@@ -286,7 +295,7 @@
                                     ${ride.description ? `<p>Опис: ${ride.description}</p>` : ''}
                                     <p>Водій: ${ride.driver_name} ★ ${ride.driver_rating.toFixed(1)}</p>
                                 </div>
-                                <div class="price-tag">${ride.price} грн</div>
+                                <div class="price-tag">${ride.price} ₴</div>
                             </div>
                             <button class="book-button" onclick="bookRide(${ride.id}, ${seats})">Забронювати</button>
                         `;
