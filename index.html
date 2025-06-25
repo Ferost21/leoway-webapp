@@ -93,7 +93,7 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 20px;
+            margin-bottom: 10px;
         }
         .close {
             color: #aaa;
@@ -119,9 +119,9 @@
             top: 10px;
             right: 10px;
             color: #000;
-            padding: 5px 10px;
-            border-radius: 5px;
             font-weight: bold;
+            padding: 0; /* Прибрано padding для чистого тексту */
+            background: none; /* Прибрано фон */
         }
         .book-button {
             background: #28a745;
@@ -146,8 +146,8 @@
     <div id="modal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
-                <span class="close" onclick="closeModal()">🡄</span>
-                <h2>Звідки ← Куди ${document.getElementById('departure')?.value || ''} ← ${document.getElementById('arrival')?.value || ''} ${document.getElementById('date')?.value || ''}</h2>
+                <span class="close" onclick="closeModal()">←</span>
+                <h2>Звідки → Куди <span id="modal-date"></span></h2>
             </div>
             <div id="modal-results"></div>
         </div>
@@ -162,7 +162,10 @@
                 dateFormat: "d-m-Y",
                 minDate: "today",
                 locale: "uk",
-                onReady: () => console.log("Date picker initialized")
+                onReady: () => console.log("Date picker initialized"),
+                onChange: (selectedDates, dateStr) => {
+                    document.getElementById('modal-date').textContent = dateStr;
+                }
             });
         });
 
