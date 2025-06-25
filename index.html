@@ -8,7 +8,65 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/uk.js"></script>
-    <link rel="stylesheet" href="style.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background: #f0f0f0;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        input {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 16px;
+            box-sizing: border-box;
+        }
+        button {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            background: #0088cc;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background: #006699;
+        }
+        .suggestions {
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            max-height: 150px;
+            overflow-y: auto;
+            background: white;
+            width: 100%;
+            box-sizing: border-box;
+            z-index: 10;
+            display: none;
+        }
+        .suggestion-item {
+            padding: 10px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+        }
+        .suggestion-item:hover {
+            background: #f0f0f0;
+        }
+        .icon {
+            margin-right: 10px;
+            font-size: 14px;
+        }
+        #date {
+            appearance: auto;
+        }
+    </style>
 </head>
 <body>
     <h1>Пошук поїздки</h1>
@@ -20,34 +78,6 @@
     <input id="seats" type="number" placeholder="Кількість місць" min="1" max="10">
     <button onclick="submitSearch()">Пошук</button>
     <div id="results"></div>
-
-    <!-- Нижнє меню -->
-    <div class="bottom-nav">
-        <div class="nav-item active" onclick="showSearch()">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0016 9.5 6.5 6.5 0 109.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
-            </svg>
-            <div>Пошук</div>
-        </div>
-        <div class="nav-item" onclick="showCreateRide()">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm5 11h-4v4h-2v-4H7v-2h4V7h2v4h4v2z"/>
-            </svg>
-            <div>Створити</div>
-        </div>
-        <div class="nav-item" onclick="showRides()">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49A1.003 1.003 0 0020 3H6.21l-.94-2H1zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2z"/>
-            </svg>
-            <div>Поїздки</div>
-        </div>
-        <div class="nav-item" onclick="showProfile()">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/>
-            </svg>
-            <div>Профіль</div>
-        </div>
-    </div>
 
     <script>
         const webApp = window.Telegram.WebApp;
@@ -63,7 +93,11 @@
         });
 
         async function fetchCities(query) {
-            if (query.length < 2) return [];
+            if (query.length < 2) {
+                console.log("Query too short, returning empty array");
+                return [];
+            }
+            console.log(`Fetching cities for query: ${query}`);
             try {
                 const response = await fetch(`https://7ed4-194-44-220-198.ngrok-free.app/api/cities?query=${encodeURIComponent(query)}`, {
                     method: 'GET',
@@ -71,8 +105,10 @@
                         'ngrok-skip-browser-warning': 'true'
                     }
                 });
-                if (!response.ok) throw new Error('Network response was not ok');
+                console.log(`Response status: ${response.status}`);
+                if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
                 const data = await response.json();
+                console.log(`Fetched data: ${JSON.stringify(data)}`);
                 return data.map(city => ({
                     code: city.code,
                     name: city.name,
@@ -89,7 +125,9 @@
         const departureSuggestions = document.getElementById('departure-suggestions');
         departureInput.addEventListener('input', async (e) => {
             const query = e.target.value;
+            console.log(`Departure input: ${query}`);
             const cities = await fetchCities(query);
+            console.log(`Cities fetched: ${JSON.stringify(cities)}`);
             departureSuggestions.style.display = cities.length > 0 ? 'block' : 'none';
             departureSuggestions.innerHTML = cities.map(city => `
                 <div class="suggestion-item" data-name="${city.name}">
@@ -104,7 +142,9 @@
         const arrivalSuggestions = document.getElementById('arrival-suggestions');
         arrivalInput.addEventListener('input', async (e) => {
             const query = e.target.value;
+            console.log(`Arrival input: ${query}`);
             const cities = await fetchCities(query);
+            console.log(`Cities fetched: ${JSON.stringify(cities)}`);
             arrivalSuggestions.style.display = cities.length > 0 ? 'block' : 'none';
             arrivalSuggestions.innerHTML = cities.map(city => `
                 <div class="suggestion-item" data-name="${city.name}">
@@ -145,7 +185,7 @@
             }
 
             try {
-                const response = await fetch(`https://015f-194-44-220-198.ngrok-free.app/api/search-rides`, {
+                const response = await fetch(`https://7ed4-194-44-220-198.ngrok-free.app/api/search-rides`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -193,7 +233,7 @@
             }
 
             try {
-                const response = await fetch(`https://015f-194-44-220-198.ngrok-free.app/api/book-ride`, {
+                const response = await fetch(`https://7ed4-194-44-220-198.ngrok-free.app/api/book-ride`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
