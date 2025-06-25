@@ -90,15 +90,15 @@
             flex-direction: column;
         }
         .close {
-            color: #aaa;
+            color: #000;
             float: right;
-            font-size: 28px;
+            font-size: 24px; /* Зменшено розмір для кращого вигляду стрілки */
             font-weight: bold;
             cursor: pointer;
             margin-bottom: 10px;
         }
         .close:hover {
-            color: #000;
+            color: #666;
         }
         .ride-item {
             border: 1px solid #ccc;
@@ -114,7 +114,7 @@
             position: absolute;
             top: 10px;
             right: 10px;
-            color: #000; /* Видалено зелений фон */
+            color: #000; /* Без зеленого фону, чорний текст */
             padding: 5px 10px;
             font-weight: bold;
         }
@@ -269,7 +269,7 @@
                 const modalTitle = document.getElementById('modal-title');
                 const dt = new Date(date);
                 const dateStr = dt.toLocaleDateString('uk-UA', { day: '2-digit', month: '2-digit' });
-                modalTitle.textContent = `🡄 ${departure} → ${arrival} ${dateStr}`;
+                modalTitle.textContent = `${departure} → ${arrival} ${dateStr}`;
 
                 if (rides.length === 0) {
                     modalResults.innerHTML = '<p>Поїздок не знайдено.</p>';
