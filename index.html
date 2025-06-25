@@ -114,11 +114,9 @@
             position: absolute;
             top: 10px;
             right: 10px;
-            color: #000;
+            color: #000; /* Видалено зелений фон */
             padding: 5px 10px;
-            border-radius: 5px;
             font-weight: bold;
-            background: transparent; /* Прибрано зелений фон */
         }
         .book-button {
             background: #28a745;
@@ -268,9 +266,10 @@
                 const modalResults = document.getElementById('modal-results');
                 modalResults.innerHTML = '';
 
+                const modalTitle = document.getElementById('modal-title');
                 const dt = new Date(date);
                 const dateStr = dt.toLocaleDateString('uk-UA', { day: '2-digit', month: '2-digit' });
-                document.getElementById('modal-title').textContent = `${departure} → ${arrival} ${dateStr}`;
+                modalTitle.textContent = `🡄 ${departure} → ${arrival} ${dateStr}`;
 
                 if (rides.length === 0) {
                     modalResults.innerHTML = '<p>Поїздок не знайдено.</p>';
@@ -278,14 +277,14 @@
                     rides.forEach(ride => {
                         const rideDiv = document.createElement('div');
                         rideDiv.className = 'ride-item';
-                        const rideDt = new Date(ride.departure_time);
-                        const timeStr = rideDt.toLocaleTimeString('uk-UA', { hour: '2-digit', minute: '2-digit' });
-                        const rideDateStr = rideDt.toLocaleDateString('uk-UA', { day: '2-digit', month: '2-digit' });
+                        const dt = new Date(ride.departure_time);
+                        const timeStr = dt.toLocaleTimeString('uk-UA', { hour: '2-digit', minute: '2-digit' });
+                        const dateStr = dt.toLocaleDateString('uk-UA', { day: '2-digit', month: '2-digit' });
                         rideDiv.innerHTML = `
                             <div style="display: flex; justify-content: space-between; align-items: flex-start;">
                                 <div>
                                     <p>${ride.departure} → ${ride.arrival}</p>
-                                    <p>${timeStr}, ${rideDateStr}</p>
+                                    <p>${timeStr}, ${dateStr}</p>
                                     <p>Місць: ${ride.seats_available}/${ride.seats_total}</p>
                                     ${ride.description ? `<p>Опис: ${ride.description}</p>` : ''}
                                     <p>Водій: ${ride.driver_name} ★ ${ride.driver_rating.toFixed(1)}</p>
@@ -325,7 +324,7 @@
                 alert(`Бронювання успішно створено! Номер бронювання: ${result.bookingId}`);
             } catch (error) {
                 console.error('Error booking ride:', error);
-                alert('Помилка при бронювання: ' + error.message);
+                alert('Помилка при бронюванні: ' + error.message);
             }
         }
 
