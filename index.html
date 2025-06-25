@@ -89,17 +89,13 @@
             display: flex;
             flex-direction: column;
         }
-        .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 10px;
-        }
         .close {
             color: #aaa;
+            float: right;
             font-size: 28px;
             font-weight: bold;
             cursor: pointer;
+            margin-bottom: 10px;
         }
         .close:hover {
             color: #000;
@@ -119,9 +115,10 @@
             top: 10px;
             right: 10px;
             color: #000;
+            padding: 5px 10px;
+            border-radius: 5px;
             font-weight: bold;
-            padding: 0; /* Прибрано padding для чистого тексту */
-            background: none; /* Прибрано фон */
+            background: transparent; /* Прибрано зелений фон */
         }
         .book-button {
             background: #28a745;
@@ -145,10 +142,8 @@
     <!-- Модальне вікно для результатів -->
     <div id="modal" class="modal">
         <div class="modal-content">
-            <div class="modal-header">
-                <span class="close" onclick="closeModal()">←</span>
-                <h2>Звідки → Куди <span id="modal-date"></span></h2>
-            </div>
+            <span class="close" onclick="closeModal()">🡄</span>
+            <h2 id="modal-title"></h2>
             <div id="modal-results"></div>
         </div>
     </div>
@@ -162,10 +157,7 @@
                 dateFormat: "d-m-Y",
                 minDate: "today",
                 locale: "uk",
-                onReady: () => console.log("Date picker initialized"),
-                onChange: (selectedDates, dateStr) => {
-                    document.getElementById('modal-date').textContent = dateStr;
-                }
+                onReady: () => console.log("Date picker initialized")
             });
         });
 
@@ -276,20 +268,24 @@
                 const modalResults = document.getElementById('modal-results');
                 modalResults.innerHTML = '';
 
+                const dt = new Date(date);
+                const dateStr = dt.toLocaleDateString('uk-UA', { day: '2-digit', month: '2-digit' });
+                document.getElementById('modal-title').textContent = `${departure} → ${arrival} ${dateStr}`;
+
                 if (rides.length === 0) {
                     modalResults.innerHTML = '<p>Поїздок не знайдено.</p>';
                 } else {
                     rides.forEach(ride => {
                         const rideDiv = document.createElement('div');
                         rideDiv.className = 'ride-item';
-                        const dt = new Date(ride.departure_time);
-                        const timeStr = dt.toLocaleTimeString('uk-UA', { hour: '2-digit', minute: '2-digit' });
-                        const dateStr = dt.toLocaleDateString('uk-UA', { day: '2-digit', month: '2-digit' });
+                        const rideDt = new Date(ride.departure_time);
+                        const timeStr = rideDt.toLocaleTimeString('uk-UA', { hour: '2-digit', minute: '2-digit' });
+                        const rideDateStr = rideDt.toLocaleDateString('uk-UA', { day: '2-digit', month: '2-digit' });
                         rideDiv.innerHTML = `
                             <div style="display: flex; justify-content: space-between; align-items: flex-start;">
                                 <div>
                                     <p>${ride.departure} → ${ride.arrival}</p>
-                                    <p>${timeStr}, ${dateStr}</p>
+                                    <p>${timeStr}, ${rideDateStr}</p>
                                     <p>Місць: ${ride.seats_available}/${ride.seats_total}</p>
                                     ${ride.description ? `<p>Опис: ${ride.description}</p>` : ''}
                                     <p>Водій: ${ride.driver_name} ★ ${ride.driver_rating.toFixed(1)}</p>
@@ -329,7 +325,7 @@
                 alert(`Бронювання успішно створено! Номер бронювання: ${result.bookingId}`);
             } catch (error) {
                 console.error('Error booking ride:', error);
-                alert('Помилка при бронюванні: ' + error.message);
+                alert('Помилка при бронювання: ' + error.message);
             }
         }
 
