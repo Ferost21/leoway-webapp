@@ -89,16 +89,20 @@
             display: flex;
             flex-direction: column;
         }
-        .close {
-            color: #000;
-            float: right;
-            font-size: 24px; /* Зменшено розмір для кращого вигляду стрілки */
-            font-weight: bold;
-            cursor: pointer;
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
             margin-bottom: 10px;
         }
+        .close {
+            color: #aaa;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
         .close:hover {
-            color: #666;
+            color: #000;
         }
         .ride-item {
             border: 1px solid #ccc;
@@ -114,9 +118,10 @@
             position: absolute;
             top: 10px;
             right: 10px;
-            color: #000; /* Без зеленого фону, чорний текст */
-            padding: 5px 10px;
+            color: #000;
             font-weight: bold;
+            padding: 0; /* Прибрано padding для чистого тексту */
+            background: none; /* Прибрано фон */
         }
         .book-button {
             background: #28a745;
@@ -140,8 +145,10 @@
     <!-- Модальне вікно для результатів -->
     <div id="modal" class="modal">
         <div class="modal-content">
-            <span class="close" onclick="closeModal()">🡄</span>
-            <h2 id="modal-title"></h2>
+            <div class="modal-header">
+                <span class="close" onclick="closeModal()">←</span>
+                <h2>Звідки → Куди <span id="modal-date"></span></h2>
+            </div>
             <div id="modal-results"></div>
         </div>
     </div>
@@ -155,7 +162,10 @@
                 dateFormat: "d-m-Y",
                 minDate: "today",
                 locale: "uk",
-                onReady: () => console.log("Date picker initialized")
+                onReady: () => console.log("Date picker initialized"),
+                onChange: (selectedDates, dateStr) => {
+                    document.getElementById('modal-date').textContent = dateStr;
+                }
             });
         });
 
@@ -265,11 +275,6 @@
 
                 const modalResults = document.getElementById('modal-results');
                 modalResults.innerHTML = '';
-
-                const modalTitle = document.getElementById('modal-title');
-                const dt = new Date(date);
-                const dateStr = dt.toLocaleDateString('uk-UA', { day: '2-digit', month: '2-digit' });
-                modalTitle.textContent = `${departure} → ${arrival} ${dateStr}`;
 
                 if (rides.length === 0) {
                     modalResults.innerHTML = '<p>Поїздок не знайдено.</p>';
