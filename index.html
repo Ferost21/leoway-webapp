@@ -8,112 +8,7 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/uk.js"></script>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            padding: 20px;
-            background: #f0f0f0;
-            max-width: 600px;
-            margin: 0 auto;
-            padding-bottom: 80px; /* Місце для нижнього меню */
-        }
-        input {
-            width: 100%;
-            padding: 10px;
-            margin: 10px 0;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            font-size: 16px;
-            box-sizing: border-box;
-        }
-        button {
-            width: 100%;
-            padding: 10px;
-            margin: 10px 0;
-            background: #0088cc;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 16px;
-        }
-        button:hover {
-            background: #006699;
-        }
-        .suggestions {
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            max-height: 150px;
-            overflow-y: auto;
-            background: white;
-            width: 100%;
-            box-sizing: border-box;
-            z-index: 10;
-            display: none;
-        }
-        .suggestion-item {
-            padding: 10px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-        }
-        .suggestion-item:hover {
-            background: #f0f0f0;
-        }
-        .icon {
-            margin-right: 10px;
-            font-size: 14px;
-        }
-        #date {
-            appearance: auto;
-        }
-        .ride-item {
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            padding: 10px;
-            margin: 10px 0;
-            background: white;
-        }
-        .book-button {
-            background: #28a745;
-        }
-        .book-button:hover {
-            background: #218838;
-        }
-        /* Нижнє меню */
-        .bottom-nav {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            background: #fff;
-            border-top: 1px solid #ccc;
-            display: flex;
-            justify-content: space-around;
-            padding: 10px 0;
-            box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1);
-            z-index: 1000;
-        }
-        .nav-item {
-            text-align: center;
-            flex: 1;
-            cursor: pointer;
-            padding: 5px;
-            font-size: 14px;
-            color: #333;
-        }
-        .nav-item.active {
-            color: #0088cc;
-        }
-        .nav-item svg {
-            width: 24px;
-            height: 24px;
-            margin-bottom: 5px;
-        }
-        .nav-item:hover {
-            background: #f0f0f0;
-        }
-    </style>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <h1>Пошук поїздки</h1>
@@ -315,25 +210,20 @@
             }
         }
 
-        // Функції для нижнього меню
         function showSearch() {
-            // Уже на сторінці пошуку
             alert('Ви вже на сторінці пошуку!');
         }
 
         function showCreateRide() {
             alert('Функція створення поїздки ще в розробці');
-            // Тут можна додати реальну логіку для створення поїздки
         }
 
         function showRides() {
             alert('Функція перегляду поїздок ще в розробці');
-            // Тут можна додати реальну логіку для перегляду поїздок
         }
 
         function showProfile() {
             alert('Функція профілю ще в розробці');
-            // Тут можна додати реальну логіку для профілю
         }
     </script>
 </body>
