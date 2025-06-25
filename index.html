@@ -269,7 +269,7 @@
                             <p>${timeStr}, ${dateStr}</p>
                             <p>Місць: ${ride.seats_available}/${ride.seats_total} | Ціна: ${ride.price} грн</p>
                             ${ride.description ? `<p>Опис: ${ride.description}</p>` : ''}
-                            <p>Водій: ${ride.driver_name} (Рейтинг: ${ride.driver_rating.toFixed(1)})</p>
+                            <p>Водій: ${ride.driver_name} ★ ${ride.driver_rating.toFixed(1)}</p>
                             <button class="book-button" onclick="bookRide(${ride.id}, ${seats})">Забронювати</button>
                         `;
                         modalResults.appendChild(rideDiv);
