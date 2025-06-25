@@ -1,3 +1,4 @@
+```html
 <!DOCTYPE html>
 <html lang="uk">
 <head>
@@ -165,9 +166,8 @@
             });
         });
 
-        // Визначаємо API URL
-        const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-        const apiBaseUrl = isLocal ? 'http://localhost:8000' : 'https://015f-194-44-220-198.ngrok-free.app';
+        // Визначаємо API URL для Mini App
+        const apiBaseUrl = 'https://e29f-194-44-220-198.ngrok-free.app'; // Актуальний ngrok URL
 
         async function fetchCities(query) {
             if (query.length < 2) return [];
