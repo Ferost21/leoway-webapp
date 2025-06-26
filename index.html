@@ -94,7 +94,34 @@
             justify-content: space-between;
             align-items: center;
             margin-bottom: 10px;
+            text-align: center;
         }
+
+        #modal-title {
+            flex-grow: 1;
+            text-align: center;
+            font-size: 18px;
+            margin: 0;
+        }
+
+        .back-button {
+            width: 30px;
+            height: 30px;
+            font-size: 24px;
+            font-weight: bold;
+            color: #444;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            border-radius: 5px;
+            user-select: none;
+        }
+
+        .back-button:hover {
+            background-color: #eee;
+        }
+
         .close {
             background: none;
             border: none;
@@ -150,9 +177,10 @@
     <div id="modal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
-                <button class="close" onclick="closeModal()">←</button>
-                <h2 id="modal-title" style="margin: 0 auto; text-align: center;"></h2>
-            </div>
+    <div class="back-button" onclick="closeModal()">🡄</div>
+    <h2 id="modal-title"></h2>
+    <div style="width: 30px;"></div> <!-- Для симетрії зліва і справа -->
+</div>
             <div id="modal-results"></div>
         </div>
     </div>
@@ -250,6 +278,14 @@
             }
         });
 
+        function formatShortDate(dateStr) {
+            const parts = dateStr.split('-');
+            if (parts.length === 3) {
+                return `${parts[0]}.${parts[1]}`; // дд.мм
+            }
+            return dateStr;
+        }
+
         async function submitSearch() {
             const departure = document.getElementById('departure').value.trim();
             const arrival = document.getElementById('arrival').value.trim();
@@ -305,14 +341,7 @@
                         modalResults.appendChild(rideDiv);
                     });
                 }
-                // Форматування дати
-                const [day, month] = date.split('-');
-                const formattedDate = `${day}.${month}`;
-
-                // Оновлюємо заголовок
-                const modalTitle = `${departure} → ${arrival} ${formattedDate}`;
-                document.getElementById('modal-title').textContent = modalTitle;
-
+                document.getElementById('modal-title').textContent = `${departure} → ${arrival} ${formatShortDate(date)}`;
                 document.getElementById('modal').style.display = 'block';
             } catch (error) {
                 console.error('Error fetching rides:', error);
