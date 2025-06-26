@@ -26,7 +26,6 @@
         }
         input {
             border: 1px solid #ccc;
-            background-color: white; /* Забезпечуємо білий фон для всіх input */
         }
         button {
             background: #28a745;
@@ -44,9 +43,9 @@
             overflow-y: auto;
             background: white;
             display: none;
-            position: absolute;
-            width: 100%;
-            z-index: 10;
+            position: absolute; /* Зміна на абсолютне позиціонування */
+            width: 100%; /* Ширина збігається з полем вводу */
+            z-index: 10; /* Забезпечуємо відображення поверх інших елементів */
         }
         .suggestion-item {
             padding: 10px;
@@ -62,25 +61,7 @@
             font-size: 14px;
         }
         #date {
-            appearance: auto; /* Дозволяємо стандартний вигляд, але додаємо стилі */
-            background-color: white; /* Білий фон для мобільних */
-            color: #333; /* Темний текст для видимості */
-        }
-
-        @media (max-width: 600px) { /* Стилі для мобільних */
-            #date {
-                background-color: white; /* Перевизначаємо фон для мобільних */
-                color: #333; /* Забезпечуємо видимість тексту */
-                padding: 12px; /* Трохи більше padding для кращого вигляду */
-                font-size: 16px; /* Зберігаємо розмір тексту */
-            }
-            #date::-webkit-datetime-edit {
-                color: #333; /* Забезпечуємо видимість тексту в Chrome на Android */
-            }
-            #date::-webkit-inner-spin-button,
-            #date::-webkit-calendar-picker-indicator {
-                display: none; /* Прибираємо стандартні стрілки, якщо заважають */
-            }
+            appearance: auto;
         }
 
         .modal {
@@ -228,12 +209,7 @@
             flatpickr("#date", {
                 dateFormat: "d-m-Y",
                 minDate: "today",
-                locale: "uk",
-                placeholder: "Дата (ДД-ММ-РРРР)", // Додаємо placeholder через Flatpickr
-                onReady: () => {
-                    const dateInput = document.getElementById('date');
-                    dateInput.placeholder = "Дата (ДД-ММ-РРРР)"; // Додаткове забезпечення placeholder
-                }
+                locale: "uk"
             });
         });
 
@@ -257,13 +233,13 @@
 
             input.addEventListener('input', async (e) => {
                 const query = e.target.value;
-                const rect = input.getBoundingClientRect();
+                const rect = input.getBoundingClientRect(); // Отримуємо координати поля вводу
                 const cities = await fetchCities(query);
                 suggestions.style.display = cities.length > 0 ? 'block' : 'none';
                 suggestions.style.position = 'absolute';
-                suggestions.style.top = `${rect.bottom + window.scrollY}px`;
-                suggestions.style.left = `${rect.left + window.scrollX}px`;
-                suggestions.style.width = `${rect.width}px`;
+                suggestions.style.top = `${rect.bottom + window.scrollY}px`; // Розташування під полем
+                suggestions.style.left = `${rect.left + window.scrollX}px`; // Збігається з лівим краєм поля
+                suggestions.style.width = `${rect.width}px`; // Ширина збігається з полем
                 suggestions.innerHTML = cities.map(city => `
                     <div class="suggestion-item" data-name="${city.name}">
                         <span class="icon">📍</span> ${city.name} (${city.category === 'M' ? 'Місто' :
@@ -280,6 +256,7 @@
                 }
             });
 
+            // При кліку поза полем чи списком ховаємо suggestions
             document.addEventListener('click', (e) => {
                 if (!input.contains(e.target) && !suggestions.contains(e.target)) {
                     suggestions.style.display = 'none';
