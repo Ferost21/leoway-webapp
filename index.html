@@ -43,8 +43,9 @@
             overflow-y: auto;
             background: white;
             display: none;
-            position: relative;
-            z-index: 10;
+            position: absolute; /* Зміна на абсолютне позиціонування */
+            width: 100%; /* Ширина збігається з полем вводу */
+            z-index: 10; /* Забезпечуємо відображення поверх інших елементів */
         }
         .suggestion-item {
             padding: 10px;
@@ -72,17 +73,17 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0); /* Початково прозорий */
+            background: rgba(0, 0, 0, 0);
             z-index: 1000;
-            transition: background 0.3s ease; /* Додаємо плавний перехід */
+            transition: background 0.3s ease;
         }
 
         .modal.show {
-            background: rgba(0, 0, 0, 0.5); /* Коли активне — затемнене */
+            background: rgba(0, 0, 0, 0.5);
         }
 
         .modal.closing {
-            background: rgba(0, 0, 0, 0); /* Плавне зникнення */
+            background: rgba(0, 0, 0, 0);
         }
         .modal-content {
             background: white;
@@ -231,8 +232,14 @@
             const suggestions = document.getElementById(suggestionsId);
 
             input.addEventListener('input', async (e) => {
-                const cities = await fetchCities(e.target.value);
+                const query = e.target.value;
+                const rect = input.getBoundingClientRect(); // Отримуємо координати поля вводу
+                const cities = await fetchCities(query);
                 suggestions.style.display = cities.length > 0 ? 'block' : 'none';
+                suggestions.style.position = 'absolute';
+                suggestions.style.top = `${rect.bottom + window.scrollY}px`; // Розташування під полем
+                suggestions.style.left = `${rect.left + window.scrollX}px`; // Збігається з лівим краєм поля
+                suggestions.style.width = `${rect.width}px`; // Ширина збігається з полем
                 suggestions.innerHTML = cities.map(city => `
                     <div class="suggestion-item" data-name="${city.name}">
                         <span class="icon">📍</span> ${city.name} (${city.category === 'M' ? 'Місто' :
@@ -245,6 +252,13 @@
                 const item = e.target.closest('.suggestion-item');
                 if (item) {
                     input.value = item.dataset.name;
+                    suggestions.style.display = 'none';
+                }
+            });
+
+            // При кліку поза полем чи списком ховаємо suggestions
+            document.addEventListener('click', (e) => {
+                if (!input.contains(e.target) && !suggestions.contains(e.target)) {
                     suggestions.style.display = 'none';
                 }
             });
