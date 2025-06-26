@@ -16,25 +16,22 @@
             max-width: 600px;
             margin: 0 auto;
         }
-        input {
+        input, button {
             width: 100%;
             padding: 10px;
             margin: 10px 0;
-            border: 1px solid #ccc;
-            border-radius: 5px;
             font-size: 16px;
             box-sizing: border-box;
+            border-radius: 5px;
+        }
+        input {
+            border: 1px solid #ccc;
         }
         button {
-            width: 100%;
-            padding: 10px;
-            margin: 10px 0;
             background: #0088cc;
             color: white;
             border: none;
-            border-radius: 5px;
             cursor: pointer;
-            font-size: 16px;
         }
         button:hover {
             background: #006699;
@@ -45,10 +42,9 @@
             max-height: 150px;
             overflow-y: auto;
             background: white;
-            width: 100%;
-            box-sizing: border-box;
-            z-index: 10;
             display: none;
+            position: relative;
+            z-index: 10;
         }
         .suggestion-item {
             padding: 10px;
@@ -66,35 +62,61 @@
         #date {
             appearance: auto;
         }
+
         .modal {
-            display: none;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.5);
+            background: rgba(0, 0, 0, 0); /* Початково прозорий */
             z-index: 1000;
+            transition: background 0.3s ease; /* Додаємо плавний перехід */
+        }
+
+        .modal.show {
+            background: rgba(0, 0, 0, 0.5); /* Коли активне — затемнене */
+        }
+
+        .modal.closing {
+            background: rgba(0, 0, 0, 0); /* Плавне зникнення */
         }
         .modal-content {
             background: white;
-            margin: 0;
-            padding: 20px;
-            border-radius: 0;
             width: 100%;
+            max-width: 600px;
             height: 100%;
-            max-height: none;
             overflow-y: auto;
             box-sizing: border-box;
-            display: flex;
-            flex-direction: column;
+            padding: 20px;
+            border-radius: 0;
+            position: relative;
+            transform: translateX(100%);
+            animation: slideIn 0.3s forwards;
         }
+
+        .modal.closing .modal-content {
+            animation: slideOut 0.3s forwards;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(100%); }
+            to { transform: translateX(0); }
+        }
+
+        @keyframes slideOut {
+            from { transform: translateX(0); }
+            to { transform: translateX(100%); }
+        }
+
         .modal-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
             margin-bottom: 10px;
-            text-align: center;
         }
 
         #modal-title {
@@ -115,26 +137,12 @@
             align-items: center;
             cursor: pointer;
             border-radius: 5px;
-            user-select: none;
         }
 
         .back-button:hover {
             background-color: #eee;
         }
 
-        .close {
-            background: none;
-            border: none;
-            font-size: 24px;
-            font-weight: bold;
-            color: #333;
-            cursor: pointer;
-            padding: 5px 10px;
-            margin: 0;
-        }
-        .close:hover {
-            color: #000;
-        }
         .ride-item {
             border: 1px solid #ccc;
             border-radius: 5px;
@@ -145,19 +153,22 @@
             display: flex;
             flex-direction: column;
         }
+
         .price-tag {
             position: absolute;
             top: 10px;
             right: 10px;
             color: #000;
             font-weight: bold;
-            padding: 0; /* Прибрано padding для чистого тексту */
-            background: none; /* Прибрано фон */
         }
+
         .book-button {
             background: #28a745;
             margin-top: 5px;
+            color: white;
+            border: none;
         }
+
         .book-button:hover {
             background: #218838;
         }
@@ -173,19 +184,18 @@
     <input id="seats" type="number" placeholder="Кількість місць" min="1" max="10">
     <button onclick="submitSearch()">Пошук</button>
 
-    <!-- Модальне вікно для результатів -->
-    <div id="modal" class="modal">
+    <!-- Модальне вікно -->
+    <div id="modal" class="modal" style="display: none;">
         <div class="modal-content">
             <div class="modal-header">
-    <div class="back-button" onclick="closeModal()">
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-        <path d="M15 18L9 12L15 6" stroke="#444" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-    </svg>
-</div>
-
-    <h2 id="modal-title"></h2>
-    <div style="width: 30px;"></div> <!-- Для симетрії зліва і справа -->
-</div>
+                <div class="back-button" onclick="closeModal()">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                        <path d="M15 18L9 12L15 6" stroke="#444" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </div>
+                <h2 id="modal-title"></h2>
+                <div style="width: 30px;"></div>
+            </div>
             <div id="modal-results"></div>
         </div>
     </div>
@@ -198,97 +208,54 @@
             flatpickr("#date", {
                 dateFormat: "d-m-Y",
                 minDate: "today",
-                locale: "uk",
-                onReady: () => console.log("Date picker initialized"),
-                onChange: (selectedDates, dateStr) => {
-                    document.getElementById('modal-date').textContent = dateStr;
-                }
+                locale: "uk"
             });
         });
 
         async function fetchCities(query) {
-            if (query.length < 2) {
-                console.log("Query too short, returning empty array");
-                return [];
-            }
-            console.log(`Fetching cities for query: ${query}`);
-            try {
-                const response = await fetch(`https://027f-194-44-220-198.ngrok-free.app/api/cities?query=${encodeURIComponent(query)}`, {
-                    method: 'GET',
-                    headers: {
-                        'ngrok-skip-browser-warning': 'true'
-                    }
-                });
-                console.log(`Response status: ${response.status}`);
-                if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
-                const data = await response.json();
-                console.log(`Fetched data: ${JSON.stringify(data)}`);
-                return data.map(city => ({
-                    code: city.code,
-                    name: city.name,
-                    category: city.category
-                }));
-            } catch (error) {
-                console.error(`Error fetching cities: ${error}`);
-                alert(`Помилка завантаження міст: ${error.message}`);
-                return [];
-            }
+            if (query.length < 2) return [];
+            const response = await fetch(`https://027f-194-44-220-198.ngrok-free.app/api/cities?query=${encodeURIComponent(query)}`, {
+                headers: { 'ngrok-skip-browser-warning': 'true' }
+            });
+            if (!response.ok) return [];
+            const data = await response.json();
+            return data.map(city => ({
+                code: city.code,
+                name: city.name,
+                category: city.category
+            }));
         }
 
-        const departureInput = document.getElementById('departure');
-        const departureSuggestions = document.getElementById('departure-suggestions');
-        departureInput.addEventListener('input', async (e) => {
-            const query = e.target.value;
-            console.log(`Departure input: ${query}`);
-            const cities = await fetchCities(query);
-            console.log(`Cities fetched: ${JSON.stringify(cities)}`);
-            departureSuggestions.style.display = cities.length > 0 ? 'block' : 'none';
-            departureSuggestions.innerHTML = cities.map(city => `
-                <div class="suggestion-item" data-name="${city.name}">
-                    <span class="icon">📍</span> ${city.name} (${city.category === 'M' ? 'Місто' : 
-                        city.category === 'S' ? 'Село' : 
+        function setupSuggestions(inputId, suggestionsId) {
+            const input = document.getElementById(inputId);
+            const suggestions = document.getElementById(suggestionsId);
+
+            input.addEventListener('input', async (e) => {
+                const cities = await fetchCities(e.target.value);
+                suggestions.style.display = cities.length > 0 ? 'block' : 'none';
+                suggestions.innerHTML = cities.map(city => `
+                    <div class="suggestion-item" data-name="${city.name}">
+                        <span class="icon">📍</span> ${city.name} (${city.category === 'M' ? 'Місто' :
+                        city.category === 'S' ? 'Село' :
                         city.category === 'C' ? 'Селище' : 'Інше'})
-                </div>
-            `).join('');
-        });
+                    </div>`).join('');
+            });
 
-        const arrivalInput = document.getElementById('arrival');
-        const arrivalSuggestions = document.getElementById('arrival-suggestions');
-        arrivalInput.addEventListener('input', async (e) => {
-            const query = e.target.value;
-            console.log(`Arrival input: ${query}`);
-            const cities = await fetchCities(query);
-            console.log(`Cities fetched: ${JSON.stringify(cities)}`);
-            arrivalSuggestions.style.display = cities.length > 0 ? 'block' : 'none';
-            arrivalSuggestions.innerHTML = cities.map(city => `
-                <div class="suggestion-item" data-name="${city.name}">
-                    <span class="icon">📍</span> ${city.name} (${city.category === 'M' ? 'Місто' : 
-                        city.category === 'S' ? 'Село' : 
-                        city.category === 'C' ? 'Селище' : 'Інше'})
-                </div>
-            `).join('');
-        });
+            suggestions.addEventListener('click', (e) => {
+                const item = e.target.closest('.suggestion-item');
+                if (item) {
+                    input.value = item.dataset.name;
+                    suggestions.style.display = 'none';
+                }
+            });
+        }
 
-        departureSuggestions.addEventListener('click', (e) => {
-            if (e.target.classList.contains('suggestion-item')) {
-                departureInput.value = e.target.dataset.name;
-                departureSuggestions.style.display = 'none';
-            }
-        });
-
-        arrivalSuggestions.addEventListener('click', (e) => {
-            if (e.target.classList.contains('suggestion-item')) {
-                arrivalInput.value = e.target.dataset.name;
-                arrivalSuggestions.style.display = 'none';
-            }
-        });
+        setupSuggestions('departure', 'departure-suggestions');
+        setupSuggestions('arrival', 'arrival-suggestions');
 
         function formatShortDate(dateStr) {
             const parts = dateStr.split('-');
-            if (parts.length === 3) {
-                return `${parts[0]}.${parts[1]}`; // дд.мм
-            }
-            return dateStr;
+            return parts.length === 3 ? `${parts[0]}.${parts[1]}` : dateStr;
         }
 
         async function submitSearch() {
@@ -297,17 +264,11 @@
             const date = document.getElementById('date').value.trim();
             const seats = document.getElementById('seats').value.trim();
 
-            if (!departure || !arrival || !date || !seats) {
-                alert('Заповніть усі поля!');
-                return;
-            }
-            if (departure.length > 255 || arrival.length > 255) {
-                alert('Місце відправлення або прибуття занадто довге (до 255 символів)!');
-                return;
-            }
+            if (!departure || !arrival || !date || !seats) return alert('Заповніть усі поля!');
+            if (departure.length > 255 || arrival.length > 255) return alert('Назви місць мають бути до 255 символів!');
 
             try {
-                const response = await fetch(`https://027f-194-44-220-198.ngrok-free.app/api/search-rides`, {
+                const res = await fetch(`https://027f-194-44-220-198.ngrok-free.app/api/search-rides`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -315,54 +276,48 @@
                     },
                     body: JSON.stringify({ departure, arrival, date, seats })
                 });
-                if (!response.ok) throw new Error(`Network response was not ok`);
-                const rides = await response.json();
-
+                if (!res.ok) throw new Error('Не вдалося отримати поїздки');
+                const rides = await res.json();
                 const modalResults = document.getElementById('modal-results');
-                modalResults.innerHTML = '';
-
-                if (rides.length === 0) {
-                    modalResults.innerHTML = '<p>Поїздок не знайдено.</p>';
-                } else {
-                    rides.forEach(ride => {
-                        const rideDiv = document.createElement('div');
-                        rideDiv.className = 'ride-item';
+                modalResults.innerHTML = rides.length === 0
+                    ? '<p>Поїздок не знайдено.</p>'
+                    : rides.map(ride => {
                         const dt = new Date(ride.departure_time);
                         const timeStr = dt.toLocaleTimeString('uk-UA', { hour: '2-digit', minute: '2-digit' });
                         const dateStr = dt.toLocaleDateString('uk-UA', { day: '2-digit', month: '2-digit' });
-                        rideDiv.innerHTML = `
-                            <div style="display: flex; justify-content: space-between; align-items: flex-start;">
-                                <div>
-                                    <p>${ride.departure} → ${ride.arrival}</p>
-                                    <p>${timeStr}, ${dateStr}</p>
-                                    <p>Місць: ${ride.seats_available}/${ride.seats_total}</p>
-                                    ${ride.description ? `<p>Опис: ${ride.description}</p>` : ''}
-                                    <p>Водій: ${ride.driver_name} ★ ${ride.driver_rating.toFixed(1)}</p>
+                        return `
+                            <div class="ride-item">
+                                <div style="display: flex; justify-content: space-between;">
+                                    <div>
+                                        <p>${ride.departure} → ${ride.arrival}</p>
+                                        <p>${timeStr}, ${dateStr}</p>
+                                        <p>Місць: ${ride.seats_available}/${ride.seats_total}</p>
+                                        ${ride.description ? `<p>Опис: ${ride.description}</p>` : ''}
+                                        <p>Водій: ${ride.driver_name} ★ ${ride.driver_rating.toFixed(1)}</p>
+                                    </div>
+                                    <div class="price-tag">${ride.price} ₴</div>
                                 </div>
-                                <div class="price-tag">${ride.price} ₴</div>
-                            </div>
-                            <button class="book-button" onclick="bookRide(${ride.id}, ${seats})">Забронювати</button>
-                        `;
-                        modalResults.appendChild(rideDiv);
-                    });
-                }
+                                <button class="book-button" onclick="bookRide(${ride.id}, ${seats})">Забронювати</button>
+                            </div>`;
+                    }).join('');
                 document.getElementById('modal-title').textContent = `${departure} → ${arrival} ${formatShortDate(date)}`;
-                document.getElementById('modal').style.display = 'block';
-            } catch (error) {
-                console.error('Error fetching rides:', error);
-                alert('Помилка при пошуку поїздок: ' + error.message);
+                const modal = document.getElementById('modal');
+                modal.style.display = 'flex';
+                requestAnimationFrame(() => {
+                    modal.classList.add('show');
+                });
+                modal.classList.remove('closing');
+            } catch (err) {
+                console.error(err);
+                alert('Помилка при пошуку поїздок: ' + err.message);
             }
         }
 
         async function bookRide(rideId, seats) {
             const tgId = webApp.initDataUnsafe.user?.id;
-            if (!tgId) {
-                alert('Не вдалося отримати ваш Telegram ID!');
-                return;
-            }
-
+            if (!tgId) return alert('Не вдалося отримати ваш Telegram ID!');
             try {
-                const response = await fetch(`https://027f-194-44-220-198.ngrok-free.app/api/book-ride`, {
+                const res = await fetch(`https://027f-194-44-220-198.ngrok-free.app/api/book-ride`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -370,33 +325,22 @@
                     },
                     body: JSON.stringify({ rideId, tgId, seats })
                 });
-                if (!response.ok) throw new Error('Booking failed');
-                const result = await response.json();
-                alert(`Бронювання успішно створено! Номер бронювання: ${result.bookingId}`);
-            } catch (error) {
-                console.error('Error booking ride:', error);
-                alert('Помилка при бронюванні: ' + error.message);
+                if (!res.ok) throw new Error('Помилка бронювання');
+                const result = await res.json();
+                alert(`Бронювання створено! Номер: ${result.bookingId}`);
+            } catch (err) {
+                alert('Помилка при бронюванні: ' + err.message);
             }
         }
 
-        function showSearch() {
-            alert('Ви вже на сторінці пошуку!');
-        }
-
-        function showCreateRide() {
-            alert('Функція створення поїздки ще в розробці');
-        }
-
-        function showRides() {
-            alert('Функція перегляду поїздок ще в розробці');
-        }
-
-        function showProfile() {
-            alert('Функція профілю ще в розробці');
-        }
-
         function closeModal() {
-            document.getElementById('modal').style.display = 'none';
+            const modal = document.getElementById('modal');
+            modal.classList.add('closing');
+            modal.classList.remove('show');
+            setTimeout(() => {
+                modal.style.display = 'none';
+                modal.classList.remove('closing');
+            }, 300);
         }
     </script>
 </body>
