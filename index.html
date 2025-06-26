@@ -15,6 +15,7 @@
             background: #f0f0f0;
             max-width: 600px;
             margin: 0 auto;
+            position: relative; /* Додано для позиціонування кнопки */
         }
         input, button {
             width: 100%;
@@ -62,14 +63,14 @@
             font-size: 14px;
         }
         #date {
-            appearance: none; /* Відключаємо нативний вигляд для кращого контролю */
+            appearance: none;
             background-color: white;
             color: #333;
             padding: 10px;
             cursor: pointer;
         }
 
-        @media (max-width: 600px) { /* Стилі для мобільних */
+        @media (max-width: 600px) {
             #date {
                 background-color: white;
                 color: #333;
@@ -77,10 +78,10 @@
                 font-size: 16px;
             }
             #date.flatpickr-input {
-                color: #333; /* Забезпечуємо видимість тексту в кастомному полі */
+                color: #333;
             }
             .flatpickr-calendar {
-                z-index: 1001; /* Забезпечуємо відображення календаря поверх інших елементів */
+                z-index: 1001;
             }
         }
 
@@ -193,12 +194,43 @@
         .book-button:hover {
             background: #218838;
         }
+
+        /* Стиль для кнопки зміни місць */
+        .swap-button {
+            position: absolute;
+            top: 35.5%;
+            right: 10px;
+            transform: translateY(-50%);
+            width: 40px;
+            height: 40px;
+            background-color: #28a745;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            z-index: 20; /* Вище за інші елементи */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 0;
+        }
+
+        .swap-button:hover {
+            background-color: #218838;
+        }
+
+        .swap-button svg {
+            width: 20px;
+            height: 20px;
+            fill: white;
+        }
     </style>
 </head>
 <body>
     <h1>Пошук поїздки</h1>
     <input id="departure" placeholder="Місце відправлення" autocomplete="off">
     <div id="departure-suggestions" class="suggestions"></div>
+     <button class="swap-button" onclick="swapLocations()">⇅</button>
+    </button>
     <input id="arrival" placeholder="Місце прибуття" autocomplete="off">
     <div id="arrival-suggestions" class="suggestions"></div>
     <input id="date" type="text" placeholder="Дата (ДД-ММ-РРРР)" readonly>
@@ -230,10 +262,10 @@
                 dateFormat: "d-m-Y",
                 minDate: "today",
                 locale: "uk",
-                disableMobile: true, // Вимикаємо нативний вибір дати на мобільних
+                disableMobile: true,
                 onReady: () => {
                     const dateInput = document.getElementById('date');
-                    dateInput.placeholder = "Дата (ДД-ММ-РРРР)"; // Забезпечуємо placeholder
+                    dateInput.placeholder = "Дата (ДД-ММ-РРРР)";
                 }
             });
         });
@@ -294,6 +326,13 @@
         function formatShortDate(dateStr) {
             const parts = dateStr.split('-');
             return parts.length === 3 ? `${parts[0]}.${parts[1]}` : dateStr;
+        }
+
+        function swapLocations() {
+            const departure = document.getElementById('departure').value;
+            const arrival = document.getElementById('arrival').value;
+            document.getElementById('departure').value = arrival;
+            document.getElementById('arrival').value = departure;
         }
 
         async function submitSearch() {
