@@ -26,7 +26,7 @@
         }
         input {
             border: 1px solid #ccc;
-            background-color: white; /* Забезпечуємо білий фон для всіх input */
+            background-color: white;
         }
         button {
             background: #28a745;
@@ -62,24 +62,25 @@
             font-size: 14px;
         }
         #date {
-            appearance: auto; /* Дозволяємо стандартний вигляд, але додаємо стилі */
-            background-color: white; /* Білий фон для мобільних */
-            color: #333; /* Темний текст для видимості */
+            appearance: none; /* Відключаємо нативний вигляд для кращого контролю */
+            background-color: white;
+            color: #333;
+            padding: 10px;
+            cursor: pointer;
         }
 
         @media (max-width: 600px) { /* Стилі для мобільних */
             #date {
-                background-color: white; /* Перевизначаємо фон для мобільних */
-                color: #333; /* Забезпечуємо видимість тексту */
-                padding: 12px; /* Трохи більше padding для кращого вигляду */
-                font-size: 16px; /* Зберігаємо розмір тексту */
+                background-color: white;
+                color: #333;
+                padding: 12px;
+                font-size: 16px;
             }
-            #date::-webkit-datetime-edit {
-                color: #333; /* Забезпечуємо видимість тексту в Chrome на Android */
+            #date.flatpickr-input {
+                color: #333; /* Забезпечуємо видимість тексту в кастомному полі */
             }
-            #date::-webkit-inner-spin-button,
-            #date::-webkit-calendar-picker-indicator {
-                display: none; /* Прибираємо стандартні стрілки, якщо заважають */
+            .flatpickr-calendar {
+                z-index: 1001; /* Забезпечуємо відображення календаря поверх інших елементів */
             }
         }
 
@@ -200,7 +201,7 @@
     <div id="departure-suggestions" class="suggestions"></div>
     <input id="arrival" placeholder="Місце прибуття" autocomplete="off">
     <div id="arrival-suggestions" class="suggestions"></div>
-    <input id="date" type="date" placeholder="Дата (ДД-ММ-РРРР)">
+    <input id="date" type="text" placeholder="Дата (ДД-ММ-РРРР)" readonly>
     <input id="seats" type="number" placeholder="Кількість місць" min="1" max="10">
     <button onclick="submitSearch()">Пошук</button>
 
@@ -229,10 +230,10 @@
                 dateFormat: "d-m-Y",
                 minDate: "today",
                 locale: "uk",
-                placeholder: "Дата (ДД-ММ-РРРР)", // Додаємо placeholder через Flatpickr
+                disableMobile: true, // Вимикаємо нативний вибір дати на мобільних
                 onReady: () => {
                     const dateInput = document.getElementById('date');
-                    dateInput.placeholder = "Дата (ДД-ММ-РРРР)"; // Додаткове забезпечення placeholder
+                    dateInput.placeholder = "Дата (ДД-ММ-РРРР)"; // Забезпечуємо placeholder
                 }
             });
         });
