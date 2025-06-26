@@ -207,12 +207,15 @@
             border: none;
             border-radius: 5px;
             cursor: pointer;
-            z-index: 20; /* Вище за інші елементи */
+            z-index: 5; /* Було 20 — тепер нижче, ніж .suggestions */
             display: flex;
             justify-content: center;
             align-items: center;
             padding: 0;
+            color: white;
+            font-size: 18px;
         }
+
 
         .swap-button:hover {
             background-color: #218838;
