@@ -283,17 +283,7 @@
         const webApp = window.Telegram.WebApp;
         webApp.ready();
 
-        // Ініціалізація кнопки "назад" Telegram
-        const backButton = webApp.BackButton;
-        backButton.onClick(() => {
-            const modal = document.getElementById('modal');
-            if (modal.style.display === 'flex' || modal.classList.contains('show')) {
-                closeModal();
-            } else {
-                webApp.close();
-            }
-        });
-        backButton.show();
+        let isModalOpen = false;
 
         document.addEventListener('DOMContentLoaded', () => {
             flatpickr("#date", {
@@ -326,6 +316,16 @@
 
             // Ініціалізація видимості при завантаженні
             updateSwapButtonVisibility();
+
+            // Обробка кнопки "назад" через Telegram WebApp
+            webApp.BackButton.onClick(() => {
+                if (isModalOpen) {
+                    closeModal();
+                } else {
+                    webApp.close();
+                }
+            });
+            webApp.BackButton.show();
         });
 
         async function fetchCities(query) {
@@ -445,6 +445,7 @@
                     modal.classList.add('show');
                 });
                 modal.classList.remove('closing');
+                isModalOpen = true;
             } catch (err) {
                 console.error(err);
                 alert('Помилка при пошуку поїздок: ' + err.message);
@@ -478,6 +479,7 @@
             setTimeout(() => {
                 modal.style.display = 'none';
                 modal.classList.remove('closing');
+                isModalOpen = false;
             }, 300);
         }
     </script>
