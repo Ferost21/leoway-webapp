@@ -279,6 +279,10 @@
         webApp.ready();
 
         document.addEventListener('DOMContentLoaded', () => {
+            webApp.ready();
+
+            Telegram.WebApp.BackButton.hide(); // 💥 Скидаємо кнопку назад при кожному завантаженні
+
             flatpickr("#date", {
                 dateFormat: "d-m-Y",
                 minDate: "today",
