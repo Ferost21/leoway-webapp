@@ -9,57 +9,13 @@
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/uk.js"></script>
     <style>
-        :root {
-            --bg-color: #f0f0f0;
-            --text-color: #333;
-            --input-bg: #fff;
-            --input-border: #ccc;
-            --button-bg: #28a745;
-            --button-hover-bg: #218838;
-            --suggestions-bg: #fff;
-            --suggestions-border: #ccc;
-            --modal-bg: #eee;
-            --modal-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-            --ride-bg: #fff;
-            --ride-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-            --ride-hover-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
-            --price-color: #000;
-            --no-rides-color: #666;
-            --back-button-hover: #eee;
-            --modal-title-bg: #fff;
-            --subtitle-color: #555;
-        }
-
-        [data-theme="dark"] {
-            --bg-color: #1c2526;
-            --text-color: #e0e0e0;
-            --input-bg: #2c383a;
-            --input-border: #444;
-            --button-bg: #28a745;
-            --button-hover-bg: #218838;
-            --suggestions-bg: #2c383a;
-            --suggestions-border: #444;
-            --modal-bg: #252e2f;
-            --modal-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
-            --ride-bg: #2c383a;
-            --ride-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
-            --ride-hover-shadow: 0 6px 15px rgba(0, 0, 0, 0.4);
-            --price-color: #e0e0e0;
-            --no-rides-color: #a0a0a0;
-            --back-button-hover: #333;
-            --modal-title-bg: #252e2f;
-            --subtitle-color: #b0b0b0;
-        }
-
         body {
             font-family: Arial, sans-serif;
             padding: 20px;
-            background: var(--bg-color);
-            color: var(--text-color);
+            background: #f0f0f0;
             max-width: 600px;
             margin: 0 auto;
             position: relative;
-            transition: background 0.3s, color 0.3s;
         }
         input, button {
             width: 100%;
@@ -68,29 +24,26 @@
             font-size: 16px;
             box-sizing: border-box;
             border-radius: 5px;
-            border: 1px solid var(--input-border);
-            background-color: var(--input-bg);
-            color: var(--text-color);
         }
-        input::placeholder {
-            color: var(--text-color);
-            opacity: 0.7;
+        input {
+            border: 1px solid #ccc;
+            background-color: white;
         }
         button {
-            background: var(--button-bg);
+            background: #28a745;
             color: white;
             border: none;
             cursor: pointer;
         }
         button:hover {
-            background: var(--button-hover-bg);
+            background: #218838;
         }
         .suggestions {
-            border: 1px solid var(--suggestions-border);
+            border: 1px solid #ccc;
             border-radius: 5px;
             max-height: 150px;
             overflow-y: auto;
-            background: var(--suggestions-bg);
+            background: white;
             display: none;
             position: absolute;
             width: 100%;
@@ -99,28 +52,27 @@
         .suggestion-item {
             padding: 10px;
             cursor: pointer;
-            color: var(--text-color);
         }
         .suggestion-item:hover {
-            background: var(--input-bg);
+            background: #f0f0f0;
         }
         #date {
             appearance: none;
-            background-color: var(--input-bg);
-            color: var(--text-color);
+            background-color: white;
+            color: #333;
             padding: 10px;
             cursor: pointer;
         }
 
         @media (max-width: 600px) {
             #date {
-                background-color: var(--input-bg);
-                color: var(--text-color);
+                background-color: white;
+                color: #333;
                 padding: 12px;
                 font-size: 16px;
             }
             #date.flatpickr-input {
-                color: var(--text-color);
+                color: #333;
             }
             .flatpickr-calendar {
                 z-index: 1001;
@@ -149,7 +101,7 @@
             background: rgba(0, 0, 0, 0);
         }
         .modal-content {
-            background: var(--modal-bg);
+            background: #eee;
             width: 100%;
             max-width: 600px;
             height: 100%;
@@ -160,7 +112,6 @@
             position: relative;
             transform: translateX(100%);
             animation: slideIn 0.3s forwards;
-            box-shadow: var(--modal-shadow);
         }
 
         .modal.closing .modal-content {
@@ -190,7 +141,6 @@
             text-align: center;
             font-size: 18px;
             margin: 0;
-            color: var(--text-color);
         }
 
         .back-button {
@@ -198,7 +148,7 @@
             height: 30px;
             font-size: 24px;
             font-weight: bold;
-            color: var(--text-color);
+            color: #444;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -207,13 +157,13 @@
         }
 
         .back-button:hover {
-            background-color: var(--back-button-hover);
+            background-color: #eee;
         }
 
         .ride-item {
             border-radius: 12px;
-            box-shadow: var(--ride-shadow);
-            background: var(--ride-bg);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            background: white;
             border: none;
             padding: 15px 20px;
             margin: 12px 0;
@@ -221,15 +171,14 @@
             display: flex;
             flex-direction: column;
             gap: 8px;
-            color: var(--text-color);
         }
 
         .ride-top {
             display: flex;
             justify-content: space-between;
-            align-items: flex-start;
+            align-items: flex-start; /* 👈 вирівнює верхній край */
         }
-        .ride-route p {
+                .ride-route p {
             margin: 4px 0;
         }
         .route {
@@ -237,35 +186,34 @@
             font-size: 16px;
         }
         .ride-item:hover {
-            box-shadow: var(--ride-hover-shadow);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
         }
         .ride-item > .ride-info {
             display: flex;
             justify-content: space-between;
-            align-items: center;
-            margin-bottom: 10px;
+            align-items: center; /* вертикальне вирівнювання */
+            margin-bottom: 10px; /* відступ від нижнього тексту */
         }
         .price-tag {
             font-weight: bold;
             font-size: 18px;
             margin-top: 4px;
             margin-right: 4px;
-            color: var(--price-color);
         }
 
         .book-button {
-            background: var(--button-bg);
+            background: #28a745;
             color: white;
             border: none;
             padding: 10px;
             font-size: 15px;
             border-radius: 6px;
-            margin-top: 4px;
+            margin-top: 4px; /* Було більше — зменшено */
             cursor: pointer;
         }
 
         .book-button:hover {
-            background: var(--button-hover-bg);
+            background: #218838;
         }
         
         .input-wrapper {
@@ -273,9 +221,10 @@
         }
 
         .input-wrapper input {
-            padding-right: 40px;
+            padding-right: 40px; /* Місце для кнопки всередині input */
         }
 
+        /* Стиль для кнопки зміни місць */
         .swap-button {
             position: absolute;
             top: 33%;
@@ -290,28 +239,28 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            opacity: 0;
-            transition: opacity 0.3s ease;
+            opacity: 0; /* Початкова прозорість для плавного з’явлення */
+            transition: opacity 0.3s ease; /* Плавна анімація з’явлення/зникнення */
             z-index: 2;
         }
 
         .swap-button.visible {
-            opacity: 1;
+            opacity: 1; /* Показати кнопку, коли є дані */
         }
 
         .swap-button:hover {
-            background: rgba(40, 167, 69, 0.1);
+            background: rgba(40, 167, 69, 0.1); /* Легкий зелений фон при наведенні */
         }
 
         .swap-button:active {
-            background: rgba(33, 136, 56, 0.2);
+            background: rgba(33, 136, 56, 0.2); /* Темніший зелений при натисканні */
         }
 
         .swap-button::after {
-            content: "⇅";
-            font-size: 20px;
-            color: var(--text-color);
-            line-height: 1;
+            content: "⇅"; /* Іконка стрілочок */
+            font-size: 20px; /* Збільшено розмір для кращого центрування */
+            color: #666; /* Сірий колір за замовчуванням */
+            line-height: 1; /* Нормалізація висоти рядка */
             display: flex;
             align-items: center;
             justify-content: center;
@@ -320,24 +269,24 @@
         }
 
         .swap-button:hover::after {
-            color: var(--button-bg);
+            color: #28a745; /* Зелений колір при наведенні */
         }
 
         .swap-button:active::after {
-            color: var(--button-hover-bg);
+            color: #218838; /* Темніший зелений при натисканні */
         }
         .no-rides {
             text-align: center;
             font-size: 18px;
-            color: var(--no-rides-color);
+            color: #666;
             margin-top: 30vh;
         }
         .modal-title-box {
             margin-top: 0;
-            background: var(--modal-title-bg);
+            background: #fff;
             border-bottom-left-radius: 12px;
             border-bottom-right-radius: 12px;
-            box-shadow: var(--modal-shadow);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
             text-align: center;
             padding: 12px 18px;
             width: 100%;
@@ -347,6 +296,12 @@
         #modal-results {
             padding: 0 20px;
         }
+        #modal-title {
+            font-size: 18px;
+            margin: 0;
+        }
+
+/**/
     </style>
 </head>
 <body>
@@ -376,43 +331,21 @@
         const webApp = window.Telegram.WebApp;
         webApp.ready();
 
-        let currentDateValue = ''; // Змінна для збереження поточного значення дати
+        document.addEventListener('DOMContentLoaded', () => {
+            webApp.ready();
 
-        // Отримуємо початкову тему та застосовуємо її
-        function applyTheme() {
-            const theme = webApp.colorScheme || 'light';
-            currentDateValue = document.getElementById('date').value; // Зберігаємо поточне значення дати
-            document.body.setAttribute('data-theme', theme);
-            // Переініціалізація Flatpickr з збереженням значення
+            Telegram.WebApp.BackButton.hide(); // 💥 Скидаємо кнопку назад при кожному завантаженні
+
             flatpickr("#date", {
                 dateFormat: "d-m-Y",
                 minDate: "today",
                 locale: "uk",
                 disableMobile: true,
-                defaultDate: currentDateValue || "today",
                 onReady: () => {
                     const dateInput = document.getElementById('date');
                     dateInput.placeholder = "Дата (ДД-ММ-РРРР)";
-                    if (currentDateValue) {
-                        dateInput.value = currentDateValue; // Відновлюємо значення
-                    }
                 }
             });
-            if (theme === 'dark') {
-                flatpickr(".flatpickr-input", { theme: 'dark' });
-            } else {
-                flatpickr(".flatpickr-input", { theme: 'light' });
-            }
-        }
-
-        // Оновлюємо тему при зміні
-        webApp.onEvent('themeChanged', applyTheme);
-        applyTheme();
-
-        document.addEventListener('DOMContentLoaded', () => {
-            webApp.ready();
-
-            Telegram.WebApp.BackButton.hide();
 
             // Функція для управління видимістю кнопки
             function updateSwapButtonVisibility() {
@@ -440,37 +373,14 @@
                 if (modal.classList.contains('show')) {
                     closeModal();
                 } else {
-                    Telegram.WebApp.close();
+                    Telegram.WebApp.close(); // Ховає WebApp, не закриває повністю
                 }
             });
 
             window.history.pushState({ modalOpen: true }, '');
+            // Додаємо стан до історії при відкритті модального вікна
+            // window.history.pushState({ modalOpen: true }, document.title);
         });
-
-        // Функція для нормалізації дати
-        function normalizeDate(dateStr) {
-            if (!dateStr) return '';
-
-            // Спробуємо розібрати як dd-mm-yyyy (формат Flatpickr)
-            const ddmmyyyy = dateStr.match(/^(\d{2})-(\d{2})-(\d{4})$/);
-            if (ddmmyyyy) return dateStr; // Якщо вже у правильному форматі, повертаємо як є
-
-            // Спробуємо розібрати як yyyy-mm-dd
-            const yyyymmdd = dateStr.match(/^(\d{4})-(\d{2})-(\d{2})$/);
-            if (yyyymmdd) {
-                return `${yyyymmdd[3]}-${yyyymmdd[2]}-${yyyymmdd[1]}`;
-            }
-
-            // Спробуємо розібрати як mm/dd/yyyy
-            const mmddyyyy = dateStr.match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
-            if (mmddyyyy) {
-                return `${mmddyyyy[2]}-${mmddyyyy[1]}-${mmddyyyy[3]}`;
-            }
-
-            // Якщо формат не розпізнано, видамо помилку
-            console.error('Невідомий формат дати:', dateStr);
-            return '';
-        }
 
         async function fetchCities(query) {
             if (query.length < 2) return [];
@@ -479,6 +389,7 @@
             });
             if (!response.ok) return [];
             const data = await response.json();
+            // Унікалізація за назвою міста
             const uniqueCities = [];
             const seenNames = new Set();
             data.forEach(city => {
@@ -542,14 +453,8 @@
         async function submitSearch() {
             const departure = document.getElementById('departure').value.trim();
             const arrival = document.getElementById('arrival').value.trim();
-            let date = document.getElementById('date').value.trim();
+            const date = document.getElementById('date').value.trim();
             const seats = document.getElementById('seats').value.trim();
-
-            // Нормалізуємо дату перед відправкою
-            date = normalizeDate(date);
-            if (!date) {
-                return alert('Невірний формат дати! Використовуйте ДД-ММ-РРРР, РРРР-ММ-ДД або ММ/ДД/РРРР.');
-            }
 
             if (!departure || !arrival || !date || !seats) return alert('Заповніть усі поля!');
             if (departure.length > 255 || arrival.length > 255) return alert('Назви місць мають бути до 255 символів!');
@@ -587,7 +492,8 @@
                                 <button class="book-button" onclick="bookRide(${ride.id}, ${seats})">Забронювати</button>
                             </div>`;
                     }).join('');
-                document.getElementById('modal-title').textContent = `${departure} → ${arrival}`;
+                document.getElementById('modal-title').textContent =
+                    `${departure} → ${arrival}`;
 
                 const modalTitleBox = document.querySelector('.modal-title-box');
                 const oldSubtitle = modalTitleBox.querySelector('p');
@@ -596,10 +502,12 @@
                 const subtitle = document.createElement('p');
                 subtitle.style.margin = '4px 0 0';
                 subtitle.style.fontSize = '14px';
-                subtitle.style.color = 'var(--subtitle-color)';
+                subtitle.style.color = '#555';
 
                 const seatsNumber = parseInt(seats);
-                const seatWord = seatsNumber === 1 ? 'пасажир' : (seatsNumber >= 2 && seatsNumber <= 4 ? 'пасажири' : 'пасажирів');
+                const seatWord =
+                    seatsNumber === 1 ? 'пасажир' :
+                    (seatsNumber >= 2 && seatsNumber <= 4 ? 'пасажири' : 'пасажирів');
 
                 subtitle.textContent = `${formatShortDate(date)}, ${seatsNumber} ${seatWord}`;
                 modalTitleBox.appendChild(subtitle);
@@ -610,14 +518,17 @@
                 });
                 modal.classList.remove('closing');
 
+                // Показати кнопку назад Telegram
                 Telegram.WebApp.BackButton.show();
                 Telegram.WebApp.BackButton.onClick(() => {
                     closeModal();
                 });
 
+                // Додаємо стан до історії після показу модального
                 setTimeout(() => {
                     window.history.pushState({ modalOpen: true }, '');
                 }, 100);
+
             } catch (err) {
                 console.error(err);
                 alert('Помилка при пошуку поїздок: ' + err.message);
@@ -651,7 +562,7 @@
             setTimeout(() => {
                 modal.style.display = 'none';
                 modal.classList.remove('closing');
-                Telegram.WebApp.BackButton.hide();
+                Telegram.WebApp.BackButton.hide(); // ❗️ховаємо back-кнопку Telegram
             }, 300);
         }
     </script>
