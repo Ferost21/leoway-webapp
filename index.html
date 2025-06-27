@@ -283,6 +283,8 @@
         const webApp = window.Telegram.WebApp;
         webApp.ready();
 
+        let isModalOpen = false;
+
         document.addEventListener('DOMContentLoaded', () => {
             flatpickr("#date", {
                 dateFormat: "d-m-Y",
@@ -315,16 +317,16 @@
             // Ініціалізація видимості при завантаженні
             updateSwapButtonVisibility();
 
-            // Обробка кнопки "назад" на телефоні
-            window.addEventListener('popstate', () => {
-                const modal = document.getElementById('modal');
-                if (modal.style.display === 'flex' || modal.classList.contains('show')) {
+            // Налаштування кнопки "назад" Telegram WebApp
+            const backButton = webApp.BackButton;
+            backButton.onClick(() => {
+                if (isModalOpen) {
                     closeModal();
+                } else {
+                    webApp.close(); // Згортаємо додаток на головному екрані
                 }
             });
-
-            // Додаємо стан до історії при відкритті модального вікна
-            window.history.pushState({ modalOpen: true }, document.title);
+            backButton.show();
         });
 
         async function fetchCities(query) {
@@ -444,8 +446,8 @@
                     modal.classList.add('show');
                 });
                 modal.classList.remove('closing');
-                // Додаємо стан до історії при відкритті модального вікна
-                window.history.pushState({ modalOpen: true }, document.title);
+                isModalOpen = true;
+                backButton.show(); // Показуємо кнопку "назад" при відкритті модального вікна
             } catch (err) {
                 console.error(err);
                 alert('Помилка при пошуку поїздок: ' + err.message);
@@ -479,8 +481,8 @@
             setTimeout(() => {
                 modal.style.display = 'none';
                 modal.classList.remove('closing');
-                // Повертаємо стан історії назад
-                window.history.back();
+                isModalOpen = false;
+                backButton.show(); // Залишаємо кнопку "назад" видимою на головному екрані
             }, 300);
         }
     </script>
