@@ -289,6 +289,12 @@
             const modal = document.getElementById('modal');
             if (modal.style.display === 'flex' || modal.classList.contains('show')) {
                 closeModal();
+            } else {
+                // Якщо модального вікна немає, дозволяємо Telegram згорнути додаток
+                backButton.offClick(); // Відключаємо обробник, щоб Telegram обробив подію
+                backButton.hide(); // Приховуємо кнопку, щоб уникнути конфліктів
+                webApp.BackButton.onClick(null); // Скидаємо обробник
+                window.history.back(); // Дозволяємо стандартну поведінку
             }
         });
         backButton.show();
