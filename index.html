@@ -107,7 +107,7 @@
             height: 100%;
             overflow-y: auto;
             box-sizing: border-box;
-            padding: 65px 20px 20px;
+            padding: 0 0 20px;
             border-radius: 0;
             position: relative;
             transform: translateX(100%);
@@ -282,21 +282,20 @@
             margin-top: 30vh;
         }
         .modal-title-box {
-            margin: 0;
-            padding: 12px 18px;
-            width: 100vw; /* вся ширина вікна */
+            margin-top: 0;
             background: #fff;
             border-bottom-left-radius: 12px;
             border-bottom-right-radius: 12px;
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
             text-align: center;
-            position: fixed;
-            top: 0;
-            left: 0;
-            z-index: 1001;
+            padding: 12px 18px;
+            width: 100%;
             box-sizing: border-box;
+            z-index: 1001;
         }
-
+        #modal-results {
+            padding: 0 20px;
+        }
         #modal-title {
             font-size: 18px;
             margin: 0;
@@ -321,13 +320,10 @@
     <!-- Модальне вікно -->
     <div id="modal" class="modal" style="display: none;">
         <div class="modal-content">
-            <div class="modal-header">
-                <div class="modal-title-box">
-                    <h2 id="modal-title"></h2>
-                </div>
-                <!-- <div style="width: 30px;"></div> -->
+            <div class="modal-title-box">
+                <h2 id="modal-title"></h2>
             </div>
-            <div id="modal-results"></div> <!-- 🔧 Ось це додай -->
+            <div id="modal-results"></div>
         </div>
     </div>
 
