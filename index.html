@@ -404,19 +404,6 @@
                 onReady: () => {
                     const dateInput = document.getElementById('date');
                     dateInput.placeholder = "Дата (ДД-ММ-РРРР)";
-                },
-                // Додаємо обробку введення для формату mm/dd/yyyy
-                onChange: function(selectedDates, dateStr, instance) {
-                    const dateInput = document.getElementById('date');
-                    if (dateStr && !/^\d{2}-\d{2}-\d{4}$/.test(dateStr)) {
-                        // Спробуємо конвертувати mm/dd/yyyy в dd-mm-yyyy
-                        const parts = dateStr.split('/');
-                        if (parts.length === 3 && !isNaN(Date.parse(dateStr))) {
-                            const normalizedDate = `${parts[1]}-${parts[0]}-${parts[2]}`;
-                            dateInput.value = normalizedDate;
-                            instance.setDate(normalizedDate, true); // Оновлюємо Flatpickr
-                        }
-                    }
                 }
             });
 
@@ -520,19 +507,37 @@
             document.getElementById('arrival').value = departure;
         }
 
+        // Функція для нормалізації формату дати
+        function normalizeDate(dateStr) {
+            // Спробуємо парсити як mm/dd/yyyy
+            const mmddyyyyRegex = /^(\d{2})\/(\d{2})\/(\d{4})$/;
+            const match = dateStr.match(mmddyyyyRegex);
+            if (match) {
+                const month = match[1];
+                const day = match[2];
+                const year = match[3];
+                return `${day}-${month}-${year}`; // Конвертуємо до dd-mm-yyyy
+            }
+            // Якщо вже у форматі dd-mm-yyyy, залишаємо як є
+            const ddmmyyyyRegex = /^(\d{2})-(\d{2})-(\d{4})$/;
+            if (dateStr.match(ddmmyyyyRegex)) {
+                return dateStr;
+            }
+            // Якщо формат некоректний, повертаємо помилку
+            throw new Error('Некоректний формат дати. Використовуйте ДД-ММ-РРРР або ММ/ДД/РРРР.');
+        }
+
         async function submitSearch() {
             const departure = document.getElementById('departure').value.trim();
             const arrival = document.getElementById('arrival').value.trim();
             let date = document.getElementById('date').value.trim();
             const seats = document.getElementById('seats').value.trim();
 
-            // Нормалізуємо дату, якщо введено у форматі mm/dd/yyyy
-            if (date && !/^\d{2}-\d{2}-\d{4}$/.test(date)) {
-                const parts = date.split('/');
-                if (parts.length === 3 && !isNaN(Date.parse(date))) {
-                    date = `${parts[1]}-${parts[0]}-${parts[2]}`;
-                    document.getElementById('date').value = date; // Оновлюємо поле
-                }
+            // Нормалізуємо формат дати
+            try {
+                date = normalizeDate(date);
+            } catch (err) {
+                return alert(err.message);
             }
 
             if (!departure || !arrival || !date || !seats) return alert('Заповніть усі поля!');
