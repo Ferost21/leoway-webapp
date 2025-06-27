@@ -317,16 +317,19 @@
             // Ініціалізація видимості при завантаженні
             updateSwapButtonVisibility();
 
-            // Налаштування кнопки "назад" Telegram WebApp
-            const backButton = webApp.BackButton;
-            backButton.onClick(() => {
+            // Обробка кнопки "назад" на телефоні
+            window.addEventListener('popstate', () => {
+                const modal = document.getElementById('modal');
                 if (isModalOpen) {
                     closeModal();
                 } else {
-                    webApp.close(); // Згортаємо додаток на головному екрані
+                    // Дозволяємо Telegram згорнути додаток на головному екрані
+                    webApp.close();
                 }
             });
-            backButton.show();
+
+            // Ініціалізація початкового стану
+            window.history.replaceState({ page: 'home' }, document.title);
         });
 
         async function fetchCities(query) {
@@ -447,7 +450,7 @@
                 });
                 modal.classList.remove('closing');
                 isModalOpen = true;
-                backButton.show(); // Показуємо кнопку "назад" при відкритті модального вікна
+                window.history.pushState({ page: 'modal' }, document.title);
             } catch (err) {
                 console.error(err);
                 alert('Помилка при пошуку поїздок: ' + err.message);
@@ -482,7 +485,7 @@
                 modal.style.display = 'none';
                 modal.classList.remove('closing');
                 isModalOpen = false;
-                backButton.show(); // Залишаємо кнопку "назад" видимою на головному екрані
+                window.history.back();
             }, 300);
         }
     </script>
