@@ -440,6 +440,31 @@
             window.history.pushState({ modalOpen: true }, '');
         });
 
+        // Функція для нормалізації дати
+        function normalizeDate(dateStr) {
+            if (!dateStr) return '';
+
+            // Спробуємо розібрати як dd-mm-yyyy (формат Flatpickr)
+            const ddmmyyyy = dateStr.match(/^(\d{2})-(\d{2})-(\d{4})$/);
+            if (ddmmyyyy) return dateStr; // Якщо вже у правильному форматі, повертаємо як є
+
+            // Спробуємо розібрати як yyyy-mm-dd
+            const yyyymmdd = dateStr.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+            if (yyyymmdd) {
+                return `${yyyymmdd[3]}-${yyyymmdd[2]}-${yyyymmdd[1]}`;
+            }
+
+            // Спробуємо розібрати як mm/dd/yyyy
+            const mmddyyyy = dateStr.match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
+            if (mmddyyyy) {
+                return `${mmddyyyy[2]}-${mmddyyyy[1]}-${mmddyyyy[3]}`;
+            }
+
+            // Якщо формат не розпізнано, видамо помилку
+            console.error('Невідомий формат дати:', dateStr);
+            return '';
+        }
+
         async function fetchCities(query) {
             if (query.length < 2) return [];
             const response = await fetch(`https://027f-194-44-220-198.ngrok-free.app/api/cities?query=${encodeURIComponent(query)}`, {
@@ -507,37 +532,16 @@
             document.getElementById('arrival').value = departure;
         }
 
-        // Функція для нормалізації формату дати
-        function normalizeDate(dateStr) {
-            // Спробуємо парсити як mm/dd/yyyy
-            const mmddyyyyRegex = /^(\d{2})\/(\d{2})\/(\d{4})$/;
-            const match = dateStr.match(mmddyyyyRegex);
-            if (match) {
-                const month = match[1];
-                const day = match[2];
-                const year = match[3];
-                return `${day}-${month}-${year}`; // Конвертуємо до dd-mm-yyyy
-            }
-            // Якщо вже у форматі dd-mm-yyyy, залишаємо як є
-            const ddmmyyyyRegex = /^(\d{2})-(\d{2})-(\d{4})$/;
-            if (dateStr.match(ddmmyyyyRegex)) {
-                return dateStr;
-            }
-            // Якщо формат некоректний, повертаємо помилку
-            throw new Error('Некоректний формат дати. Використовуйте ДД-ММ-РРРР або ММ/ДД/РРРР.');
-        }
-
         async function submitSearch() {
             const departure = document.getElementById('departure').value.trim();
             const arrival = document.getElementById('arrival').value.trim();
             let date = document.getElementById('date').value.trim();
             const seats = document.getElementById('seats').value.trim();
 
-            // Нормалізуємо формат дати
-            try {
-                date = normalizeDate(date);
-            } catch (err) {
-                return alert(err.message);
+            // Нормалізуємо дату перед відправкою
+            date = normalizeDate(date);
+            if (!date) {
+                return alert('Невірний формат дати! Використовуйте ДД-ММ-РРРР, РРРР-ММ-ДД або ММ/ДД/РРРР.');
             }
 
             if (!departure || !arrival || !date || !seats) return alert('Заповніть усі поля!');
