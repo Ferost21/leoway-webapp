@@ -283,16 +283,6 @@
         const webApp = window.Telegram.WebApp;
         webApp.ready();
 
-        // Ініціалізація кнопки "назад" Telegram
-        const backButton = webApp.BackButton;
-        backButton.onClick(() => {
-            const modal = document.getElementById('modal');
-            if (modal.style.display === 'flex' || modal.classList.contains('show')) {
-                closeModal();
-            }
-        });
-        backButton.show();
-
         document.addEventListener('DOMContentLoaded', () => {
             flatpickr("#date", {
                 dateFormat: "d-m-Y",
@@ -324,6 +314,17 @@
 
             // Ініціалізація видимості при завантаженні
             updateSwapButtonVisibility();
+
+            // Обробка кнопки "назад" на телефоні
+            window.addEventListener('popstate', () => {
+                const modal = document.getElementById('modal');
+                if (modal.style.display === 'flex' || modal.classList.contains('show')) {
+                    closeModal();
+                }
+            });
+
+            // Додаємо стан до історії при відкритті модального вікна
+            window.history.pushState({ modalOpen: true }, document.title);
         });
 
         async function fetchCities(query) {
@@ -443,6 +444,8 @@
                     modal.classList.add('show');
                 });
                 modal.classList.remove('closing');
+                // Додаємо стан до історії при відкритті модального вікна
+                window.history.pushState({ modalOpen: true }, document.title);
             } catch (err) {
                 console.error(err);
                 alert('Помилка при пошуку поїздок: ' + err.message);
@@ -476,6 +479,8 @@
             setTimeout(() => {
                 modal.style.display = 'none';
                 modal.classList.remove('closing');
+                // Повертаємо стан історії назад
+                window.history.back();
             }, 300);
         }
     </script>
