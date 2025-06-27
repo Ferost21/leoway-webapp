@@ -316,15 +316,18 @@
             updateSwapButtonVisibility();
 
             // Обробка кнопки "назад" на телефоні
-            window.addEventListener('popstate', () => {
+            window.addEventListener('popstate', (event) => {
                 const modal = document.getElementById('modal');
-                if (modal.style.display === 'flex' || modal.classList.contains('show')) {
+                if (modal.classList.contains('show')) {
                     closeModal();
+                } else {
+                    Telegram.WebApp.close(); // Ховає WebApp, не закриває повністю
                 }
             });
 
+            window.history.pushState({ modalOpen: true }, '');
             // Додаємо стан до історії при відкритті модального вікна
-            window.history.pushState({ modalOpen: true }, document.title);
+            // window.history.pushState({ modalOpen: true }, document.title);
         });
 
         async function fetchCities(query) {
@@ -444,8 +447,12 @@
                     modal.classList.add('show');
                 });
                 modal.classList.remove('closing');
-                // Додаємо стан до історії при відкритті модального вікна
-                window.history.pushState({ modalOpen: true }, document.title);
+
+                // Додаємо стан до історії після показу модального
+                setTimeout(() => {
+                    window.history.pushState({ modalOpen: true }, '');
+                }, 100);
+
             } catch (err) {
                 console.error(err);
                 alert('Помилка при пошуку поїздок: ' + err.message);
@@ -479,8 +486,7 @@
             setTimeout(() => {
                 modal.style.display = 'none';
                 modal.classList.remove('closing');
-                // Повертаємо стан історії назад
-                window.history.back();
+                history.replaceState({}, ''); // очищаємо стан, не переходимо назад
             }, 300);
         }
     </script>
