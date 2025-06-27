@@ -315,23 +315,16 @@
             // Ініціалізація видимості при завантаженні
             updateSwapButtonVisibility();
 
-            // Обробка апаратної кнопки "Назад"
-            const modal = document.getElementById('modal');
-            webApp.BackButton.onClick(() => {
-                if (modal.style.display === 'flex' && modal.classList.contains('show')) {
-                    // Закриваємо модальне вікно і перенаправляємо на головну сторінку
+            // Обробка кнопки "назад" на телефоні
+            window.addEventListener('popstate', () => {
+                const modal = document.getElementById('modal');
+                if (modal.style.display === 'flex' || modal.classList.contains('show')) {
                     closeModal();
-                    window.location.href = '/'; // Перенаправлення на головну сторінку
                 }
             });
 
-            // Додатковий fallback для обробки подій "popstate" (якщо кнопка "Назад" не через Telegram API)
-            window.addEventListener('popstate', () => {
-                if (modal.style.display === 'flex' && modal.classList.contains('show')) {
-                    closeModal();
-                    window.location.href = '/';
-                }
-            });
+            // Додаємо стан до історії при відкритті модального вікна
+            window.history.pushState({ modalOpen: true }, document.title);
         });
 
         async function fetchCities(query) {
@@ -451,6 +444,8 @@
                     modal.classList.add('show');
                 });
                 modal.classList.remove('closing');
+                // Додаємо стан до історії при відкритті модального вікна
+                window.history.pushState({ modalOpen: true }, document.title);
             } catch (err) {
                 console.error(err);
                 alert('Помилка при пошуку поїздок: ' + err.message);
@@ -484,6 +479,8 @@
             setTimeout(() => {
                 modal.style.display = 'none';
                 modal.classList.remove('closing');
+                // Повертаємо стан історії назад
+                window.history.back();
             }, 300);
         }
     </script>
