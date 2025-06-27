@@ -195,45 +195,74 @@
             background: #218838;
         }
 
+        .input-wrapper {
+            position: relative;
+        }
+
+        .input-wrapper input {
+            padding-right: 40px; /* Місце для кнопки всередині input */
+        }
+
         /* Стиль для кнопки зміни місць */
         .swap-button {
             position: absolute;
-            top: 35.5%;
-            right: 10px;
+            top: 33%;
+            right: 5px;
             transform: translateY(-50%);
-            width: 40px;
-            height: 40px;
-            background-color: #28a745;
+            width: 30px;
+            height: 30px;
+            background: transparent;
             border: none;
-            border-radius: 5px;
             cursor: pointer;
-            z-index: 5; /* Було 20 — тепер нижче, ніж .suggestions */
+            padding: 0;
             display: flex;
             justify-content: center;
             align-items: center;
-            padding: 0;
-            color: white;
-            font-size: 18px;
+            opacity: 0; /* Початкова прозорість для плавного з’явлення */
+            transition: opacity 0.3s ease; /* Плавна анімація з’явлення/зникнення */
+            z-index: 2;
         }
 
+        .swap-button.visible {
+            opacity: 1; /* Показати кнопку, коли є дані */
+        }
 
         .swap-button:hover {
-            background-color: #218838;
+            background: rgba(40, 167, 69, 0.1); /* Легкий зелений фон при наведенні */
         }
 
-        .swap-button svg {
-            width: 20px;
-            height: 20px;
-            fill: white;
+        .swap-button:active {
+            background: rgba(33, 136, 56, 0.2); /* Темніший зелений при натисканні */
+        }
+
+        .swap-button::after {
+            content: "⇅"; /* Іконка стрілочок */
+            font-size: 20px; /* Збільшено розмір для кращого центрування */
+            color: #666; /* Сірий колір за замовчуванням */
+            line-height: 1; /* Нормалізація висоти рядка */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: 100%;
+        }
+
+        .swap-button:hover::after {
+            color: #28a745; /* Зелений колір при наведенні */
+        }
+
+        .swap-button:active::after {
+            color: #218838; /* Темніший зелений при натисканні */
         }
     </style>
 </head>
 <body>
     <h1>Пошук поїздки</h1>
-    <input id="departure" placeholder="Місце відправлення" autocomplete="off">
+    <div class="input-wrapper">
+        <input id="departure" placeholder="Місце відправлення" autocomplete="off">
+        <button class="swap-button" onclick="swapLocations()" aria-label="Змінити місця"></button>
+    </div>
     <div id="departure-suggestions" class="suggestions"></div>
-     <button class="swap-button" onclick="swapLocations()">⇅</button>
-    </button>
     <input id="arrival" placeholder="Місце прибуття" autocomplete="off">
     <div id="arrival-suggestions" class="suggestions"></div>
     <input id="date" type="text" placeholder="Дата (ДД-ММ-РРРР)" readonly>
