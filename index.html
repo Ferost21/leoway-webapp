@@ -448,6 +448,12 @@
                 });
                 modal.classList.remove('closing');
 
+                // Показати кнопку назад Telegram
+                Telegram.WebApp.BackButton.show();
+                Telegram.WebApp.BackButton.onClick(() => {
+                    closeModal();
+                });
+
                 // Додаємо стан до історії після показу модального
                 setTimeout(() => {
                     window.history.pushState({ modalOpen: true }, '');
@@ -486,7 +492,7 @@
             setTimeout(() => {
                 modal.style.display = 'none';
                 modal.classList.remove('closing');
-                history.replaceState({}, ''); // очищаємо стан, не переходимо назад
+                Telegram.WebApp.BackButton.hide(); // ❗️ховаємо back-кнопку Telegram
             }, 300);
         }
     </script>
