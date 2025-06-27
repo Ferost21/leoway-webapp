@@ -248,6 +248,27 @@
         .swap-button:active::after {
             color: #218838; /* Темніший зелений при натисканні */
         }
+        .no-rides {
+            text-align: center;
+            font-size: 18px;
+            color: #666;
+            margin-top: 30vh;
+        }
+        .modal-title-box {
+            background: #fff;
+            padding: 10px 15px;
+            border-radius: 10px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1); /* тінь знизу */
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        #modal-title {
+            font-size: 18px;
+            margin: 0;
+        }
+
+/**/
     </style>
 </head>
 <body>
@@ -267,10 +288,11 @@
     <div id="modal" class="modal" style="display: none;">
         <div class="modal-content">
             <div class="modal-header">
-                <h2 id="modal-title"></h2>
+                <div class="modal-title-box">
+                    <h2 id="modal-title"></h2>
+                </div>
                 <div style="width: 30px;"></div>
             </div>
-            <div id="modal-results"></div>
         </div>
     </div>
 
@@ -419,7 +441,7 @@
                 const rides = await res.json();
                 const modalResults = document.getElementById('modal-results');
                 modalResults.innerHTML = rides.length === 0
-                    ? '<p>Поїздок не знайдено.</p>'
+                    ? '<div class="no-rides">Поїздок не знайдено.</div>'
                     : rides.map(ride => {
                         const dt = new Date(ride.departure_time);
                         const timeStr = dt.toLocaleTimeString('uk-UA', { hour: '2-digit', minute: '2-digit' });
