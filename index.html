@@ -376,10 +376,28 @@
         const webApp = window.Telegram.WebApp;
         webApp.ready();
 
+        let currentDateValue = ''; // Змінна для збереження поточного значення дати
+
         // Отримуємо початкову тему та застосовуємо її
         function applyTheme() {
             const theme = webApp.colorScheme || 'light';
+            currentDateValue = document.getElementById('date').value; // Зберігаємо поточне значення дати
             document.body.setAttribute('data-theme', theme);
+            // Переініціалізація Flatpickr з збереженням значення
+            flatpickr("#date", {
+                dateFormat: "d-m-Y",
+                minDate: "today",
+                locale: "uk",
+                disableMobile: true,
+                defaultDate: currentDateValue || "today",
+                onReady: () => {
+                    const dateInput = document.getElementById('date');
+                    dateInput.placeholder = "Дата (ДД-ММ-РРРР)";
+                    if (currentDateValue) {
+                        dateInput.value = currentDateValue; // Відновлюємо значення
+                    }
+                }
+            });
             if (theme === 'dark') {
                 flatpickr(".flatpickr-input", { theme: 'dark' });
             } else {
@@ -395,17 +413,6 @@
             webApp.ready();
 
             Telegram.WebApp.BackButton.hide();
-
-            flatpickr("#date", {
-                dateFormat: "d-m-Y",
-                minDate: "today",
-                locale: "uk",
-                disableMobile: true,
-                onReady: () => {
-                    const dateInput = document.getElementById('date');
-                    dateInput.placeholder = "Дата (ДД-ММ-РРРР)";
-                }
-            });
 
             // Функція для управління видимістю кнопки
             function updateSwapButtonVisibility() {
