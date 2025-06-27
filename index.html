@@ -256,10 +256,11 @@
         }
         .modal-title-box {
             background: #fff;
-            padding: 10px 15px;
-            border-radius: 10px;
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1); /* тінь знизу */
-            margin: 0 auto;
+            padding: 12px 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            width: calc(100% - 40px); /* розтягуємо до країв з відступом */
+            margin: 10px auto 0; /* трохи вище */
             text-align: center;
         }
 
@@ -462,7 +463,25 @@
                                 <button class="book-button" onclick="bookRide(${ride.id}, ${seats})">Забронювати</button>
                             </div>`;
                     }).join('');
-                document.getElementById('modal-title').textContent = `${departure} → ${arrival} ${formatShortDate(date)}`;
+                document.getElementById('modal-title').textContent =
+                    `${departure} → ${arrival}`;
+
+                const modalTitleBox = document.querySelector('.modal-title-box');
+                const oldSubtitle = modalTitleBox.querySelector('p');
+                if (oldSubtitle) oldSubtitle.remove();
+
+                const subtitle = document.createElement('p');
+                subtitle.style.margin = '4px 0 0';
+                subtitle.style.fontSize = '14px';
+                subtitle.style.color = '#555';
+
+                const seatsNumber = parseInt(seats);
+                const seatWord =
+                    seatsNumber === 1 ? 'пасажир' :
+                    (seatsNumber >= 2 && seatsNumber <= 4 ? 'пасажири' : 'пасажирів');
+
+                subtitle.textContent = `${formatShortDate(date)}, ${seatsNumber} ${seatWord}`;
+                modalTitleBox.appendChild(subtitle);
                 const modal = document.getElementById('modal');
                 modal.style.display = 'flex';
                 requestAnimationFrame(() => {
