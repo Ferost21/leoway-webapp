@@ -52,15 +52,9 @@
         .suggestion-item {
             padding: 10px;
             cursor: pointer;
-            display: flex;
-            align-items: center;
         }
         .suggestion-item:hover {
             background: #f0f0f0;
-        }
-        .icon {
-            margin-right: 10px;
-            font-size: 14px;
         }
         #date {
             appearance: none;
@@ -329,11 +323,16 @@
             });
             if (!response.ok) return [];
             const data = await response.json();
-            return data.map(city => ({
-                code: city.code,
-                name: city.name,
-                category: city.category
-            }));
+            // Унікалізація за назвою міста
+            const uniqueCities = [];
+            const seenNames = new Set();
+            data.forEach(city => {
+                if (!seenNames.has(city.name)) {
+                    seenNames.add(city.name);
+                    uniqueCities.push(city.name);
+                }
+            });
+            return uniqueCities.map(name => ({ name }));
         }
 
         function setupSuggestions(inputId, suggestionsId) {
@@ -351,9 +350,7 @@
                 suggestions.style.width = `${rect.width}px`;
                 suggestions.innerHTML = cities.map(city => `
                     <div class="suggestion-item" data-name="${city.name}">
-                        <span class="icon">📍</span> ${city.name} (${city.category === 'M' ? 'Місто' :
-                        city.category === 'S' ? 'Село' :
-                        city.category === 'C' ? 'Селище' : 'Інше'})
+                        ${city.name}
                     </div>`).join('');
             });
 
