@@ -107,7 +107,7 @@
             height: 100%;
             overflow-y: auto;
             box-sizing: border-box;
-            padding: 20px;
+            padding: 60px 20px 20px;
             border-radius: 0;
             position: relative;
             transform: translateX(100%);
@@ -284,13 +284,19 @@
         .modal-title-box {
             margin: 0;
             padding: 12px 18px;
-            width: calc(100% - 40px);
-            max-width: 600px;
+            width: 100vw; /* вся ширина вікна */
             background: #fff;
-            border-radius: 12px;
+            border-bottom-left-radius: 12px;
+            border-bottom-right-radius: 12px;
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
             text-align: center;
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 1001;
+            box-sizing: border-box;
         }
+
         #modal-title {
             font-size: 18px;
             margin: 0;
