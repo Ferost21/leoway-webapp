@@ -129,7 +129,7 @@
         }
 
         .modal-header {
-            margin: 0;
+            margin: 0 0 20px 0;
             padding: 0;
             display: flex;
             justify-content: center;
@@ -161,29 +161,55 @@
         }
 
         .ride-item {
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            padding: 10px;
-            margin: 10px 0;
+            border-radius: 12px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
             background: white;
+            border: none;
+            padding: 15px 20px;
+            margin: 12px 0;
             position: relative;
             display: flex;
             flex-direction: column;
+            gap: 8px;
         }
 
-        .price-tag {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            color: #000;
+        .ride-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start; /* 👈 вирівнює верхній край */
+        }
+                .ride-route p {
+            margin: 4px 0;
+        }
+        .route {
             font-weight: bold;
+            font-size: 16px;
+        }
+        .ride-item:hover {
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+        }
+        .ride-item > .ride-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center; /* вертикальне вирівнювання */
+            margin-bottom: 10px; /* відступ від нижнього тексту */
+        }
+        .price-tag {
+            font-weight: bold;
+            font-size: 18px;
+            margin-top: 4px;
+            margin-right: 4px;
         }
 
         .book-button {
             background: #28a745;
-            margin-top: 5px;
             color: white;
             border: none;
+            padding: 10px;
+            font-size: 15px;
+            border-radius: 6px;
+            margin-top: 4px; /* Було більше — зменшено */
+            cursor: pointer;
         }
 
         .book-button:hover {
@@ -451,9 +477,9 @@
                         const dateStr = dt.toLocaleDateString('uk-UA', { day: '2-digit', month: '2-digit' });
                         return `
                             <div class="ride-item">
-                                <div style="display: flex; justify-content: space-between;">
-                                    <div>
-                                        <p>${ride.departure} → ${ride.arrival}</p>
+                                <div class="ride-top">
+                                    <div class="ride-route">
+                                        <p class="route">${ride.departure} → ${ride.arrival}</p>
                                         <p>${timeStr}, ${dateStr}</p>
                                         <p>Місць: ${ride.seats_available}/${ride.seats_total}</p>
                                         ${ride.description ? `<p>Опис: ${ride.description}</p>` : ''}
