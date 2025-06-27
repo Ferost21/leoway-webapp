@@ -15,7 +15,7 @@
             background: #f0f0f0;
             max-width: 600px;
             margin: 0 auto;
-            position: relative; /* Додано для позиціонування кнопки */
+            position: relative;
         }
         input, button {
             width: 100%;
@@ -194,7 +194,7 @@
         .book-button:hover {
             background: #218838;
         }
-
+        
         .input-wrapper {
             position: relative;
         }
@@ -300,6 +300,26 @@
                     dateInput.placeholder = "Дата (ДД-ММ-РРРР)";
                 }
             });
+
+            // Функція для управління видимістю кнопки
+            function updateSwapButtonVisibility() {
+                const departure = document.getElementById('departure').value.trim();
+                const arrival = document.getElementById('arrival').value.trim();
+                const swapButton = document.querySelector('.swap-button');
+                if (departure.length > 0 || arrival.length > 0) {
+                    swapButton.classList.add('visible');
+                } else {
+                    swapButton.classList.remove('visible');
+                }
+            }
+
+            // Слухачі для оновлення видимості при введенні/видаленні
+            ['departure', 'arrival'].forEach(id => {
+                document.getElementById(id).addEventListener('input', updateSwapButtonVisibility);
+            });
+
+            // Ініціалізація видимості при завантаженні
+            updateSwapButtonVisibility();
         });
 
         async function fetchCities(query) {
