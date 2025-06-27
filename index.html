@@ -397,20 +397,25 @@
             Telegram.WebApp.BackButton.hide();
 
             flatpickr("#date", {
-                dateFormat: "d-m-Y", // Встановлюємо чіткий формат ДД-ММ-РРРР
+                dateFormat: "d-m-Y",
                 minDate: "today",
                 locale: "uk",
-                disableMobile: true, // Вимкнення стандартного мобільного клавіатури для дати
+                disableMobile: true,
                 onReady: () => {
                     const dateInput = document.getElementById('date');
                     dateInput.placeholder = "Дата (ДД-ММ-РРРР)";
                 },
-                onChange: (selectedDates, dateStr, instance) => {
-                    // Переформатуємо дату, якщо введено в іншому форматі
-                    if (selectedDates.length > 0) {
-                        const d = selectedDates[0];
-                        const formattedDate = `${d.getDate().toString().padStart(2, '0')}-${(d.getMonth() + 1).toString().padStart(2, '0')}-${d.getFullYear()}`;
-                        dateInput.value = formattedDate;
+                // Додаємо обробку введення для формату mm/dd/yyyy
+                onChange: function(selectedDates, dateStr, instance) {
+                    const dateInput = document.getElementById('date');
+                    if (dateStr && !/^\d{2}-\d{2}-\d{4}$/.test(dateStr)) {
+                        // Спробуємо конвертувати mm/dd/yyyy в dd-mm-yyyy
+                        const parts = dateStr.split('/');
+                        if (parts.length === 3 && !isNaN(Date.parse(dateStr))) {
+                            const normalizedDate = `${parts[1]}-${parts[0]}-${parts[2]}`;
+                            dateInput.value = normalizedDate;
+                            instance.setDate(normalizedDate, true); // Оновлюємо Flatpickr
+                        }
                     }
                 }
             });
@@ -518,8 +523,17 @@
         async function submitSearch() {
             const departure = document.getElementById('departure').value.trim();
             const arrival = document.getElementById('arrival').value.trim();
-            const date = document.getElementById('date').value.trim();
+            let date = document.getElementById('date').value.trim();
             const seats = document.getElementById('seats').value.trim();
+
+            // Нормалізуємо дату, якщо введено у форматі mm/dd/yyyy
+            if (date && !/^\d{2}-\d{2}-\d{4}$/.test(date)) {
+                const parts = date.split('/');
+                if (parts.length === 3 && !isNaN(Date.parse(date))) {
+                    date = `${parts[1]}-${parts[0]}-${parts[2]}`;
+                    document.getElementById('date').value = date; // Оновлюємо поле
+                }
+            }
 
             if (!departure || !arrival || !date || !seats) return alert('Заповніть усі поля!');
             if (departure.length > 255 || arrival.length > 255) return alert('Назви місць мають бути до 255 символів!');
