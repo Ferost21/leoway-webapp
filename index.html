@@ -380,17 +380,9 @@
                     minDate: "today",
                     locale: "uk",
                     disableMobile: true,
-                    allowInput: false,
-                    onReady: function() {
+                    onReady: () => {
                         const dateInput = document.getElementById('date');
                         dateInput.placeholder = "Дата (ДД-ММ-РРРР)";
-                        console.log('flatpickr ініціалізовано успішно');
-                        // Ensure calendar is themed
-                        unifyDatepickerColors();
-                    },
-                    onChange: function(selectedDates, dateStr) {
-                        console.log('Дата змінена:', dateStr);
-                        unifyDatepickerColors();
                     }
                 });
             } catch (err) {
