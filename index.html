@@ -303,14 +303,8 @@
         let isModalOpen = false;
 
         document.addEventListener('DOMContentLoaded', () => {
-            // Активуємо повноекранний режим
-            if (webApp.requestFullscreen && webApp.requestFullscreen.isAvailable()) {
-                webApp.requestFullscreen().then(() => {
-                    console.log('Повноекранний режим активовано');
-                }).catch(err => {
-                    console.error('Помилка активації повноекранного режиму:', err);
-                });
-            }
+            // Видалено спробу викликати requestFullscreen через непідтримку
+            console.log('Повноекранний режим не підтримується в цій версії Telegram.');
 
             // Опціонально: Зафіксувати орієнтацію (наприклад, portrait)
             if (webApp.lockOrientation) {
