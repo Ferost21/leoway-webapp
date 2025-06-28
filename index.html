@@ -2,7 +2,7 @@
 <html lang="uk">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Пошук поїздки</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
@@ -16,11 +16,16 @@
             max-width: 600px;
             margin: 0 auto;
             position: relative;
-            min-height: 100vh;
-            box-sizing: border-box;
-            /* Додано для уникнення зсуву під статусний рядок */
+            /* Додаємо padding для безпечної зони Telegram */
             padding-top: env(safe-area-inset-top, 20px);
             padding-bottom: env(safe-area-inset-bottom, 20px);
+            padding-left: env(safe-area-inset-left, 20px);
+            padding-right: env(safe-area-inset-right, 20px);
+            box-sizing: border-box;
+            min-height: 100vh;
+        }
+        h1 {
+            margin-top: 0; /* Прибираємо верхній margin, щоб уникнути зсуву */
         }
         input, button {
             width: 100%;
@@ -80,10 +85,6 @@
             }
             .flatpickr-calendar {
                 z-index: 1001;
-            }
-            body {
-                padding-top: env(safe-area-inset-top, 10px);
-                padding-bottom: env(safe-area-inset-bottom, 10px);
             }
         }
         .modal {
@@ -309,17 +310,13 @@
         const webApp = window.Telegram.WebApp;
         webApp.ready();
 
-        // Розгорнути вміст до повноекранного режиму
-        if (webApp.expand) {
-            webApp.expand();
-        }
-
         let isModalOpen = false;
 
         document.addEventListener('DOMContentLoaded', () => {
+            // Видаляємо requestFullscreen, оскільки не підтримується у версії 6.0
             console.log('Telegram Web App версія:', webApp.version || 'невідома');
 
-            // Опціонально: Зафіксувати орієнтацію (наприклад, portrait)
+            // Опціонально: Зафіксувати орієнтацію (якщо підтримується)
             if (webApp.lockOrientation) {
                 webApp.lockOrientation('portrait');
             }
