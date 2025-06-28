@@ -2,7 +2,7 @@
 <html lang="uk">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Пошук поїздки</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
@@ -16,9 +16,11 @@
             max-width: 600px;
             margin: 0 auto;
             position: relative;
-            /* Додано для коректного відображення у повноекранному режимі */
             min-height: 100vh;
             box-sizing: border-box;
+            /* Додано для уникнення зсуву під статусний рядок */
+            padding-top: env(safe-area-inset-top, 20px);
+            padding-bottom: env(safe-area-inset-bottom, 20px);
         }
         input, button {
             width: 100%;
@@ -80,7 +82,8 @@
                 z-index: 1001;
             }
             body {
-                padding-top: 10px; /* Корекція для повноекранного режиму */
+                padding-top: env(safe-area-inset-top, 10px);
+                padding-bottom: env(safe-area-inset-bottom, 10px);
             }
         }
         .modal {
@@ -306,10 +309,14 @@
         const webApp = window.Telegram.WebApp;
         webApp.ready();
 
+        // Розгорнути вміст до повноекранного режиму
+        if (webApp.expand) {
+            webApp.expand();
+        }
+
         let isModalOpen = false;
 
         document.addEventListener('DOMContentLoaded', () => {
-            // Видалено спробу requestFullscreen через несумісність з версією 6.0
             console.log('Telegram Web App версія:', webApp.version || 'невідома');
 
             // Опціонально: Зафіксувати орієнтацію (наприклад, portrait)
