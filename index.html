@@ -63,7 +63,6 @@
             padding: 10px;
             cursor: pointer;
         }
-
         @media (max-width: 600px) {
             #date {
                 background-color: white;
@@ -78,7 +77,6 @@
                 z-index: 1001;
             }
         }
-
         .modal {
             display: flex;
             justify-content: center;
@@ -92,11 +90,9 @@
             z-index: 1000;
             transition: background 0.3s ease;
         }
-
         .modal.show {
             background: rgba(0, 0, 0, 0.5);
         }
-
         .modal.closing {
             background: rgba(0, 0, 0, 0);
         }
@@ -113,21 +109,17 @@
             transform: translateX(100%);
             animation: slideIn 0.3s forwards;
         }
-
         .modal.closing .modal-content {
             animation: slideOut 0.3s forwards;
         }
-
         @keyframes slideIn {
             from { transform: translateX(100%); }
             to { transform: translateX(0); }
         }
-
         @keyframes slideOut {
             from { transform: translateX(0); }
             to { transform: translateX(100%); }
         }
-
         .modal-header {
             margin: 0 0 20px 0;
             padding: 0;
@@ -135,14 +127,12 @@
             justify-content: center;
             align-items: flex-start;
         }
-
         #modal-title {
             flex-grow: 1;
             text-align: center;
             font-size: 18px;
             margin: 0;
         }
-
         .back-button {
             width: 30px;
             height: 30px;
@@ -155,11 +145,9 @@
             cursor: pointer;
             border-radius: 5px;
         }
-
         .back-button:hover {
             background-color: #eee;
         }
-
         .ride-item {
             border-radius: 12px;
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
@@ -172,13 +160,12 @@
             flex-direction: column;
             gap: 8px;
         }
-
         .ride-top {
             display: flex;
             justify-content: space-between;
-            align-items: flex-start; /* 👈 вирівнює верхній край */
+            align-items: flex-start;
         }
-                .ride-route p {
+        .ride-route p {
             margin: 4px 0;
         }
         .route {
@@ -191,8 +178,8 @@
         .ride-item > .ride-info {
             display: flex;
             justify-content: space-between;
-            align-items: center; /* вертикальне вирівнювання */
-            margin-bottom: 10px; /* відступ від нижнього тексту */
+            align-items: center;
+            margin-bottom: 10px;
         }
         .price-tag {
             font-weight: bold;
@@ -200,7 +187,6 @@
             margin-top: 4px;
             margin-right: 4px;
         }
-
         .book-button {
             background: #28a745;
             color: white;
@@ -208,28 +194,23 @@
             padding: 10px;
             font-size: 15px;
             border-radius: 6px;
-            margin-top: 4px; /* Було більше — зменшено */
+            margin-top: 4px;
             cursor: pointer;
         }
-
         .book-button:hover {
             background: #218838;
         }
-        
         .input-wrapper {
             position: relative;
         }
-
         .input-wrapper input {
-            padding-right: 40px; /* Місце для кнопки всередині input */
+            padding-right: 40px;
         }
-
-        /* Стиль для кнопки зміни місць */
         .swap-button {
             position: absolute;
             top: 33%;
             right: 5px;
-            transform: translateY(-50%);
+            transform: Fullscreen mode for Telegram Mini ApptranslateY(-50%);
             width: 30px;
             height: 30px;
             background: transparent;
@@ -239,41 +220,35 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            opacity: 0; /* Початкова прозорість для плавного з’явлення */
-            transition: opacity 0.3s ease; /* Плавна анімація з’явлення/зникнення */
+            opacity: 0;
+            transition: opacity 0.3s ease;
             z-index: 2;
         }
-
         .swap-button.visible {
-            opacity: 1; /* Показати кнопку, коли є дані */
+            opacity: 1;
         }
-
         .swap-button:hover {
-            background: rgba(40, 167, 69, 0.1); /* Легкий зелений фон при наведенні */
+            background: rgba(40, 167, 69, 0.1);
         }
-
         .swap-button:active {
-            background: rgba(33, 136, 56, 0.2); /* Темніший зелений при натисканні */
+            background: rgba(33, 136, 56, 0.2);
         }
-
         .swap-button::after {
-            content: "⇅"; /* Іконка стрілочок */
-            font-size: 20px; /* Збільшено розмір для кращого центрування */
-            color: #666; /* Сірий колір за замовчуванням */
-            line-height: 1; /* Нормалізація висоти рядка */
+            content: "⇅";
+            font-size: 20px;
+            color: #666;
+            line-height: 1;
             display: flex;
             align-items: center;
             justify-content: center;
             width: 100%;
             height: 100%;
         }
-
         .swap-button:hover::after {
-            color: #28a745; /* Зелений колір при наведенні */
+            color: #28a745;
         }
-
         .swap-button:active::after {
-            color: #218838; /* Темніший зелений при натисканні */
+            color: #218838;
         }
         .no-rides {
             text-align: center;
@@ -300,8 +275,6 @@
             font-size: 18px;
             margin: 0;
         }
-
-/**/
     </style>
 </head>
 <body>
@@ -333,9 +306,22 @@
 
         document.addEventListener('DOMContentLoaded', () => {
             webApp.ready();
-            webApp.expand(); // 💥 Розгортає на весь екран
 
-            Telegram.WebApp.BackButton.hide(); // 💥 Скидаємо кнопку назад при кожному завантаженні
+            // Активуємо повноекранний режим
+            if (webApp.requestFullscreen && webApp.requestFullscreen.isAvailable()) {
+                webApp.requestFullscreen().then(() => {
+                    console.log('Повноекранний режим активовано');
+                }).catch(err => {
+                    console.error('Помилка активації повноекранного режиму:', err);
+                });
+            }
+
+            // Опціонально: Зафіксувати орієнтацію (наприклад, portrait)
+            if (webApp.lockOrientation) {
+                webApp.lockOrientation('portrait');
+            }
+
+            Telegram.WebApp.BackButton.hide();
 
             flatpickr("#date", {
                 dateFormat: "d-m-Y",
@@ -348,7 +334,6 @@
                 }
             });
 
-            // Функція для управління видимістю кнопки
             function updateSwapButtonVisibility() {
                 const departure = document.getElementById('departure').value.trim();
                 const arrival = document.getElementById('arrival').value.trim();
@@ -360,27 +345,22 @@
                 }
             }
 
-            // Слухачі для оновлення видимості при введенні/видаленні
             ['departure', 'arrival'].forEach(id => {
                 document.getElementById(id).addEventListener('input', updateSwapButtonVisibility);
             });
 
-            // Ініціалізація видимості при завантаженні
             updateSwapButtonVisibility();
 
-            // Обробка кнопки "назад" на телефоні
             window.addEventListener('popstate', (event) => {
                 const modal = document.getElementById('modal');
                 if (modal.classList.contains('show')) {
                     closeModal();
                 } else {
-                    Telegram.WebApp.close(); // Ховає WebApp, не закриває повністю
+                    Telegram.WebApp.close();
                 }
             });
 
             window.history.pushState({ modalOpen: true }, '');
-            // Додаємо стан до історії при відкритті модального вікна
-            // window.history.pushState({ modalOpen: true }, document.title);
         });
 
         async function fetchCities(query) {
@@ -390,7 +370,6 @@
             });
             if (!response.ok) return [];
             const data = await response.json();
-            // Унікалізація за назвою міста
             const uniqueCities = [];
             const seenNames = new Set();
             data.forEach(city => {
@@ -415,8 +394,8 @@
                 suggestions.style.top = `${rect.bottom + window.scrollY}px`;
                 suggestions.style.left = `${rect.left + window.scrollX}px`;
                 suggestions.style.width = `${rect.width}px`;
-                suggestions.innerHTML = cities.map(city => `
-                    <div class="suggestion-item" data-name="${city.name}">
+                suggestions.innerHTML = cities.map(city => 
+                    `<div class="suggestion-item" data-name="${city.name}">
                         ${city.name}
                     </div>`).join('');
             });
@@ -461,7 +440,7 @@
             if (departure.length > 255 || arrival.length > 255) return alert('Назви місць мають бути до 255 символів!');
 
             try {
-                const res = await fetch(`https://027f-194-44-220-198.ngrok-free.app/api/search-rides`, {
+                const res = await fetch('https://027f-194-44-220-198.ngrok-free.app/api/search-rides', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -493,8 +472,7 @@
                                 <button class="book-button" onclick="bookRide(${ride.id}, ${seats})">Забронювати</button>
                             </div>`;
                     }).join('');
-                document.getElementById('modal-title').textContent =
-                    `${departure} → ${arrival}`;
+                document.getElementById('modal-title').textContent = `${departure} → ${arrival}`;
 
                 const modalTitleBox = document.querySelector('.modal-title-box');
                 const oldSubtitle = modalTitleBox.querySelector('p');
@@ -519,17 +497,14 @@
                 });
                 modal.classList.remove('closing');
 
-                // Показати кнопку назад Telegram
                 Telegram.WebApp.BackButton.show();
                 Telegram.WebApp.BackButton.onClick(() => {
                     closeModal();
                 });
 
-                // Додаємо стан до історії після показу модального
                 setTimeout(() => {
                     window.history.pushState({ modalOpen: true }, '');
                 }, 100);
-
             } catch (err) {
                 console.error(err);
                 alert('Помилка при пошуку поїздок: ' + err.message);
@@ -540,7 +515,7 @@
             const tgId = webApp.initDataUnsafe.user?.id;
             if (!tgId) return alert('Не вдалося отримати ваш Telegram ID!');
             try {
-                const res = await fetch(`https://027f-194-44-220-198.ngrok-free.app/api/book-ride`, {
+                const res = await fetch('https://027f-194-44-220-198.ngrok-free.app/api/book-ride', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -563,7 +538,7 @@
             setTimeout(() => {
                 modal.style.display = 'none';
                 modal.classList.remove('closing');
-                Telegram.WebApp.BackButton.hide(); // ❗️ховаємо back-кнопку Telegram
+                Telegram.WebApp.BackButton.hide();
             }, 300);
         }
     </script>
