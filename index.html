@@ -392,9 +392,6 @@
                     locale: "uk",
                     disableMobile: true,
                     allowInput: false,
-                    onOpen: function() {
-                        document.getElementById('date').blur(); // Prevent keyboard
-                    },
                     onOpen: function(selectedDates, dateStr, instance) {
                         console.log('Календар відкрито', instance.calendarContainer);
                     },
