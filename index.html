@@ -303,8 +303,18 @@
         let isModalOpen = false;
 
         document.addEventListener('DOMContentLoaded', () => {
-            // Видалено спробу викликати requestFullscreen через непідтримку
-            console.log('Повноекранний режим не підтримується в цій версії Telegram.');
+            // Спроба активувати повноекранний режим (доступно не для всіх версій)
+            if (webApp.requestFullscreen) {
+                webApp.requestFullscreen()
+                    .then(() => {
+                        console.log('Повноекранний режим активовано');
+                    })
+                    .catch(err => {
+                        console.warn('Повноекранний режим недоступний:', err);
+                    });
+            } else {
+                console.warn('Метод requestFullscreen не підтримується цією версією Telegram Web App');
+            }
 
             // Опціонально: Зафіксувати орієнтацію (наприклад, portrait)
             if (webApp.lockOrientation) {
@@ -319,6 +329,10 @@
                 onReady: () => {
                     const dateInput = document.getElementById('date');
                     dateInput.placeholder = "Дата (ДД-ММ-РРРР)";
+                    console.log('flatpickr ініціалізований');
+                },
+                onChange: (selectedDates, dateStr, instance) => {
+                    console.log('Дата змінена:', dateStr);
                 }
             });
 
