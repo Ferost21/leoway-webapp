@@ -296,13 +296,21 @@
             color: var(--tg-theme-hint-color, #666);
             margin-top: 30vh;
         }
+        .header-space {
+            padding-top: env(safe-area-inset-top, 40px); /* достатньо місця під кнопку */
+            text-align: center;
+        }
+
         #modal-results {
             padding: 0 20px;
         }
     </style>
 </head>
 <body>
-    <h1>Пошук поїздки</h1>
+    <div class="header-space">
+        <h1>Пошук поїздки</h1>
+    </div>
+
     <div class="input-wrapper">
         <input id="departure" placeholder="Місце відправлення" autocomplete="off">
         <button class="swap-button" onclick="swapLocations()" aria-label="Змінити місця"></button>
