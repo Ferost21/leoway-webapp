@@ -325,14 +325,8 @@
                     dateFormat: "d-m-Y",
                     minDate: "today",
                     locale: "uk",
-                    disableMobile: true,
                     onReady: () => {
-                        const dateInput = document.getElementById('date');
-                        dateInput.placeholder = "Дата (ДД-ММ-РРРР)";
-                        console.log('flatpickr ініціалізовано успішно');
-                    },
-                    onChange: (selectedDates, dateStr, instance) => {
-                        console.log('Дата змінена:', dateStr);
+                        console.log("Готово");
                     }
                 });
                 if (!fp) {
