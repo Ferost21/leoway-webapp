@@ -16,6 +16,9 @@
             max-width: 600px;
             margin: 0 auto;
             position: relative;
+            /* Додано для коректного відображення у повноекранному режимі */
+            min-height: 100vh;
+            box-sizing: border-box;
         }
         input, button {
             width: 100%;
@@ -75,6 +78,9 @@
             }
             .flatpickr-calendar {
                 z-index: 1001;
+            }
+            body {
+                padding-top: 10px; /* Корекція для повноекранного режиму */
             }
         }
         .modal {
@@ -303,18 +309,8 @@
         let isModalOpen = false;
 
         document.addEventListener('DOMContentLoaded', () => {
-            // Спроба активувати повноекранний режим (доступно не для всіх версій)
-            if (webApp.requestFullscreen) {
-                webApp.requestFullscreen()
-                    .then(() => {
-                        console.log('Повноекранний режим активовано');
-                    })
-                    .catch(err => {
-                        console.warn('Повноекранний режим недоступний:', err);
-                    });
-            } else {
-                console.warn('Метод requestFullscreen не підтримується цією версією Telegram Web App');
-            }
+            // Видалено спробу requestFullscreen через несумісність з версією 6.0
+            console.log('Telegram Web App версія:', webApp.version || 'невідома');
 
             // Опціонально: Зафіксувати орієнтацію (наприклад, portrait)
             if (webApp.lockOrientation) {
