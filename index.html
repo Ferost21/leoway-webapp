@@ -88,6 +88,8 @@
             }
             .flatpickr-calendar {
                 z-index: 1001;
+                background: var(--tg-theme-secondary-bg-color, white);
+                color: var(--tg-theme-text-color, #000);
             }
             .flatpickr-day {
                 color: var(--tg-theme-text-color, #000);
@@ -375,16 +377,21 @@
 
             // Initialize Flatpickr
             try {
-                flatpickr("#date", {
+                const fp = flatpickr("#date", {
                     dateFormat: "d-m-Y",
                     minDate: "today",
                     locale: "uk",
                     disableMobile: true,
-                    onReady: () => {
-                        const dateInput = document.getElementById('date');
-                        dateInput.placeholder = "Дата (ДД-ММ-РРРР)";
+                    allowInput: false,
+                    clickOpens: false, // ❗️ не відкриватиме автоматично
+                    onReady: function(_, __, instance) {
+                        const input = document.getElementById('date');
+                        input.addEventListener('click', () => {
+                            instance.open(); // 🟢 відкриваємо вручну
+                        });
                     }
                 });
+
             } catch (err) {
                 console.error('Помилка ініціалізації flatpickr:', err);
             }
