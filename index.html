@@ -46,6 +46,9 @@
             background: white;
             display: none;
             position: absolute;
+            top: 100%; /* Розташувати під полем вводу */
+            left: 0;
+            right: 0; /* Вирівнювання зліва і справа відносно input-wrapper */
             z-index: 10;
         }
         .suggestion-item {
@@ -175,9 +178,9 @@
         .ride-top {
             display: flex;
             justify-content: space-between;
-            align-items: flex-start;
+            align-items: flex-start; /* 👈 вирівнює верхній край */
         }
-        .ride-route p {
+                .ride-route p {
             margin: 4px 0;
         }
         .route {
@@ -190,8 +193,8 @@
         .ride-item > .ride-info {
             display: flex;
             justify-content: space-between;
-            align-items: center;
-            margin-bottom: 10px;
+            align-items: center; /* вертикальне вирівнювання */
+            margin-bottom: 10px; /* відступ від нижнього тексту */
         }
         .price-tag {
             font-weight: bold;
@@ -207,7 +210,7 @@
             padding: 10px;
             font-size: 15px;
             border-radius: 6px;
-            margin-top: 4px;
+            margin-top: 4px; /* Було більше — зменшено */
             cursor: pointer;
         }
 
@@ -220,9 +223,10 @@
         }
 
         .input-wrapper input {
-            padding-right: 40px;
+            padding-right: 40px; /* Місце для кнопки всередині input */
         }
 
+        /* Стиль для кнопки зміни місць */
         .swap-button {
             position: absolute;
             top: 33%;
@@ -237,28 +241,28 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            opacity: 0;
-            transition: opacity 0.3s ease;
+            opacity: 0; /* Початкова прозорість для плавного з’явлення */
+            transition: opacity 0.3s ease; /* Плавна анімація з’явлення/зникнення */
             z-index: 2;
         }
 
         .swap-button.visible {
-            opacity: 1;
+            opacity: 1; /* Показати кнопку, коли є дані */
         }
 
         .swap-button:hover {
-            background: rgba(40, 167, 69, 0.1);
+            background: rgba(40, 167, 69, 0.1); /* Легкий зелений фон при наведенні */
         }
 
         .swap-button:active {
-            background: rgba(33, 136, 56, 0.2);
+            background: rgba(33, 136, 56, 0.2); /* Темніший зелений при натисканні */
         }
 
         .swap-button::after {
-            content: "⇅";
-            font-size: 20px;
-            color: #666;
-            line-height: 1;
+            content: "⇅"; /* Іконка стрілочок */
+            font-size: 20px; /* Збільшено розмір для кращого центрування */
+            color: #666; /* Сірий колір за замовчуванням */
+            line-height: 1; /* Нормалізація висоти рядка */
             display: flex;
             align-items: center;
             justify-content: center;
@@ -267,11 +271,11 @@
         }
 
         .swap-button:hover::after {
-            color: #28a745;
+            color: #28a745; /* Зелений колір при наведенні */
         }
 
         .swap-button:active::after {
-            color: #218838;
+            color: #218838; /* Темніший зелений при натисканні */
         }
         .no-rides {
             text-align: center;
@@ -298,6 +302,8 @@
             font-size: 18px;
             margin: 0;
         }
+
+/**/
     </style>
 </head>
 <body>
@@ -305,10 +311,12 @@
     <div class="input-wrapper">
         <input id="departure" placeholder="Місце відправлення" autocomplete="off">
         <button class="swap-button" onclick="swapLocations()" aria-label="Змінити місця"></button>
+        <div id="departure-suggestions" class="suggestions"></div>
     </div>
-    <div id="departure-suggestions" class="suggestions"></div>
-    <input id="arrival" placeholder="Місце прибуття" autocomplete="off">
-    <div id="arrival-suggestions" class="suggestions"></div>
+    <div class="input-wrapper">
+        <input id="arrival" placeholder="Місце прибуття" autocomplete="off">
+        <div id="arrival-suggestions" class="suggestions"></div>
+    </div>
     <input id="date" type="text" placeholder="Дата (ДД-ММ-РРРР)" readonly>
     <input id="seats" type="number" placeholder="Кількість місць" min="1" max="10">
     <button onclick="submitSearch()">Пошук</button>
@@ -330,7 +338,7 @@
         document.addEventListener('DOMContentLoaded', () => {
             webApp.ready();
 
-            Telegram.WebApp.BackButton.hide();
+            Telegram.WebApp.BackButton.hide(); // 💥 Скидаємо кнопку назад при кожному завантаженні
 
             flatpickr("#date", {
                 dateFormat: "d-m-Y",
@@ -339,10 +347,11 @@
                 disableMobile: true,
                 onReady: () => {
                     const dateInput = document.getElementById('date');
-                    dateInput.placeholder = "Date (DD-MM-YYYY)";
+                    dateInput.placeholder = "Дата (ДД-ММ-РРРР)";
                 }
             });
 
+            // Функція для управління видимістю кнопки
             function updateSwapButtonVisibility() {
                 const departure = document.getElementById('departure').value.trim();
                 const arrival = document.getElementById('arrival').value.trim();
@@ -354,22 +363,27 @@
                 }
             }
 
+            // Слухачі для оновлення видимості при введенні/видаленні
             ['departure', 'arrival'].forEach(id => {
                 document.getElementById(id).addEventListener('input', updateSwapButtonVisibility);
             });
 
+            // Ініціалізація видимості при завантаженні
             updateSwapButtonVisibility();
 
+            // Обробка кнопки "назад" на телефоні
             window.addEventListener('popstate', (event) => {
                 const modal = document.getElementById('modal');
                 if (modal.classList.contains('show')) {
                     closeModal();
                 } else {
-                    Telegram.WebApp.close();
+                    Telegram.WebApp.close(); // Ховає WebApp, не закриває повністю
                 }
             });
 
             window.history.pushState({ modalOpen: true }, '');
+            // Додаємо стан до історії при відкритті модального вікна
+            // window.history.pushState({ modalOpen: true }, document.title);
         });
 
         async function fetchCities(query) {
@@ -379,6 +393,7 @@
             });
             if (!response.ok) return [];
             const data = await response.json();
+            // Унікалізація за назвою міста
             const uniqueCities = [];
             const seenNames = new Set();
             data.forEach(city => {
@@ -396,13 +411,8 @@
 
             input.addEventListener('input', async (e) => {
                 const query = e.target.value;
-                const rect = input.getBoundingClientRect();
                 const cities = await fetchCities(query);
                 suggestions.style.display = cities.length > 0 ? 'block' : 'none';
-                suggestions.style.top = `${rect.bottom + window.scrollY}px`;
-                suggestions.style.left = `${rect.left + window.scrollX}px`;
-                suggestions.style.width = `${rect.width}px`; // Align width with input
-                suggestions.style.boxSizing = 'border-box'; // Ensure padding/border included
                 suggestions.innerHTML = cities.map(city => `
                     <div class="suggestion-item" data-name="${city.name}">
                         ${city.name}
@@ -507,11 +517,13 @@
                 });
                 modal.classList.remove('closing');
 
+                // Показати кнопку назад Telegram
                 Telegram.WebApp.BackButton.show();
                 Telegram.WebApp.BackButton.onClick(() => {
                     closeModal();
                 });
 
+                // Додаємо стан до історії після показу модального
                 setTimeout(() => {
                     window.history.pushState({ modalOpen: true }, '');
                 }, 100);
@@ -549,7 +561,7 @@
             setTimeout(() => {
                 modal.style.display = 'none';
                 modal.classList.remove('closing');
-                Telegram.WebApp.BackButton.hide();
+                Telegram.WebApp.BackButton.hide(); // ❗️ховаємо back-кнопку Telegram
             }, 300);
         }
     </script>
