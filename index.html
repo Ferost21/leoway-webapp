@@ -2,20 +2,31 @@
 <html lang="uk">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Пошук поїздки</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/uk.js"></script>
     <style>
+        html, body {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            height: 100dvh; /* Dynamic viewport height for fullscreen */
+            overflow: hidden;
+        }
         body {
             font-family: Arial, sans-serif;
             padding: 20px;
-            background: #f0f0f0;
+            background: var(--tg-theme-bg-color, #f0f0f0);
+            color: var(--tg-theme-text-color, #000000);
             max-width: 600px;
             margin: 0 auto;
             position: relative;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
         }
         input, button {
             width: 100%;
@@ -26,24 +37,25 @@
             border-radius: 5px;
         }
         input {
-            border: 1px solid #ccc;
-            background-color: white;
+            border: 1px solid var(--tg-theme-hint-color, #ccc);
+            background-color: var(--tg-theme-secondary-bg-color, white);
+            color: var(--tg-theme-text-color, #333);
         }
         button {
-            background: #28a745;
-            color: white;
+            background: var(--tg-theme-button-color, #28a745);
+            color: var(--tg-theme-button-text-color, white);
             border: none;
             cursor: pointer;
         }
         button:hover {
-            background: #218838;
+            background: var(--tg-theme-button-color-hover, #218838);
         }
         .suggestions {
-            border: 1px solid #ccc;
+            border: 1px solid var(--tg-theme-hint-color, #ccc);
             border-radius: 5px;
             max-height: 150px;
             overflow-y: auto;
-            background: white;
+            background: var(--tg-theme-secondary-bg-color, white);
             display: none;
             position: absolute;
             width: 100%;
@@ -52,29 +64,42 @@
         .suggestion-item {
             padding: 10px;
             cursor: pointer;
+            color: var(--tg-theme-text-color, #000);
         }
         .suggestion-item:hover {
-            background: #f0f0f0;
+            background: var(--tg-theme-hint-color, #f0f0f0);
         }
         #date {
             appearance: none;
-            background-color: white;
-            color: #333;
+            background-color: var(--tg-theme-secondary-bg-color, white);
+            color: var(--tg-theme-text-color, #333);
             padding: 10px;
             cursor: pointer;
         }
         @media (max-width: 600px) {
             #date {
-                background-color: white;
-                color: #333;
+                background-color: var(--tg-theme-secondary-bg-color, white);
+                color: var(--tg-theme-text-color, #333);
                 padding: 12px;
                 font-size: 16px;
             }
             #date.flatpickr-input {
-                color: #333;
+                color: var(--tg-theme-text-color, #333);
             }
             .flatpickr-calendar {
                 z-index: 1001;
+                background: var(--tg-theme-secondary-bg-color, white);
+                color: var(--tg-theme-text-color, #000);
+            }
+            .flatpickr-day {
+                color: var(--tg-theme-text-color, #000);
+            }
+            .flatpickr-day:hover {
+                background: var(--tg-theme-hint-color, #f0f0f0);
+            }
+            .flatpickr-day.selected {
+                background: var(--tg-theme-button-color, #28a745);
+                color: var(--tg-theme-button-text-color, white);
             }
         }
         .modal {
@@ -91,13 +116,13 @@
             transition: background 0.3s ease;
         }
         .modal.show {
-            background: rgba(0, 0, 0, 0.5);
+            background: var(--tg-theme-bg-color, rgba(0, 0, 0, 0.5));
         }
         .modal.closing {
             background: rgba(0, 0, 0, 0);
         }
         .modal-content {
-            background: #eee;
+            background: var(--tg-theme-bg-color, #eee);
             width: 100%;
             max-width: 600px;
             height: 100%;
@@ -129,7 +154,7 @@
         }
         .modal-title-box {
             margin-top: 0;
-            background: #fff;
+            background: var(--tg-theme-secondary-bg-color, #fff);
             border-bottom-left-radius: 12px;
             border-bottom-right-radius: 12px;
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
@@ -144,13 +169,14 @@
             text-align: center;
             font-size: 18px;
             margin: 0;
+            color: var(--tg-theme-text-color, #000);
         }
         .back-button {
             width: 30px;
             height: 30px;
             font-size: 24px;
             font-weight: bold;
-            color: #444;
+            color: var(--tg-theme-text-color, #444);
             display: flex;
             justify-content: center;
             align-items: center;
@@ -158,12 +184,12 @@
             border-radius: 5px;
         }
         .back-button:hover {
-            background-color: #eee;
+            background-color: var(--tg-theme-hint-color, #eee);
         }
         .ride-item {
             border-radius: 12px;
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-            background: white;
+            background: var(--tg-theme-secondary-bg-color, white);
             border: none;
             padding: 15px 20px;
             margin: 12px 0;
@@ -179,6 +205,7 @@
         }
         .ride-route p {
             margin: 4px 0;
+            color: var(--tg-theme-text-color, #000);
         }
         .route {
             font-weight: bold;
@@ -198,10 +225,11 @@
             font-size: 18px;
             margin-top: 4px;
             margin-right: 4px;
+            color: var(--tg-theme-text-color, #000);
         }
         .book-button {
-            background: #28a745;
-            color: white;
+            background: var(--tg-theme-button-color, #28a745);
+            color: var(--tg-theme-button-text-color, white);
             border: none;
             padding: 10px;
             font-size: 15px;
@@ -210,7 +238,7 @@
             cursor: pointer;
         }
         .book-button:hover {
-            background: #218838;
+            background: var(--tg-theme-button-color-hover, #218838);
         }
         .input-wrapper {
             position: relative;
@@ -240,15 +268,15 @@
             opacity: 1;
         }
         .swap-button:hover {
-            background: rgba(40, 167, 69, 0.1);
+            background: var(--tg-theme-hint-color, rgba(40, 167, 69, 0.1));
         }
         .swap-button:active {
-            background: rgba(33, 136, 56, 0.2);
+            background: var(--tg-theme-hint-color, rgba(33, 136, 56, 0.2));
         }
         .swap-button::after {
             content: "⇅";
             font-size: 20px;
-            color: #666;
+            color: var(--tg-theme-hint-color, #666);
             line-height: 1;
             display: flex;
             align-items: center;
@@ -257,15 +285,15 @@
             height: 100%;
         }
         .swap-button:hover::after {
-            color: #28a745;
+            color: var(--tg-theme-button-color, #28a745);
         }
         .swap-button:active::after {
-            color: #218838;
+            color: var(--tg-theme-button-color-hover, #218838);
         }
         .no-rides {
             text-align: center;
             font-size: 18px;
-            color: #666;
+            color: var(--tg-theme-hint-color, #666);
             margin-top: 30vh;
         }
         #modal-results {
@@ -286,7 +314,6 @@
     <input id="seats" type="number" placeholder="Кількість місць" min="1" max="10">
     <button onclick="submitSearch()">Пошук</button>
 
-    <!-- Модальне вікно -->
     <div id="modal" class="modal" style="display: none;">
         <div class="modal-content">
             <div class="modal-title-box">
@@ -299,47 +326,92 @@
     <script>
         const webApp = window.Telegram.WebApp;
         webApp.ready();
-
         let isModalOpen = false;
 
+        // Theme handling
+        function updateTheme() {
+            const themeParams = webApp.themeParams;
+            const root = document.documentElement;
+            root.style.setProperty('--tg-theme-bg-color', themeParams.bg_color || '#f0f0f0');
+            root.style.setProperty('--tg-theme-text-color', themeParams.text_color || '#000000');
+            root.style.setProperty('--tg-theme-hint-color', themeParams.hint_color || '#666');
+            root.style.setProperty('--tg-theme-button-color', themeParams.button_color || '#28a745');
+            root.style.setProperty('--tg-theme-button-text-color', themeParams.button_text_color || 'white');
+            root.style.setProperty('--tg-theme-secondary-bg-color', themeParams.secondary_bg_color || 'white');
+            const buttonColor = themeParams.button_color || '#28a745';
+            const r = parseInt(buttonColor.slice(1, 3), 16);
+            const g = parseInt(buttonColor.slice(3, 5), 16);
+            const b = parseInt(buttonColor.slice(5, 7), 16);
+            const darkerButton = `rgb(${Math.max(r - 20, 0)}, ${Math.max(g - 20, 0)}, ${Math.max(b - 20, 0)})`;
+            root.style.setProperty('--tg-theme-button-color-hover', darkerButton);
+        }
+
+        // Fullscreen and viewport handling
+        function handleViewport() {
+            const viewport = webApp.viewportHeight;
+            const safeArea = webApp.isVerticalSwipesEnabled ? 0 : webApp.safeArea?.bottom || 0;
+            document.documentElement.style.setProperty('--tg-viewport-height', `${viewport - safeArea}px`);
+        }
+
         document.addEventListener('DOMContentLoaded', () => {
-            // Спроба активувати повноекранний режим (без перевірки isAvailable)
+            webApp.ready();
+            updateTheme();
+            webApp.onEvent('themeChanged', updateTheme);
+            webApp.onEvent('viewportChanged', handleViewport);
+            handleViewport();
+
+            // Fullscreen mode
             if (webApp.requestFullscreen) {
                 webApp.requestFullscreen()
-                    .then(() => {
-                        console.log('Повноекранний режим активовано');
-                    })
-                    .catch(err => {
-                        console.warn('Повноекранний режим не підтримується:', err);
-                    });
+                    .then(() => console.log('Повноекранний режим активовано'))
+                    .catch(err => console.warn('Повноекранний режим не підтримується:', err));
+            } else {
+                console.warn('requestFullscreen не підтримується');
+                webApp.expand(); // Fallback to expand
             }
 
-            // Опціонально: Зафіксувати орієнтацію (наприклад, portrait)
+            // Lock orientation to portrait
             if (webApp.lockOrientation) {
                 webApp.lockOrientation('portrait');
             }
 
-            // Ініціалізація flatpickr з відлагодженням
+            // Initialize Flatpickr
             try {
-                const fp = flatpickr("#date", {
+                flatpickr("#date", {
                     dateFormat: "d-m-Y",
                     minDate: "today",
                     locale: "uk",
                     disableMobile: true,
-                    onReady: () => {
+                    allowInput: false,
+                    onOpen: function() {
+                        document.getElementById('date').blur(); // Prevent keyboard
+                    },
+                    onReady: function() {
                         const dateInput = document.getElementById('date');
                         dateInput.placeholder = "Дата (ДД-ММ-РРРР)";
                         console.log('flatpickr ініціалізовано успішно');
+                        // Ensure calendar is themed
+                        unifyDatepickerColors();
                     },
-                    onChange: (selectedDates, dateStr, instance) => {
+                    onChange: function(selectedDates, dateStr) {
                         console.log('Дата змінена:', dateStr);
+                        unifyDatepickerColors();
                     }
                 });
-                if (!fp) {
-                    console.error('flatpickr не ініціалізовано');
-                }
             } catch (err) {
                 console.error('Помилка ініціалізації flatpickr:', err);
+            }
+
+            function unifyDatepickerColors() {
+                const calendar = document.querySelector('.flatpickr-calendar');
+                if (calendar) {
+                    calendar.style.background = getComputedStyle(document.documentElement).getPropertyValue('--tg-theme-secondary-bg-color');
+                    calendar.style.color = getComputedStyle(document.documentElement).getPropertyValue('--tg-theme-text-color');
+                    const days = calendar.querySelectorAll('.flatpickr-day');
+                    days.forEach(day => {
+                        day.style.color = getComputedStyle(document.documentElement).getPropertyValue('--tg-theme-text-color');
+                    });
+                }
             }
 
             function updateSwapButtonVisibility() {
@@ -360,7 +432,6 @@
             updateSwapButtonVisibility();
 
             window.addEventListener('popstate', (event) => {
-                const modal = document.getElementById('modal');
                 if (isModalOpen) {
                     closeModal();
                 } else {
@@ -402,8 +473,8 @@
                 suggestions.style.top = `${rect.bottom + window.scrollY}px`;
                 suggestions.style.left = `${rect.left + window.scrollX}px`;
                 suggestions.style.width = `${rect.width}px`;
-                suggestions.innerHTML = cities.map(city => 
-                    `<div class="suggestion-item" data-name="${city.name}">
+                suggestions.innerHTML = cities.map(city => `
+                    <div class="suggestion-item" data-name="${city.name}">
                         ${city.name}
                     </div>`).join('');
             });
@@ -448,7 +519,7 @@
             if (departure.length > 255 || arrival.length > 255) return alert('Назви місць мають бути до 255 символів!');
 
             try {
-                const res = await fetch('https://027f-194-44-220-198.ngrok-free.app/api/search-rides', {
+                const res = await fetch(`https://027f-194-44-220-198.ngrok-free.app/api/search-rides`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -489,12 +560,10 @@
                 const subtitle = document.createElement('p');
                 subtitle.style.margin = '4px 0 0';
                 subtitle.style.fontSize = '14px';
-                subtitle.style.color = '#555';
+                subtitle.style.color = 'var(--tg-theme-hint-color, #555)';
 
                 const seatsNumber = parseInt(seats);
-                const seatWord =
-                    seatsNumber === 1 ? 'пасажир' :
-                    (seatsNumber >= 2 && seatsNumber <= 4 ? 'пасажири' : 'пасажирів');
+                const seatWord = seatsNumber === 1 ? 'пасажир' : (seatsNumber >= 2 && seatsNumber <= 4 ? 'пасажири' : 'пасажирів');
 
                 subtitle.textContent = `${formatShortDate(date)}, ${seatsNumber} ${seatWord}`;
                 modalTitleBox.appendChild(subtitle);
@@ -524,7 +593,7 @@
             const tgId = webApp.initDataUnsafe.user?.id;
             if (!tgId) return alert('Не вдалося отримати ваш Telegram ID!');
             try {
-                const res = await fetch('https://027f-194-44-220-198.ngrok-free.app/api/book-ride', {
+                const res = await fetch(`https://027f-194-44-220-198.ngrok-free.app/api/book-ride`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
