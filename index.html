@@ -39,16 +39,14 @@
             background: #218838;
         }
         .suggestions {
-            position: absolute;
-            top: 100%;
-            left: 0;
-            width: 100%;
             border: 1px solid #ccc;
             border-radius: 5px;
             max-height: 150px;
             overflow-y: auto;
             background: white;
             display: none;
+            position: absolute;
+            width: 100%;
             z-index: 10;
         }
         .suggestion-item {
@@ -409,8 +407,13 @@
 
             input.addEventListener('input', async (e) => {
                 const query = e.target.value;
+                const rect = input.getBoundingClientRect();
                 const cities = await fetchCities(query);
                 suggestions.style.display = cities.length > 0 ? 'block' : 'none';
+                suggestions.style.position = 'absolute';
+                suggestions.style.top = `${rect.bottom + window.scrollY}px`;
+                suggestions.style.left = `${rect.left + window.scrollX}px`;
+                suggestions.style.width = `${rect.width}px`;
                 suggestions.innerHTML = cities.map(city => `
                     <div class="suggestion-item" data-name="${city.name}">
                         ${city.name}
