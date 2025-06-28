@@ -282,7 +282,7 @@
     <div id="departure-suggestions" class="suggestions"></div>
     <input id="arrival" placeholder="Місце прибуття" autocomplete="off">
     <div id="arrival-suggestions" class="suggestions"></div>
-    <input id="date" type="text" placeholder="Дата (ДД-ММ-РРРР)" ${isMobile ? 'readonly' : ''}>
+    <input id="date" type="text" placeholder="Дата (ДД-ММ-РРРР)" readonly>
     <input id="seats" type="number" placeholder="Кількість місць" min="1" max="10">
     <button onclick="submitSearch()">Пошук</button>
 
@@ -325,8 +325,14 @@
                     dateFormat: "d-m-Y",
                     minDate: "today",
                     locale: "uk",
+                    disableMobile: true,
                     onReady: () => {
-                        console.log("Готово");
+                        const dateInput = document.getElementById('date');
+                        dateInput.placeholder = "Дата (ДД-ММ-РРРР)";
+                        console.log('flatpickr ініціалізовано успішно');
+                    },
+                    onChange: (selectedDates, dateStr, instance) => {
+                        console.log('Дата змінена:', dateStr);
                     }
                 });
                 if (!fp) {
