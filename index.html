@@ -303,15 +303,17 @@
         let isModalOpen = false;
 
         document.addEventListener('DOMContentLoaded', () => {
-            // Спроба активувати повноекранний режим (без перевірки isAvailable)
+            // Спроба активувати повноекранний режим (доступно не для всіх версій)
             if (webApp.requestFullscreen) {
                 webApp.requestFullscreen()
                     .then(() => {
                         console.log('Повноекранний режим активовано');
                     })
                     .catch(err => {
-                        console.warn('Повноекранний режим не підтримується:', err);
+                        console.warn('Повноекранний режим недоступний:', err);
                     });
+            } else {
+                console.warn('Метод requestFullscreen не підтримується цією версією Telegram Web App');
             }
 
             // Опціонально: Зафіксувати орієнтацію (наприклад, portrait)
@@ -319,28 +321,20 @@
                 webApp.lockOrientation('portrait');
             }
 
-            // Ініціалізація flatpickr з відлагодженням
-            try {
-                const fp = flatpickr("#date", {
-                    dateFormat: "d-m-Y",
-                    minDate: "today",
-                    locale: "uk",
-                    disableMobile: true,
-                    onReady: () => {
-                        const dateInput = document.getElementById('date');
-                        dateInput.placeholder = "Дата (ДД-ММ-РРРР)";
-                        console.log('flatpickr ініціалізовано успішно');
-                    },
-                    onChange: (selectedDates, dateStr, instance) => {
-                        console.log('Дата змінена:', dateStr);
-                    }
-                });
-                if (!fp) {
-                    console.error('flatpickr не ініціалізовано');
+            flatpickr("#date", {
+                dateFormat: "d-m-Y",
+                minDate: "today",
+                locale: "uk",
+                disableMobile: true,
+                onReady: () => {
+                    const dateInput = document.getElementById('date');
+                    dateInput.placeholder = "Дата (ДД-ММ-РРРР)";
+                    console.log('flatpickr ініціалізований');
+                },
+                onChange: (selectedDates, dateStr, instance) => {
+                    console.log('Дата змінена:', dateStr);
                 }
-            } catch (err) {
-                console.error('Помилка ініціалізації flatpickr:', err);
-            }
+            });
 
             function updateSwapButtonVisibility() {
                 const departure = document.getElementById('departure').value.trim();
