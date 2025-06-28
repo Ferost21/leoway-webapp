@@ -16,16 +16,6 @@
             max-width: 600px;
             margin: 0 auto;
             position: relative;
-            /* Додаємо padding для безпечної зони Telegram */
-            padding-top: env(safe-area-inset-top, 20px);
-            padding-bottom: env(safe-area-inset-bottom, 20px);
-            padding-left: env(safe-area-inset-left, 20px);
-            padding-right: env(safe-area-inset-right, 20px);
-            box-sizing: border-box;
-            min-height: 100vh;
-        }
-        h1 {
-            margin-top: 0; /* Прибираємо верхній margin, щоб уникнути зсуву */
         }
         input, button {
             width: 100%;
@@ -313,10 +303,20 @@
         let isModalOpen = false;
 
         document.addEventListener('DOMContentLoaded', () => {
-            // Видаляємо requestFullscreen, оскільки не підтримується у версії 6.0
-            console.log('Telegram Web App версія:', webApp.version || 'невідома');
+            // Спроба активувати повноекранний режим (доступно не для всіх версій)
+            if (webApp.requestFullscreen) {
+                webApp.requestFullscreen()
+                    .then(() => {
+                        console.log('Повноекранний режим активовано');
+                    })
+                    .catch(err => {
+                        console.warn('Повноекранний режим недоступний:', err);
+                    });
+            } else {
+                console.warn('Метод requestFullscreen не підтримується цією версією Telegram Web App');
+            }
 
-            // Опціонально: Зафіксувати орієнтацію (якщо підтримується)
+            // Опціонально: Зафіксувати орієнтацію (наприклад, portrait)
             if (webApp.lockOrientation) {
                 webApp.lockOrientation('portrait');
             }
