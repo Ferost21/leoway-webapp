@@ -14,7 +14,7 @@
             padding: 0;
             height: 100%;
             height: 100dvh; /* Dynamic viewport height for fullscreen */
-            overflow: visible;
+            overflow: hidden;
         }
         body {
             font-family: Arial, sans-serif;
@@ -296,21 +296,13 @@
             color: var(--tg-theme-hint-color, #666);
             margin-top: 30vh;
         }
-        .title-container {
-            padding-top: calc(env(safe-area-inset-top, 20px) + 12px);
-            text-align: center;
-        }
-
         #modal-results {
             padding: 0 20px;
         }
     </style>
 </head>
 <body>
-    <div class="title-container">
-        <h1>Пошук поїздки</h1>
-    </div>
-
+    <h1>Пошук поїздки</h1>
     <div class="input-wrapper">
         <input id="departure" placeholder="Місце відправлення" autocomplete="off">
         <button class="swap-button" onclick="swapLocations()" aria-label="Змінити місця"></button>
@@ -318,7 +310,7 @@
     <div id="departure-suggestions" class="suggestions"></div>
     <input id="arrival" placeholder="Місце прибуття" autocomplete="off">
     <div id="arrival-suggestions" class="suggestions"></div>
-    <input id="date" type="text" placeholder="Дата (ДД-ММ-РРРР)" readonly inputmode="none">
+    <input id="date" type="text" placeholder="Дата (ДД-ММ-РРРР)" readonly>
     <input id="seats" type="number" placeholder="Кількість місць" min="1" max="10">
     <button onclick="submitSearch()">Пошук</button>
 
@@ -391,8 +383,8 @@
                     locale: "uk",
                     disableMobile: true,
                     allowInput: false,
-                    onOpen: function(selectedDates, dateStr, instance) {
-                        console.log('Календар відкрито', instance.calendarContainer);
+                    onOpen: function() {
+                        document.getElementById('date').blur(); // Prevent keyboard
                     },
                     onReady: function() {
                         const dateInput = document.getElementById('date');
