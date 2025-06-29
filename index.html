@@ -11,7 +11,7 @@
     <style>
         body {
             font-family: Arial, sans-serif;
-            padding: 20px;
+            padding: 60px 20px 20px; /* Додано padding-top 60px для відступу зверху */
             background: #f0f0f0;
             max-width: 600px;
             margin: 0 auto;
@@ -78,7 +78,7 @@
                 color: #333;
             }
             .flatpickr-calendar {
-                z-index: 1002 !important; /* Підвищено пріоритет */
+                z-index: 1002 !important;
                 position: fixed !important;
                 top: 50% !important;
                 left: 50% !important;
@@ -91,7 +91,7 @@
                 box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1) !important;
             }
             .flatpickr-day {
-                display: block !important; /* Переконуємося, що дні відображаються */
+                display: block !important;
             }
         }
         .modal {
