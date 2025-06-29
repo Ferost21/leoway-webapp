@@ -2,7 +2,7 @@
 <html lang="uk">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Пошук поїздки</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
@@ -13,9 +13,11 @@
             font-family: Arial, sans-serif;
             padding: 20px;
             background: #f0f0f0;
-            max-width: 600px;
-            margin: 0 auto;
+            max-width: 100%;
+            margin: 0;
             position: relative;
+            height: 100vh;
+            overflow-y: auto;
         }
         input, button {
             width: 100%;
@@ -46,9 +48,9 @@
             background: white;
             display: none;
             position: absolute;
-            top: 100%; /* Розташувати під полем вводу */
+            top: 100%;
             left: 0;
-            right: 0; /* Вирівнювання зліва і справа відносно input-wrapper */
+            right: 0;
             z-index: 10;
         }
         .suggestion-item {
@@ -65,7 +67,6 @@
             padding: 10px;
             cursor: pointer;
         }
-
         @media (max-width: 600px) {
             #date {
                 background-color: white;
@@ -80,7 +81,6 @@
                 z-index: 1001;
             }
         }
-
         .modal {
             display: flex;
             justify-content: center;
@@ -94,18 +94,15 @@
             z-index: 1000;
             transition: background 0.3s ease;
         }
-
         .modal.show {
             background: rgba(0, 0, 0, 0.5);
         }
-
         .modal.closing {
             background: rgba(0, 0, 0, 0);
         }
         .modal-content {
             background: #eee;
             width: 100%;
-            max-width: 600px;
             height: 100%;
             overflow-y: auto;
             box-sizing: border-box;
@@ -115,21 +112,17 @@
             transform: translateX(100%);
             animation: slideIn 0.3s forwards;
         }
-
         .modal.closing .modal-content {
             animation: slideOut 0.3s forwards;
         }
-
         @keyframes slideIn {
             from { transform: translateX(100%); }
             to { transform: translateX(0); }
         }
-
         @keyframes slideOut {
             from { transform: translateX(0); }
             to { transform: translateX(100%); }
         }
-
         .modal-header {
             margin: 0 0 20px 0;
             padding: 0;
@@ -137,14 +130,12 @@
             justify-content: center;
             align-items: flex-start;
         }
-
         #modal-title {
             flex-grow: 1;
             text-align: center;
             font-size: 18px;
             margin: 0;
         }
-
         .back-button {
             width: 30px;
             height: 30px;
@@ -157,11 +148,9 @@
             cursor: pointer;
             border-radius: 5px;
         }
-
         .back-button:hover {
             background-color: #eee;
         }
-
         .ride-item {
             border-radius: 12px;
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
@@ -174,13 +163,12 @@
             flex-direction: column;
             gap: 8px;
         }
-
         .ride-top {
             display: flex;
             justify-content: space-between;
-            align-items: flex-start; /* 👈 вирівнює верхній край */
+            align-items: flex-start;
         }
-                .ride-route p {
+        .ride-route p {
             margin: 4px 0;
         }
         .route {
@@ -193,8 +181,8 @@
         .ride-item > .ride-info {
             display: flex;
             justify-content: space-between;
-            align-items: center; /* вертикальне вирівнювання */
-            margin-bottom: 10px; /* відступ від нижнього тексту */
+            align-items: center;
+            margin-bottom: 10px;
         }
         .price-tag {
             font-weight: bold;
@@ -202,7 +190,6 @@
             margin-top: 4px;
             margin-right: 4px;
         }
-
         .book-button {
             background: #28a745;
             color: white;
@@ -210,23 +197,18 @@
             padding: 10px;
             font-size: 15px;
             border-radius: 6px;
-            margin-top: 4px; /* Було більше — зменшено */
+            margin-top: 4px;
             cursor: pointer;
         }
-
         .book-button:hover {
             background: #218838;
         }
-        
         .input-wrapper {
             position: relative;
         }
-
         .input-wrapper input {
-            padding-right: 40px; /* Місце для кнопки всередині input */
+            padding-right: 40px;
         }
-
-        /* Стиль для кнопки зміни місць */
         .swap-button {
             position: absolute;
             top: 33%;
@@ -241,41 +223,35 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            opacity: 0; /* Початкова прозорість для плавного з’явлення */
-            transition: opacity 0.3s ease; /* Плавна анімація з’явлення/зникнення */
+            opacity: 0;
+            transition: opacity 0.3s ease;
             z-index: 2;
         }
-
         .swap-button.visible {
-            opacity: 1; /* Показати кнопку, коли є дані */
+            opacity: 1;
         }
-
         .swap-button:hover {
-            background: rgba(40, 167, 69, 0.1); /* Легкий зелений фон при наведенні */
+            background: rgba(40, 167, 69, 0.1);
         }
-
         .swap-button:active {
-            background: rgba(33, 136, 56, 0.2); /* Темніший зелений при натисканні */
+            background: rgba(33, 136, 56, 0.2);
         }
-
         .swap-button::after {
-            content: "⇅"; /* Іконка стрілочок */
-            font-size: 20px; /* Збільшено розмір для кращого центрування */
-            color: #666; /* Сірий колір за замовчуванням */
-            line-height: 1; /* Нормалізація висоти рядка */
+            content: "⇅";
+            font-size: 20px;
+            color: #666;
+            line-height: 1;
             display: flex;
             align-items: center;
             justify-content: center;
             width: 100%;
             height: 100%;
         }
-
         .swap-button:hover::after {
-            color: #28a745; /* Зелений колір при наведенні */
+            color: #28a745;
         }
-
         .swap-button:active::after {
-            color: #218838; /* Темніший зелений при натисканні */
+            color: #218838;
         }
         .no-rides {
             text-align: center;
@@ -302,8 +278,6 @@
             font-size: 18px;
             margin: 0;
         }
-
-/**/
     </style>
 </head>
 <body>
@@ -334,39 +308,12 @@
     <script>
         const webApp = window.Telegram.WebApp;
         webApp.ready();
+        webApp.expand(); // Enable full-screen mode
 
         document.addEventListener('DOMContentLoaded', () => {
             webApp.ready();
-
-            // Ensure Telegram WebApp is fully initialized
-            setTimeout(() => {
-                // Check if full-screen is supported
-                if (webApp.isVersionAtLeast && webApp.isVersionAtLeast('10.3') && webApp.requestFullscreen) {
-                    console.log('Attempting to enable full-screen mode...');
-                    webApp.requestFullscreen()
-                        .then(() => {
-                            console.log('Full-screen mode activated successfully');
-                            document.body.classList.add('fullscreen'); // Add CSS class for full-screen styling
-                        })
-                        .catch(err => {
-                            console.error('Failed to enable full-screen mode:', err.message);
-                            // Fallback to expand() for older versions
-                            if (webApp.expand) {
-                                webApp.expand();
-                                console.log('Fallback: Expanded WebApp to maximum size');
-                            }
-                        });
-                } else {
-                    console.warn('Full-screen mode not supported. Telegram version:', webApp.version);
-                    // Fallback to expand() for older versions
-                    if (webApp.expand) {
-                        webApp.expand();
-                        console.log('Fallback: Expanded WebApp to maximum size');
-                    }
-                }
-            }, 100); // Delay to ensure SDK is ready
-
-            Telegram.WebApp.BackButton.hide(); // Reset back button on load
+            webApp.expand(); // Ensure full-screen on load
+            Telegram.WebApp.BackButton.hide();
 
             flatpickr("#date", {
                 dateFormat: "d-m-Y",
@@ -379,7 +326,6 @@
                 }
             });
 
-            // Function to manage swap button visibility
             function updateSwapButtonVisibility() {
                 const departure = document.getElementById('departure').value.trim();
                 const arrival = document.getElementById('arrival').value.trim();
@@ -391,21 +337,18 @@
                 }
             }
 
-            // Listeners for updating swap button visibility
             ['departure', 'arrival'].forEach(id => {
                 document.getElementById(id).addEventListener('input', updateSwapButtonVisibility);
             });
 
-            // Initialize swap button visibility
             updateSwapButtonVisibility();
 
-            // Handle back button on phone
             window.addEventListener('popstate', (event) => {
                 const modal = document.getElementById('modal');
                 if (modal.classList.contains('show')) {
                     closeModal();
                 } else {
-                    Telegram.WebApp.close(); // Hides WebApp
+                    Telegram.WebApp.close();
                 }
             });
 
@@ -470,7 +413,7 @@
         function swapLocations() {
             const departure = document.getElementById('departure').value;
             const arrival = document.getElementById('arrival').value;
-            document.getElementById('departure').value = arrival;
+            document.getElementById('depart departures').value = arrival;
             document.getElementById('arrival').value = departure;
         }
 
@@ -478,7 +421,7 @@
             const departure = document.getElementById('departure').value.trim();
             const arrival = document.getElementById('arrival').value.trim();
             const date = document.getElementById('date').value.trim();
-            const seats = document.get('seats').value.trim();
+            const seats = document.getElementById('seats').value.trim();
 
             if (!departure || !arrival || !date || !seats) return alert('Заповніть усі поля!');
             if (departure.length > 255 || arrival.length > 255) return alert('Назви місць мають бути до 255 символів!');
@@ -516,8 +459,7 @@
                                 <button class="book-button" onclick="bookRide(${ride.id}, ${seats})">Забронювати</button>
                             </div>`;
                     }).join('');
-                document.getElementById('modal-title').textContent =
-                    `${departure} → ${arrival}`;
+                document.getElementById('modal-title').textContent = `${departure} → ${arrival}`;
 
                 const modalTitleBox = document.querySelector('.modal-title-box');
                 const oldSubtitle = modalTitleBox.querySelector('p');
@@ -529,8 +471,7 @@
                 subtitle.style.color = '#555';
 
                 const seatsNumber = parseInt(seats);
-                const seatWord =
-                    seatsNumber === 1 ? 'пасажир' :
+                const seatWord = seatsNumber === 1 ? 'пасажир' :
                     (seatsNumber >= 2 && seatsNumber <= 4 ? 'пасажири' : 'пасажирів');
 
                 subtitle.textContent = `${formatShortDate(date)}, ${seatsNumber} ${seatWord}`;
@@ -542,13 +483,11 @@
                 });
                 modal.classList.remove('closing');
 
-                // Show Telegram back button
                 Telegram.WebApp.BackButton.show();
                 Telegram.WebApp.BackButton.onClick(() => {
                     closeModal();
                 });
 
-                // Add state to history after showing modal
                 setTimeout(() => {
                     window.history.pushState({ modalOpen: true }, '');
                 }, 100);
@@ -585,18 +524,7 @@
             setTimeout(() => {
                 modal.style.display = 'none';
                 modal.classList.remove('closing');
-                Telegram.WebApp.BackButton.hide(); // Hide Telegram back button
-                // Exit full-screen mode when closing modal
-                if (webApp.exitFullscreen && webApp.isVersionAtLeast && webApp.isVersionAtLeast('10.3')) {
-                    webApp.exitFullscreen()
-                        .then(() => {
-                            console.log('Exited full-screen mode');
-                            document.body.classList.remove('fullscreen');
-                        })
-                        .catch(err => {
-                            console.error('Failed to exit full-screen mode:', err.message);
-                        });
-                }
+                Telegram.WebApp.BackButton.hide();
             }, 300);
         }
     </script>
