@@ -12,13 +12,13 @@
         body {
             font-family: Arial, sans-serif;
             padding: 60px 20px 20px;
-            background: var(--bg-color, #f5f5f5); /* Світліший фон для світлої теми */
+            background: var(--bg-color, #f5f5f5);
             max-width: 600px;
             margin: 0 auto;
             position: relative;
             height: 100vh;
             box-sizing: border-box;
-            color: var(--text-color, #222); /* Темніший текст для світлої теми */
+            color: var(--text-color, #222);
         }
         input, button {
             width: 100%;
@@ -35,13 +35,13 @@
             background-color: var(--input-bg-color, white);
         }
         button {
-            background: var(--button-bg-color, #27ae60); /* М’якший зелений для світлої теми */
+            background: var(--button-bg-color, #27ae60);
             color: var(--button-text-color, white);
             border: none;
             cursor: pointer;
         }
         button:hover {
-            background: var(--button-hover-bg-color, #219653); /* Темніший зелений для ховеру */
+            background: var(--button-hover-bg-color, #219653);
         }
         .suggestions {
             border: 1px solid var(--border-color, #ccc);
@@ -339,16 +339,17 @@
             const isDark = webApp.colorScheme === 'dark';
 
             const root = document.documentElement;
-            root.style.setProperty('--bg-color', isDark ? '#1f2a2d' : '#f5f5f5'); /* Глибший фон для темної теми */
-            root.style.setProperty('--text-color', isDark ? '#e0e0e0' : '#222'); /* Світліший текст для темної теми */
-            root.style.setProperty('--border-color', isDark ? '#555' : '#ccc');
-            root.style.setProperty('--input-bg-color', isDark ? '#2c3839' : 'white');
-            root.style.setProperty('--button-bg-color', isDark ? '#2ecc71' : '#27ae60'); /* Насичений зелений для темної теми */
-            root.style.setProperty('--button-text-color', isDark ? 'white' : 'white');
-            root.style.setProperty('--button-hover-bg-color', isDark ? '#27ae60' : '#219653');
-            root.style.setProperty('--hover-bg-color', isDark ? '#2c3839' : '#f0f0f0');
-            root.style.setProperty('--modal-bg-color', isDark ? '#2c3839' : '#eee');
-            root.style.setProperty('--ride-bg-color', isDark ? '#2c3839' : 'white');
+            // Використовуємо themeParams, якщо доступні, інакше резервні значення
+            root.style.setProperty('--bg-color', themeParams.bg_color || (isDark ? '#1f2a2d' : '#f5f5f5'));
+            root.style.setProperty('--text-color', themeParams.text_color || (isDark ? '#e0e0e0' : '#222'));
+            root.style.setProperty('--border-color', themeParams.border_color || (isDark ? '#555' : '#ccc'));
+            root.style.setProperty('--input-bg-color', themeParams.section_bg_color || (isDark ? '#2c3839' : 'white'));
+            root.style.setProperty('--button-bg-color', themeParams.button_color || (isDark ? '#2ecc71' : '#27ae60'));
+            root.style.setProperty('--button-text-color', themeParams.button_text_color || 'white');
+            root.style.setProperty('--button-hover-bg-color', themeParams.button_color || (isDark ? '#27ae60' : '#219653'));
+            root.style.setProperty('--hover-bg-color', themeParams.section_bg_color || (isDark ? '#2c3839' : '#f0f0f0'));
+            root.style.setProperty('--modal-bg-color', themeParams.section_bg_color || (isDark ? '#2c3839' : '#eee'));
+            root.style.setProperty('--ride-bg-color', themeParams.section_bg_color || (isDark ? '#2c3839' : 'white'));
 
             // Синхронізація кольорів заголовка та фону з Telegram
             webApp.setHeaderColor(themeParams.bg_color || (isDark ? '#1f2a2d' : '#ffffff'), 'bg_color');
