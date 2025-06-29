@@ -11,13 +11,14 @@
     <style>
         body {
             font-family: Arial, sans-serif;
-            padding: 60px 20px 20px; /* Додано padding-top 60px для відступу зверху */
+            padding: 60px 20px 20px;
             background: #f0f0f0;
             max-width: 600px;
             margin: 0 auto;
             position: relative;
             height: 100vh;
             box-sizing: border-box;
+            transition: background-color 0.3s ease;
         }
         input, button {
             width: 100%;
@@ -26,10 +27,12 @@
             font-size: 16px;
             box-sizing: border-box;
             border-radius: 5px;
+            transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
         }
         input {
             border: 1px solid #ccc;
             background-color: white;
+            color: #333;
         }
         button {
             background: #28a745;
@@ -52,10 +55,12 @@
             left: 0;
             right: 0;
             z-index: 10;
+            transition: background-color 0.3s ease, border-color 0.3s ease;
         }
         .suggestion-item {
             padding: 10px;
             cursor: pointer;
+            color: #333;
         }
         .suggestion-item:hover {
             background: #f0f0f0;
@@ -125,6 +130,7 @@
             position: relative;
             transform: translateX(100%);
             animation: slideIn 0.3s forwards;
+            transition: background-color 0.3s ease;
         }
         .modal.closing .modal-content {
             animation: slideOut 0.3s forwards;
@@ -149,6 +155,8 @@
             text-align: center;
             font-size: 18px;
             margin: 0;
+            color: #333;
+            transition: color 0.3s ease;
         }
         .back-button {
             width: 30px;
@@ -161,6 +169,7 @@
             align-items: center;
             cursor: pointer;
             border-radius: 5px;
+            transition: color 0.3s ease, background-color 0.3s ease;
         }
         .back-button:hover {
             background-color: #eee;
@@ -176,6 +185,7 @@
             display: flex;
             flex-direction: column;
             gap: 8px;
+            transition: background-color 0.3s ease, box-shadow 0.3s ease;
         }
         .ride-top {
             display: flex;
@@ -184,6 +194,8 @@
         }
         .ride-route p {
             margin: 4px 0;
+            color: #333;
+            transition: color 0.3s ease;
         }
         .route {
             font-weight: bold;
@@ -203,6 +215,8 @@
             font-size: 18px;
             margin-top: 4px;
             margin-right: 4px;
+            color: #333;
+            transition: color 0.3s ease;
         }
         .book-button {
             background: #28a745;
@@ -213,6 +227,7 @@
             border-radius: 6px;
             margin-top: 4px;
             cursor: pointer;
+            transition: background-color 0.3s ease;
         }
         .book-button:hover {
             background: #218838;
@@ -238,7 +253,7 @@
             justify-content: center;
             align-items: center;
             opacity: 0;
-            transition: opacity 0.3s ease;
+            transition: opacity 0.3s ease, background-color 0.3s ease;
             z-index: 2;
         }
         .swap-button.visible {
@@ -260,6 +275,7 @@
             justify-content: center;
             width: 100%;
             height: 100%;
+            transition: color 0.3s ease;
         }
         .swap-button:hover::after {
             color: #28a745;
@@ -272,6 +288,7 @@
             font-size: 18px;
             color: #666;
             margin-top: 30vh;
+            transition: color 0.3s ease;
         }
         .modal-title-box {
             margin-top: 0;
@@ -280,10 +297,11 @@
             border-bottom-right-radius: 12px;
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
             text-align: center;
-            padding: 30px 18px 12px;
+            padding: 30px 18px 12px; /* Збережено ваш padding */
             width: 100%;
             box-sizing: border-box;
             z-index: 1001;
+            transition: background-color 0.3s ease, box-shadow 0.3s ease;
         }
         #modal-results {
             padding: 0 20px;
@@ -291,6 +309,8 @@
         #modal-title {
             font-size: 18px;
             margin: 0;
+            color: #333;
+            transition: color 0.3s ease;
         }
     </style>
 </head>
@@ -324,6 +344,67 @@
         webApp.ready();
 
         let isModalOpen = false;
+
+        // Функція для оновлення кольорів на основі теми Telegram
+        function updateTheme() {
+            const themeParams = webApp.themeParams || {};
+            const isDark = webApp.colorScheme === 'dark';
+
+            document.body.style.backgroundColor = isDark ? themeParams.bg_color || '#1c2526' : '#f0f0f0';
+            document.querySelectorAll('input').forEach(input => {
+                input.style.backgroundColor = isDark ? themeParams.secondary_bg_color || '#2c3e50' : 'white';
+                input.style.color = isDark ? themeParams.text_color || '#ffffff' : '#333';
+                input.style.borderColor = isDark ? themeParams.border_color || '#34495e' : '#ccc';
+            });
+            document.querySelectorAll('button').forEach(button => {
+                button.style.backgroundColor = isDark ? themeParams.button_color || '#27ae60' : '#28a745';
+                button.style.color = isDark ? themeParams.button_text_color || '#ffffff' : 'white';
+            });
+            document.querySelectorAll('.suggestions').forEach(sugg => {
+                sugg.style.backgroundColor = isDark ? themeParams.secondary_bg_color || '#2c3e50' : 'white';
+                sugg.style.borderColor = isDark ? themeParams.border_color || '#34495e' : '#ccc';
+            });
+            document.querySelectorAll('.suggestion-item').forEach(item => {
+                item.style.color = isDark ? themeParams.text_color || '#ffffff' : '#333';
+            });
+            document.querySelectorAll('.suggestion-item:hover').forEach(item => {
+                item.style.backgroundColor = isDark ? '#34495e' : '#f0f0f0';
+            });
+            document.querySelector('.modal-content').style.backgroundColor = isDark ? themeParams.bg_color || '#1c2526' : '#eee';
+            document.querySelectorAll('.ride-item').forEach(item => {
+                item.style.backgroundColor = isDark ? themeParams.secondary_bg_color || '#2c3e50' : 'white';
+                item.style.boxShadow = isDark ? '0 4px 10px rgba(0, 0, 0, 0.3)' : '0 4px 10px rgba(0, 0, 0, 0.1)';
+            });
+            document.querySelectorAll('.ride-route p, .price-tag, #modal-title, .no-rides').forEach(el => {
+                el.style.color = isDark ? themeParams.text_color || '#ffffff' : '#333';
+            });
+            document.querySelectorAll('.book-button').forEach(button => {
+                button.style.backgroundColor = isDark ? themeParams.button_color || '#27ae60' : '#28a745';
+            });
+            document.querySelectorAll('.book-button:hover').forEach(button => {
+                button.style.backgroundColor = isDark ? '#219653' : '#218838';
+            });
+            document.querySelectorAll('.back-button').forEach(button => {
+                button.style.color = isDark ? themeParams.text_color || '#ffffff' : '#444';
+            });
+            document.querySelectorAll('.back-button:hover').forEach(button => {
+                button.style.backgroundColor = isDark ? '#34495e' : '#eee';
+            });
+            document.querySelectorAll('.swap-button').forEach(button => {
+                button.style.backgroundColor = isDark ? 'rgba(39, 174, 96, 0.1)' : 'rgba(40, 167, 69, 0.1)';
+            });
+            document.querySelectorAll('.swap-button:active').forEach(button => {
+                button.style.backgroundColor = isDark ? 'rgba(33, 150, 83, 0.2)' : 'rgba(33, 136, 56, 0.2)';
+            });
+            document.querySelectorAll('.swap-button::after').forEach(el => {
+                el.style.color = isDark ? themeParams.hint_color || '#bdc3c7' : '#666';
+            });
+            document.querySelectorAll('.modal.show').forEach(modal => {
+                modal.style.background = isDark ? 'rgba(0, 0, 0, 0.7)' : 'rgba(0, 0, 0, 0.5)';
+            });
+            document.querySelector('.modal-title-box').style.backgroundColor = isDark ? themeParams.bg_color || '#1c2526' : '#fff';
+            document.querySelector('.modal-title-box').style.boxShadow = isDark ? '0 4px 10px rgba(0, 0, 0, 0.3)' : '0 4px 10px rgba(0, 0, 0, 0.1)';
+        }
 
         document.addEventListener('DOMContentLoaded', () => {
             webApp.ready();
@@ -397,6 +478,11 @@
             });
 
             window.history.replaceState({ page: 'home' }, document.title);
+
+            // Оновлення теми при завантаженні
+            updateTheme();
+            // Оновлення теми при зміні
+            webApp.onEvent('themeChanged', updateTheme);
         });
 
         async function fetchCities(query) {
@@ -512,7 +598,7 @@
                 const subtitle = document.createElement('p');
                 subtitle.style.margin = '4px 0 0';
                 subtitle.style.fontSize = '14px';
-                subtitle.style.color = '#555';
+                subtitle.style.color = isDark ? themeParams.text_color || '#ffffff' : '#555';
 
                 const seatsNumber = parseInt(seats);
                 const seatWord = seatsNumber === 1 ? 'пасажир' : (seatsNumber >= 2 && seatsNumber <= 4 ? 'пасажири' : 'пасажирів');
