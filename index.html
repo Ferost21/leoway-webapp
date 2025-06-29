@@ -12,14 +12,13 @@
         body {
             font-family: Arial, sans-serif;
             padding: 60px 20px 20px;
-            background: #f0f0f0;
+            background: var(--bg-color, #f0f0f0); /* Адаптивний фон */
             max-width: 600px;
             margin: 0 auto;
             position: relative;
             height: 100vh;
             box-sizing: border-box;
-            color: #000;
-            transition: background-color 0.3s, color 0.3s;
+            color: var(--text-color, #333); /* Адаптивний текст */
         }
         input, button {
             width: 100%;
@@ -28,58 +27,59 @@
             font-size: 16px;
             box-sizing: border-box;
             border-radius: 5px;
-            border: 1px solid #ccc;
-            background-color: #fff;
-            color: #000;
-            transition: background-color 0.3s, color 0.3s, border-color 0.3s;
+            border: 1px solid var(--border-color, #ccc); /* Адаптивна обводка */
+            background-color: var(--input-bg-color, white);
+            color: var(--text-color, #333);
+        }
+        input {
+            background-color: var(--input-bg-color, white);
         }
         button {
-            background: #28a745;
-            color: #fff;
+            background: var(--button-bg-color, #28a745);
+            color: var(--button-text-color, white);
             border: none;
             cursor: pointer;
         }
         button:hover {
-            background: #218838;
+            background: var(--button-hover-bg-color, #218838);
         }
         .suggestions {
-            border: 1px solid #ccc;
+            border: 1px solid var(--border-color, #ccc);
             border-radius: 5px;
             max-height: 150px;
             overflow-y: auto;
-            background: #fff;
+            background: var(--input-bg-color, white);
             display: none;
             position: absolute;
             top: 100%;
             left: 0;
             right: 0;
             z-index: 10;
-            color: #000;
-            transition: background-color 0.3s, color 0.3s, border-color 0.3s;
+            color: var(--text-color, #333);
         }
         .suggestion-item {
             padding: 10px;
             cursor: pointer;
         }
         .suggestion-item:hover {
-            background: #f0f0f0;
+            background: var(--hover-bg-color, #f0f0f0);
         }
         #date {
             appearance: none;
-            background-color: #fff;
-            color: #000;
+            background-color: white;
+            color: #333;
             padding: 10px;
             cursor: pointer;
         }
         @media (max-width: 600px) {
             #date {
-                background-color: #fff;
-                color: #000;
+                background-color: white;
+                color: #333;
                 padding: 12px;
                 font-size: 16px;
             }
             #date.flatpickr-input {
-                color: #000;
+                color: #333;
             }
             .flatpickr-calendar {
                 z-index: 1002 !important;
@@ -118,7 +118,7 @@
             background: rgba(0, 0, 0, 0);
         }
         .modal-content {
-            background: #eee;
+            background: var(--modal-bg-color, #eee);
             width: 100%;
             max-width: 600px;
             height: 100%;
@@ -129,8 +129,6 @@
             position: relative;
             transform: translateX(100%);
             animation: slideIn 0.3s forwards;
-            color: #000;
-            transition: background-color 0.3s, color 0.3s;
         }
         .modal.closing .modal-content {
             animation: slideOut 0.3s forwards;
@@ -155,29 +153,27 @@
             text-align: center;
             font-size: 18px;
             margin: 0;
-            color: #000;
-            transition: color 0.3s;
+            color: var(--text-color, #333);
         }
         .back-button {
             width: 30px;
             height: 30px;
             font-size: 24px;
             font-weight: bold;
-            color: #444;
+            color: var(--text-color, #444);
             display: flex;
             justify-content: center;
             align-items: center;
             cursor: pointer;
             border-radius: 5px;
-            transition: color 0.3s;
         }
         .back-button:hover {
-            background-color: #eee;
+            background-color: var(--hover-bg-color, #eee);
         }
         .ride-item {
             border-radius: 12px;
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-            background: #fff;
+            background: var(--ride-bg-color, white);
             border: none;
             padding: 15px 20px;
             margin: 12px 0;
@@ -185,8 +181,7 @@
             display: flex;
             flex-direction: column;
             gap: 8px;
-            color: #000;
-            transition: background-color 0.3s, color 0.3s;
+            color: var(--text-color, #333);
         }
         .ride-top {
             display: flex;
@@ -195,8 +190,7 @@
         }
         .ride-route p {
             margin: 4px 0;
-            color: #000;
-            transition: color 0.3s;
+            color: var(--text-color, #333);
         }
         .route {
             font-weight: bold;
@@ -216,22 +210,20 @@
             font-size: 18px;
             margin-top: 4px;
             margin-right: 4px;
-            color: #000;
-            transition: color 0.3s;
+            color: var(--text-color, #333);
         }
         .book-button {
-            background: #28a745;
-            color: #fff;
+            background: var(--button-bg-color, #28a745);
+            color: var(--button-text-color, white);
             border: none;
             padding: 10px;
             font-size: 15px;
             border-radius: 6px;
             margin-top: 4px;
             cursor: pointer;
-            transition: background-color 0.3s;
         }
         .book-button:hover {
-            background: #218838;
+            background: var(--button-hover-bg-color, #218838);
         }
         .input-wrapper {
             position: relative;
@@ -261,49 +253,45 @@
             opacity: 1;
         }
         .swap-button:hover {
-            background: rgba(40, 167, 69, 0.1);
+            background: var(--hover-bg-color, rgba(40, 167, 69, 0.1));
         }
         .swap-button:active {
-            background: rgba(33, 136, 56, 0.2);
+            background: var(--hover-bg-color, rgba(33, 136, 56, 0.2));
         }
         .swap-button::after {
             content: "⇅";
             font-size: 20px;
-            color: #666;
+            color: var(--text-color, #666);
             line-height: 1;
             display: flex;
             align-items: center;
             justify-content: center;
             width: 100%;
             height: 100%;
-            transition: color 0.3s;
         }
         .swap-button:hover::after {
-            color: #28a745;
+            color: var(--button-bg-color, #28a745);
         }
         .swap-button:active::after {
-            color: #218838;
+            color: var(--button-hover-bg-color, #218838);
         }
         .no-rides {
             text-align: center;
             font-size: 18px;
-            color: #666;
+            color: var(--text-color, #666);
             margin-top: 30vh;
-            transition: color 0.3s;
         }
         .modal-title-box {
             margin-top: 0;
-            background: #fff;
+            background: var(--modal-bg-color, #fff);
             border-bottom-left-radius: 12px;
             border-bottom-right-radius: 12px;
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
             text-align: center;
-            padding: 30px 18px 12px; /* Збережено ваш padding */
+            padding: 30px 18px 12px; /* Залишаємо ваш padding */
             width: 100%;
             box-sizing: border-box;
             z-index: 1001;
-            color: #000;
-            transition: background-color 0.3s, color 0.3s;
         }
         #modal-results {
             padding: 0 20px;
@@ -311,8 +299,6 @@
         #modal-title {
             font-size: 18px;
             margin: 0;
-            color: #000;
-            transition: color 0.3s;
         }
     </style>
 </head>
@@ -347,12 +333,36 @@
 
         let isModalOpen = false;
 
+        // Функція для оновлення стилів на основі теми
+        function updateTheme() {
+            const themeParams = webApp.themeParams || {};
+            const isDark = webApp.colorScheme === 'dark';
+
+            const root = document.documentElement;
+            root.style.setProperty('--bg-color', isDark ? '#1c2526' : '#f0f0f0');
+            root.style.setProperty('--text-color', isDark ? '#ffffff' : '#333');
+            root.style.setProperty('--border-color', isDark ? '#444' : '#ccc');
+            root.style.setProperty('--input-bg-color', isDark ? '#2c3839' : 'white');
+            root.style.setProperty('--button-bg-color', isDark ? '#00a32e' : '#28a745');
+            root.style.setProperty('--button-text-color', isDark ? 'white' : 'white');
+            root.style.setProperty('--button-hover-bg-color', isDark ? '#008f27' : '#218838');
+            root.style.setProperty('--hover-bg-color', isDark ? '#2c3839' : '#f0f0f0');
+            root.style.setProperty('--modal-bg-color', isDark ? '#2c3839' : '#eee');
+            root.style.setProperty('--ride-bg-color', isDark ? '#2c3839' : 'white');
+
+            // Синхронізація кольорів заголовка та фону з Telegram
+            webApp.setHeaderColor(themeParams.bg_color || (isDark ? '#1c2526' : '#ffffff'), 'bg_color');
+            webApp.setBackgroundColor(themeParams.bg_color || (isDark ? '#1c2526' : '#f0f0f0'));
+        }
+
         document.addEventListener('DOMContentLoaded', () => {
             webApp.ready();
 
-            // Отримання параметрів теми Telegram
-            const themeParams = webApp.getThemeParams();
-            applyTheme(themeParams);
+            // Оновлюємо тему при завантаженні
+            updateTheme();
+
+            // Слухаємо зміни теми
+            webApp.onEvent('themeChanged', updateTheme);
 
             // Ініціалізація flatpickr з відлагодженням
             try {
@@ -424,59 +434,6 @@
 
             window.history.replaceState({ page: 'home' }, document.title);
         });
-
-        // Функція для застосування теми
-        function applyTheme(theme) {
-            document.body.style.backgroundColor = theme.bg_color || '#f0f0f0';
-            document.body.style.color = theme.text_color || '#000';
-            document.querySelectorAll('input').forEach(input => {
-                input.style.backgroundColor = theme.bg_color || '#fff';
-                input.style.color = theme.text_color || '#000';
-                input.style.borderColor = theme.border_color || '#ccc';
-            });
-            document.querySelectorAll('button').forEach(button => {
-                button.style.backgroundColor = theme.button_color || '#28a745';
-                button.style.color = theme.button_text_color || '#fff';
-            });
-            document.querySelectorAll('.suggestions').forEach(suggestions => {
-                suggestions.style.backgroundColor = theme.bg_color || '#fff';
-                suggestions.style.color = theme.text_color || '#000';
-                suggestions.style.borderColor = theme.border_color || '#ccc';
-            });
-            document.querySelectorAll('.suggestion-item:hover').forEach(item => {
-                item.style.backgroundColor = theme.secondary_bg_color || '#f0f0f0';
-            });
-            document.querySelector('.modal-content').style.backgroundColor = theme.bg_color || '#eee';
-            document.querySelector('.modal-content').style.color = theme.text_color || '#000';
-            document.querySelector('.modal-title-box').style.backgroundColor = theme.bg_color || '#fff';
-            document.querySelector('.modal-title-box').style.color = theme.text_color || '#000';
-            document.querySelectorAll('.ride-item').forEach(item => {
-                item.style.backgroundColor = theme.bg_color || '#fff';
-                item.style.color = theme.text_color || '#000';
-            });
-            document.querySelectorAll('.ride-route p').forEach(p => {
-                p.style.color = theme.text_color || '#000';
-            });
-            document.querySelectorAll('.price-tag').forEach(tag => {
-                tag.style.color = theme.text_color || '#000';
-            });
-            document.querySelectorAll('.book-button').forEach(button => {
-                button.style.backgroundColor = theme.button_color || '#28a745';
-                button.style.color = theme.button_text_color || '#fff';
-            });
-            document.querySelectorAll('.no-rides').forEach(noRides => {
-                noRides.style.color = theme.hint_color || '#666';
-            });
-            document.querySelectorAll('.swap-button::after').forEach(after => {
-                after.style.color = theme.hint_color || '#666';
-            });
-            document.querySelectorAll('.back-button').forEach(button => {
-                button.style.color = theme.hint_color || '#444';
-            });
-            document.querySelectorAll('#modal-title').forEach(title => {
-                title.style.color = theme.text_color || '#000';
-            });
-        }
 
         async function fetchCities(query) {
             if (query.length < 2) return [];
@@ -591,7 +548,7 @@
                 const subtitle = document.createElement('p');
                 subtitle.style.margin = '4px 0 0';
                 subtitle.style.fontSize = '14px';
-                subtitle.style.color = themeParams.text_color || '#555';
+                subtitle.style.color = 'var(--text-color, #555)';
 
                 const seatsNumber = parseInt(seats);
                 const seatWord = seatsNumber === 1 ? 'пасажир' : (seatsNumber >= 2 && seatsNumber <= 4 ? 'пасажири' : 'пасажирів');
