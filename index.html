@@ -12,13 +12,13 @@
         body {
             font-family: Arial, sans-serif;
             padding: 60px 20px 20px;
-            background: var(--bg-color, #f0f0f0); /* Адаптивний фон */
+            background: var(--bg-color, #f5f5f5); /* Світліший фон для світлої теми */
             max-width: 600px;
             margin: 0 auto;
             position: relative;
             height: 100vh;
             box-sizing: border-box;
-            color: var(--text-color, #333); /* Адаптивний текст */
+            color: var(--text-color, #222); /* Темніший текст для світлої теми */
         }
         input, button {
             width: 100%;
@@ -27,21 +27,21 @@
             font-size: 16px;
             box-sizing: border-box;
             border-radius: 5px;
-            border: 1px solid var(--border-color, #ccc); /* Адаптивна обводка */
+            border: 1px solid var(--border-color, #ccc);
             background-color: var(--input-bg-color, white);
-            color: var(--text-color, #333);
+            color: var(--text-color, #222);
         }
         input {
             background-color: var(--input-bg-color, white);
         }
         button {
-            background: var(--button-bg-color, #28a745);
+            background: var(--button-bg-color, #27ae60); /* М’якший зелений для світлої теми */
             color: var(--button-text-color, white);
             border: none;
             cursor: pointer;
         }
         button:hover {
-            background: var(--button-hover-bg-color, #218838);
+            background: var(--button-hover-bg-color, #219653); /* Темніший зелений для ховеру */
         }
         .suggestions {
             border: 1px solid var(--border-color, #ccc);
@@ -55,7 +55,7 @@
             left: 0;
             right: 0;
             z-index: 10;
-            color: var(--text-color, #333);
+            color: var(--text-color, #222);
         }
         .suggestion-item {
             padding: 10px;
@@ -153,7 +153,7 @@
             text-align: center;
             font-size: 18px;
             margin: 0;
-            color: var(--text-color, #333);
+            color: var(--text-color, #222);
         }
         .back-button {
             width: 30px;
@@ -168,7 +168,7 @@
             border-radius: 5px;
         }
         .back-button:hover {
-            background-color: var(--hover-bg-color, #eee);
+            background-color: var(--hover-bg-color, #f0f0f0);
         }
         .ride-item {
             border-radius: 12px;
@@ -181,7 +181,7 @@
             display: flex;
             flex-direction: column;
             gap: 8px;
-            color: var(--text-color, #333);
+            color: var(--text-color, #222);
         }
         .ride-top {
             display: flex;
@@ -190,7 +190,7 @@
         }
         .ride-route p {
             margin: 4px 0;
-            color: var(--text-color, #333);
+            color: var(--text-color, #222);
         }
         .route {
             font-weight: bold;
@@ -210,10 +210,10 @@
             font-size: 18px;
             margin-top: 4px;
             margin-right: 4px;
-            color: var(--text-color, #333);
+            color: var(--text-color, #222);
         }
         .book-button {
-            background: var(--button-bg-color, #28a745);
+            background: var(--button-bg-color, #27ae60);
             color: var(--button-text-color, white);
             border: none;
             padding: 10px;
@@ -223,7 +223,7 @@
             cursor: pointer;
         }
         .book-button:hover {
-            background: var(--button-hover-bg-color, #218838);
+            background: var(--button-hover-bg-color, #219653);
         }
         .input-wrapper {
             position: relative;
@@ -253,10 +253,10 @@
             opacity: 1;
         }
         .swap-button:hover {
-            background: var(--hover-bg-color, rgba(40, 167, 69, 0.1));
+            background: var(--hover-bg-color, rgba(39, 174, 96, 0.1));
         }
         .swap-button:active {
-            background: var(--hover-bg-color, rgba(33, 136, 56, 0.2));
+            background: var(--hover-bg-color, rgba(33, 150, 83, 0.2));
         }
         .swap-button::after {
             content: "⇅";
@@ -270,10 +270,10 @@
             height: 100%;
         }
         .swap-button:hover::after {
-            color: var(--button-bg-color, #28a745);
+            color: var(--button-bg-color, #27ae60);
         }
         .swap-button:active::after {
-            color: var(--button-hover-bg-color, #218838);
+            color: var(--button-hover-bg-color, #219653);
         }
         .no-rides {
             text-align: center;
@@ -288,7 +288,7 @@
             border-bottom-right-radius: 12px;
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
             text-align: center;
-            padding: 30px 18px 12px; /* Залишаємо ваш padding */
+            padding: 30px 18px 12px;
             width: 100%;
             box-sizing: border-box;
             z-index: 1001;
@@ -339,20 +339,20 @@
             const isDark = webApp.colorScheme === 'dark';
 
             const root = document.documentElement;
-            root.style.setProperty('--bg-color', isDark ? '#1c2526' : '#f0f0f0');
-            root.style.setProperty('--text-color', isDark ? '#ffffff' : '#333');
-            root.style.setProperty('--border-color', isDark ? '#444' : '#ccc');
+            root.style.setProperty('--bg-color', isDark ? '#1f2a2d' : '#f5f5f5'); /* Глибший фон для темної теми */
+            root.style.setProperty('--text-color', isDark ? '#e0e0e0' : '#222'); /* Світліший текст для темної теми */
+            root.style.setProperty('--border-color', isDark ? '#555' : '#ccc');
             root.style.setProperty('--input-bg-color', isDark ? '#2c3839' : 'white');
-            root.style.setProperty('--button-bg-color', isDark ? '#00a32e' : '#28a745');
+            root.style.setProperty('--button-bg-color', isDark ? '#2ecc71' : '#27ae60'); /* Насичений зелений для темної теми */
             root.style.setProperty('--button-text-color', isDark ? 'white' : 'white');
-            root.style.setProperty('--button-hover-bg-color', isDark ? '#008f27' : '#218838');
+            root.style.setProperty('--button-hover-bg-color', isDark ? '#27ae60' : '#219653');
             root.style.setProperty('--hover-bg-color', isDark ? '#2c3839' : '#f0f0f0');
             root.style.setProperty('--modal-bg-color', isDark ? '#2c3839' : '#eee');
             root.style.setProperty('--ride-bg-color', isDark ? '#2c3839' : 'white');
 
             // Синхронізація кольорів заголовка та фону з Telegram
-            webApp.setHeaderColor(themeParams.bg_color || (isDark ? '#1c2526' : '#ffffff'), 'bg_color');
-            webApp.setBackgroundColor(themeParams.bg_color || (isDark ? '#1c2526' : '#f0f0f0'));
+            webApp.setHeaderColor(themeParams.bg_color || (isDark ? '#1f2a2d' : '#ffffff'), 'bg_color');
+            webApp.setBackgroundColor(themeParams.bg_color || (isDark ? '#1f2a2d' : '#f5f5f5'));
         }
 
         document.addEventListener('DOMContentLoaded', () => {
