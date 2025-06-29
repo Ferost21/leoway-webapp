@@ -16,7 +16,7 @@
             max-width: 600px;
             margin: 0 auto;
             position: relative;
-            height: 100vh; /* Забезпечуємо повну висоту для повноекранного режиму */
+            height: 100vh;
             box-sizing: border-box;
         }
         input, button {
@@ -48,9 +48,9 @@
             background: white;
             display: none;
             position: absolute;
-            top: 100%; /* Розташувати під полем вводу */
+            top: 100%;
             left: 0;
-            right: 0; /* Вирівнювання зліва і справа відносно input-wrapper */
+            right: 0;
             z-index: 10;
         }
         .suggestion-item {
@@ -328,17 +328,34 @@
 
             Telegram.WebApp.BackButton.hide();
 
-            // Ініціалізація flatpickr
-            flatpickr("#date", {
-                dateFormat: "d-m-Y",
-                minDate: "today",
-                locale: "uk",
-                disableMobile: true,
-                onReady: () => {
-                    const dateInput = document.getElementById('date');
-                    dateInput.placeholder = "Дата (ДД-ММ-РРРР)";
+            // Ініціалізація flatpickr з відлагодженням
+            try {
+                const fp = flatpickr("#date", {
+                    dateFormat: "d-m-Y",
+                    minDate: "today",
+                    locale: "uk",
+                    disableMobile: true,
+                    onReady: () => {
+                        const dateInput = document.getElementById('date');
+                        dateInput.placeholder = "Дата (ДД-ММ-РРРР)";
+                        console.log('flatpickr ініціалізовано успішно');
+                    },
+                    onChange: (selectedDates, dateStr, instance) => {
+                        console.log('Дата змінена:', dateStr);
+                    },
+                    onOpen: () => {
+                        console.log('Календар відкрито');
+                    },
+                    onClose: () => {
+                        console.log('Календар закрито');
+                    }
+                });
+                if (!fp) {
+                    console.error('flatpickr не ініціалізовано');
                 }
-            });
+            } catch (err) {
+                console.error('Помилка ініціалізації flatpickr:', err);
+            }
 
             // Функція для управління видимістю кнопки
             function updateSwapButtonVisibility() {
