@@ -78,7 +78,7 @@
                 color: #333;
             }
             .flatpickr-calendar {
-                z-index: 1001;
+                z-index: 1002 !important; /* Підвищено пріоритет */
                 position: fixed !important;
                 top: 50% !important;
                 left: 50% !important;
@@ -86,6 +86,12 @@
                 width: 90% !important;
                 max-height: 80vh !important;
                 overflow-y: auto !important;
+                background: white !important;
+                border-radius: 5px !important;
+                box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1) !important;
+            }
+            .flatpickr-day {
+                display: block !important; /* Переконуємося, що дні відображаються */
             }
         }
         .modal {
@@ -322,19 +328,6 @@
         document.addEventListener('DOMContentLoaded', () => {
             webApp.ready();
 
-            // Активувати повноекранний режим лише на мобільних пристроях
-            if (webApp.requestFullscreen && window.innerWidth <= 600) {
-                webApp.requestFullscreen()
-                    .then(() => {
-                        console.log('Повноекранний режим активовано');
-                    })
-                    .catch(err => {
-                        console.warn('Повноекранний режим не підтримується:', err);
-                    });
-            }
-
-            Telegram.WebApp.BackButton.hide();
-
             // Ініціалізація flatpickr з відлагодженням
             try {
                 const fp = flatpickr("#date", {
@@ -345,6 +338,16 @@
                         const dateInput = document.getElementById('date');
                         dateInput.placeholder = "Дата (ДД-ММ-РРРР)";
                         console.log('flatpickr ініціалізовано успішно');
+                        // Активувати повноекранний режим після ініціалізації
+                        if (webApp.requestFullscreen && window.innerWidth <= 600) {
+                            webApp.requestFullscreen()
+                                .then(() => {
+                                    console.log('Повноекранний режим активовано');
+                                })
+                                .catch(err => {
+                                    console.warn('Повноекранний режим не підтримується:', err);
+                                });
+                        }
                     },
                     onChange: (selectedDates, dateStr, instance) => {
                         console.log('Дата змінена:', dateStr);
@@ -362,6 +365,8 @@
             } catch (err) {
                 console.error('Помилка ініціалізації flatpickr:', err);
             }
+
+            Telegram.WebApp.BackButton.hide();
 
             // Функція для управління видимістю кнопки
             function updateSwapButtonVisibility() {
@@ -387,7 +392,6 @@
                 if (isModalOpen) {
                     closeModal();
                 } else {
-                    // Залишаємо додаток відкритим, не закриваємо
                     console.log('Повернення до головного меню');
                 }
             });
@@ -566,7 +570,6 @@
                 modal.classList.remove('closing');
                 isModalOpen = false;
                 Telegram.WebApp.BackButton.hide();
-                // Замінюємо history.back() на pushState для повернення до головного меню
                 window.history.pushState({ page: 'home' }, document.title);
             }, 300);
         }
