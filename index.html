@@ -322,16 +322,16 @@
         document.addEventListener('DOMContentLoaded', () => {
             webApp.ready();
 
-            // Тимчасово відключено requestFullscreen через несумісність
-            // if (webApp.requestFullscreen && window.innerWidth <= 600) {
-            //     webApp.requestFullscreen()
-            //         .then(() => {
-            //             console.log('Повноекранний режим активовано');
-            //         })
-            //         .catch(err => {
-            //             console.warn('Повноекранний режим не підтримується:', err);
-            //         });
-            // }
+            // Активувати повноекранний режим лише на мобільних пристроях
+            if (webApp.requestFullscreen && window.innerWidth <= 600) {
+                webApp.requestFullscreen()
+                    .then(() => {
+                        console.log('Повноекранний режим активовано');
+                    })
+                    .catch(err => {
+                        console.warn('Повноекранний режим не підтримується:', err);
+                    });
+            }
 
             Telegram.WebApp.BackButton.hide();
 
@@ -381,12 +381,14 @@
 
             updateSwapButtonVisibility();
 
+            // Обробка кнопки "назад" для повернення до головного меню
             window.addEventListener('popstate', (event) => {
                 const modal = document.getElementById('modal');
                 if (isModalOpen) {
                     closeModal();
                 } else {
-                    Telegram.WebApp.close();
+                    // Залишаємо додаток відкритим, не закриваємо
+                    console.log('Повернення до головного меню');
                 }
             });
 
@@ -564,7 +566,8 @@
                 modal.classList.remove('closing');
                 isModalOpen = false;
                 Telegram.WebApp.BackButton.hide();
-                window.history.back();
+                // Замінюємо history.back() на pushState для повернення до головного меню
+                window.history.pushState({ page: 'home' }, document.title);
             }, 300);
         }
     </script>
