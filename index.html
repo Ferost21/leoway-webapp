@@ -78,11 +78,14 @@
                 color: #333;
             }
             .flatpickr-calendar {
-                z-index: 1001;
-                position: fixed !important; /* Додатковий фікс для Telegram */
+                z-index: 10000 !important; /* Підвищений z-index для мобільних */
+                position: fixed !important;
                 top: 50% !important;
                 left: 50% !important;
                 transform: translate(-50%, -50%) !important;
+                width: 90% !important;
+                max-height: 80vh !important;
+                overflow-y: auto !important;
             }
         }
         .modal {
@@ -296,7 +299,7 @@
         <input id="arrival" placeholder="Місце прибуття" autocomplete="off">
         <div id="arrival-suggestions" class="suggestions"></div>
     </div>
-    <input id="date" type="text" placeholder="Дата (ДД-ММ-РРРР)" readonly>
+    <input id="date" type="text" placeholder="Дата (ДД-ММ-РРРР)">
     <input id="seats" type="number" placeholder="Кількість місць" min="1" max="10">
     <button onclick="submitSearch()">Пошук</button>
 
@@ -319,8 +322,10 @@
         document.addEventListener('DOMContentLoaded', () => {
             webApp.ready();
 
-            // Активувати повноекранний режим лише на мобільних пристроях
-            if (webApp.requestFullscreen && window.innerWidth <= 600) {
+            // Активувати повноекранний режим лише на мобільних пристроях і якщо версія підтримує
+            const version = webApp.initDataUnsafe.version || '0.0';
+            const majorVersion = parseInt(version.split('.')[0]);
+            if (webApp.requestFullscreen && window.innerWidth <= 600 && majorVersion > 6.0) {
                 webApp.requestFullscreen()
                     .then(() => {
                         console.log('Повноекранний режим активовано');
@@ -338,7 +343,6 @@
                     dateFormat: "d-m-Y",
                     minDate: "today",
                     locale: "uk",
-                    // Видаляємо disableMobile, щоб перевірити, чи це проблема
                     onReady: () => {
                         const dateInput = document.getElementById('date');
                         dateInput.placeholder = "Дата (ДД-ММ-РРРР)";
