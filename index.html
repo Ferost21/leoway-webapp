@@ -79,6 +79,10 @@
             }
             .flatpickr-calendar {
                 z-index: 1001;
+                position: fixed !important; /* Додатковий фікс для Telegram */
+                top: 50% !important;
+                left: 50% !important;
+                transform: translate(-50%, -50%) !important;
             }
         }
         .modal {
@@ -315,8 +319,8 @@
         document.addEventListener('DOMContentLoaded', () => {
             webApp.ready();
 
-            // Спроба активувати повноекранний режим
-            if (webApp.requestFullscreen) {
+            // Активувати повноекранний режим лише на мобільних пристроях
+            if (webApp.requestFullscreen && window.innerWidth <= 600) {
                 webApp.requestFullscreen()
                     .then(() => {
                         console.log('Повноекранний режим активовано');
@@ -334,7 +338,7 @@
                     dateFormat: "d-m-Y",
                     minDate: "today",
                     locale: "uk",
-                    disableMobile: true,
+                    // Видаляємо disableMobile, щоб перевірити, чи це проблема
                     onReady: () => {
                         const dateInput = document.getElementById('date');
                         dateInput.placeholder = "Дата (ДД-ММ-РРРР)";
@@ -369,15 +373,12 @@
                 }
             }
 
-            // Слухачі для оновлення видимості при введенні/видаленні
             ['departure', 'arrival'].forEach(id => {
                 document.getElementById(id).addEventListener('input', updateSwapButtonVisibility);
             });
 
-            // Ініціалізація видимості при завантаженні
             updateSwapButtonVisibility();
 
-            // Обробка кнопки "назад" на телефоні
             window.addEventListener('popstate', (event) => {
                 const modal = document.getElementById('modal');
                 if (isModalOpen) {
