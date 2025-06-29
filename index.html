@@ -337,8 +337,24 @@
 
         document.addEventListener('DOMContentLoaded', () => {
             webApp.ready();
+            Telegram.WebApp.BackButton.hide(); // Reset back button on load
 
-            Telegram.WebApp.BackButton.hide(); // 💥 Скидаємо кнопку назад при кожному завантаженні
+            // Enable full-screen mode
+            if (Telegram.WebApp.requestFullscreen && Telegram.WebApp.requestFullscreen.isAvailable?.()) {
+                Telegram.WebApp.requestFullscreen()
+                    .then(() => {
+                        console.log('Full-screen mode activated');
+                        // Optionally check if full-screen is active
+                        if (Telegram.WebApp.isFullscreen?.()) {
+                            console.log('App is now in full-screen mode');
+                        }
+                    })
+                    .catch(err => {
+                        console.error('Failed to enable full-screen mode:', err);
+                    });
+            } else {
+                console.warn('Full-screen mode is not supported in this Telegram version.');
+            }
 
             flatpickr("#date", {
                 dateFormat: "d-m-Y",
@@ -351,7 +367,7 @@
                 }
             });
 
-            // Функція для управління видимістю кнопки
+            // Function to manage swap button visibility
             function updateSwapButtonVisibility() {
                 const departure = document.getElementById('departure').value.trim();
                 const arrival = document.getElementById('arrival').value.trim();
@@ -363,27 +379,25 @@
                 }
             }
 
-            // Слухачі для оновлення видимості при введенні/видаленні
+            // Listeners for updating swap button visibility
             ['departure', 'arrival'].forEach(id => {
                 document.getElementById(id).addEventListener('input', updateSwapButtonVisibility);
             });
 
-            // Ініціалізація видимості при завантаженні
+            // Initialize swap button visibility
             updateSwapButtonVisibility();
 
-            // Обробка кнопки "назад" на телефоні
+            // Handle back button on phone
             window.addEventListener('popstate', (event) => {
                 const modal = document.getElementById('modal');
                 if (modal.classList.contains('show')) {
                     closeModal();
                 } else {
-                    Telegram.WebApp.close(); // Ховає WebApp, не закриває повністю
+                    Telegram.WebApp.close(); // Hides WebApp
                 }
             });
 
             window.history.pushState({ modalOpen: true }, '');
-            // Додаємо стан до історії при відкритті модального вікна
-            // window.history.pushState({ modalOpen: true }, document.title);
         });
 
         async function fetchCities(query) {
@@ -393,7 +407,7 @@
             });
             if (!response.ok) return [];
             const data = await response.json();
-            // Унікалізація за назвою міста
+            // Deduplicate cities by name
             const uniqueCities = [];
             const seenNames = new Set();
             data.forEach(city => {
@@ -517,17 +531,16 @@
                 });
                 modal.classList.remove('closing');
 
-                // Показати кнопку назад Telegram
+                // Show Telegram back button
                 Telegram.WebApp.BackButton.show();
                 Telegram.WebApp.BackButton.onClick(() => {
                     closeModal();
                 });
 
-                // Додаємо стан до історії після показу модального
+                // Add state to history after showing modal
                 setTimeout(() => {
                     window.history.pushState({ modalOpen: true }, '');
                 }, 100);
-
             } catch (err) {
                 console.error(err);
                 alert('Помилка при пошуку поїздок: ' + err.message);
@@ -561,8 +574,19 @@
             setTimeout(() => {
                 modal.style.display = 'none';
                 modal.classList.remove('closing');
-                Telegram.WebApp.BackButton.hide(); // ❗️ховаємо back-кнопку Telegram
+                Telegram.WebApp.BackButton.hide(); // Hide Telegram back button
             }, 300);
+
+            // Optionally exit full-screen mode when closing modal
+            if (Telegram.WebApp.exitFullscreen && Telegram.WebApp.exitFullscreen.isAvailable?.()) {
+                Telegram.WebApp.exitFullscreen()
+                    .then(() => {
+                        console.log('Exited full-screen mode');
+                    })
+                    .catch(err => {
+                        console.error('Failed to exit full-screen mode:', err);
+                    });
+            }
         }
     </script>
 </body>
