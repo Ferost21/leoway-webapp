@@ -19,6 +19,11 @@
             height: 100vh;
             box-sizing: border-box;
             color: var(--text-color, #222);
+            transition: transform 0.3s ease; /* Додаємо перехід для масштабування */
+            transform: scale(1); /* Початковий масштаб */
+        }
+        body.modal-open {
+            transform: scale(1.05); /* Збільшення масштабу при відкритті модального вікна */
         }
         input, button {
             width: 100%;
@@ -98,7 +103,6 @@
                 display: block !important;
             }
         }
-        /* Оновлені стилі для модального вікна */
         .modal {
             display: flex;
             justify-content: center;
@@ -173,7 +177,7 @@
             flex-direction: column;
             gap: 8px;
             color: var(--text-color, #222);
-            max-width: 100%; /* Обмеження ширини до ширини полів введення */
+            max-width: 100%;
             box-sizing: border-box;
         }
         .ride-top {
@@ -301,7 +305,6 @@
 
         let isModalOpen = false;
 
-        // Функція для оновлення стилів на основі теми
         function updateTheme() {
             const themeParams = webApp.themeParams || {};
             const isDark = webApp.colorScheme === 'dark';
@@ -497,10 +500,10 @@
                 modal.style.display = 'flex';
                 requestAnimationFrame(() => {
                     modal.classList.add('show');
+                    document.body.classList.add('modal-open'); // Додаємо клас для масштабування body
                 });
                 modal.classList.remove('closing');
 
-                // Додаємо слухачі подій для кнопок бронювання
                 document.querySelectorAll('.book-button').forEach(button => {
                     button.addEventListener('click', () => {
                         const rideId = parseInt(button.dataset.rideId);
@@ -516,7 +519,6 @@
                     window.history.pushState({ modalOpen: true }, '');
                 }, 100);
 
-                // Додаємо можливість закривати модальне вікно при кліку на фон
                 modal.addEventListener('click', (e) => {
                     if (e.target === modal) closeModal();
                 });
@@ -550,6 +552,7 @@
             const modal = document.getElementById('modal');
             modal.classList.add('closing');
             modal.classList.remove('show');
+            document.body.classList.remove('modal-open'); // Видаляємо клас для повернення масштабу
             setTimeout(() => {
                 modal.style.display = 'none';
                 modal.classList.remove('closing');
