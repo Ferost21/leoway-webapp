@@ -98,6 +98,7 @@
                 display: block !important;
             }
         }
+        /* Оновлені стилі для модального вікна */
         .modal {
             display: flex;
             justify-content: center;
@@ -110,69 +111,55 @@
             background: rgba(0, 0, 0, 0);
             z-index: 1000;
             transition: background 0.3s ease;
-            opacity: 0;
-            pointer-events: none;
         }
         .modal.show {
             background: rgba(0, 0, 0, 0.5);
-            opacity: 1;
-            pointer-events: auto;
         }
         .modal.closing {
             background: rgba(0, 0, 0, 0);
-            opacity: 0;
         }
         .modal-content {
             background: var(--modal-bg-color, #eee);
             width: 100%;
             max-width: 600px;
-            max-height: 80vh;
+            height: 100%;
             overflow-y: auto;
             box-sizing: border-box;
-            padding: 0 0 20px;
-            border-radius: 12px;
+            padding: 0;
+            border-radius: 0;
             position: relative;
-            transform: scale(0.7);
             opacity: 0;
-            transition: transform 0.3s ease, opacity 0.3s ease;
-            will-change: transform, opacity;
+            transform: scale(0.7);
+            transition: opacity 0.3s ease, transform 0.3s ease;
         }
         .modal.show .modal-content {
-            transform: scale(1);
             opacity: 1;
+            transform: scale(1);
         }
         .modal.closing .modal-content {
-            transform: scale(0.7);
             opacity: 0;
+            transform: scale(0.7);
         }
-        .modal-header {
-            margin: 0 0 20px 0;
-            padding: 0;
-            display: flex;
-            justify-content: center;
-            align-items: flex-start;
+        .modal-title-box {
+            position: sticky;
+            top: 0;
+            background: var(--modal-bg-color, #fff);
+            border-bottom-left-radius: 12px;
+            border-bottom-right-radius: 12px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            padding: 30px 18px 12px;
+            width: 100%;
+            box-sizing: border-box;
+            z-index: 1001;
         }
         #modal-title {
-            flex-grow: 1;
-            text-align: center;
             font-size: 18px;
             margin: 0;
             color: var(--text-color, #222);
         }
-        .back-button {
-            width: 30px;
-            height: 30px;
-            font-size: 24px;
-            font-weight: bold;
-            color: var(--text-color, #444);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            cursor: pointer;
-            border-radius: 5px;
-        }
-        .back-button:hover {
-            background-color: var(--hover-bg-color, #f0f0f0);
+        .modal-results {
+            padding: 0 20px;
         }
         .ride-item {
             border-radius: 12px;
@@ -186,6 +173,8 @@
             flex-direction: column;
             gap: 8px;
             color: var(--text-color, #222);
+            max-width: 100%; /* Обмеження ширини до ширини полів введення */
+            box-sizing: border-box;
         }
         .ride-top {
             display: flex;
@@ -202,12 +191,6 @@
         }
         .ride-item:hover {
             box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
-        }
-        .ride-item > .ride-info {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 10px;
         }
         .price-tag {
             font-weight: bold;
@@ -285,25 +268,6 @@
             color: var(--text-color, #666);
             margin-top: 30vh;
         }
-        .modal-title-box {
-            margin-top: 0;
-            background: var(--modal-bg-color, #fff);
-            border-bottom-left-radius: 12px;
-            border-bottom-right-radius: 12px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-            text-align: center;
-            padding: 30px 18px 12px;
-            width: 100%;
-            box-sizing: border-box;
-            z-index: 1001;
-        }
-        #modal-results {
-            padding: 0 20px;
-        }
-        #modal-title {
-            font-size: 18px;
-            margin: 0;
-        }
     </style>
 </head>
 <body>
@@ -327,7 +291,7 @@
             <div class="modal-title-box">
                 <h2 id="modal-title"></h2>
             </div>
-            <div id="modal-results"></div>
+            <div id="modal-results" class="modal-results"></div>
         </div>
     </div>
 
@@ -371,16 +335,12 @@
                     onReady: () => {
                         const dateInput = document.getElementById('date');
                         dateInput.placeholder = "Дата (ДД-ММ-РРРР)";
-                        console.log('flatpickr ініціалізовано успішно');
                         if (webApp.requestFullscreen && window.innerWidth <= 600) {
                             webApp.requestFullscreen()
                                 .then(() => console.log('Повноекранний режим активовано'))
                                 .catch(err => console.warn('Повноекранний режим не підтримується:', err));
                         }
                     },
-                    onChange: (selectedDates, dateStr) => console.log('Дата змінена:', dateStr),
-                    onOpen: () => console.log('Календар відкрито'),
-                    onClose: () => console.log('Календар закрито')
                 });
                 if (!fp) console.error('flatpickr не ініціалізовано');
             } catch (err) {
@@ -407,45 +367,30 @@
             updateSwapButtonVisibility();
 
             window.addEventListener('popstate', (event) => {
-                const modal = document.getElementById('modal');
                 if (isModalOpen) {
                     closeModal();
-                } else {
-                    console.log('Повернення до головного меню');
                 }
             });
 
             window.history.replaceState({ page: 'home' }, document.title);
-
-            // Додаємо можливість закривати модальне вікно кліком по фону
-            const modal = document.getElementById('modal');
-            modal.addEventListener('click', (e) => {
-                if (e.target === modal) closeModal();
-            });
         });
 
         async function fetchCities(query) {
             if (query.length < 2) return [];
-            try {
-                const response = await fetch(`https://027f-194-44-220-198.ngrok-free.app/api/cities?query=${encodeURIComponent(query)}`, {
-                    headers: { 'ngrok-skip-browser-warning': 'true' }
-                });
-                if (!response.ok) throw new Error('Помилка запиту до API міст');
-                const data = await response.json();
-                if (!Array.isArray(data)) throw new Error('Некоректний формат даних');
-                const uniqueCities = [];
-                const seenNames = new Set();
-                data.forEach(city => {
-                    if (!seenNames.has(city.name)) {
-                        seenNames.add(city.name);
-                        uniqueCities.push(city.name);
-                    }
-                });
-                return uniqueCities.map(name => ({ name }));
-            } catch (err) {
-                console.error('Помилка fetchCities:', err);
-                return [];
-            }
+            const response = await fetch(`https://027f-194-44-220-198.ngrok-free.app/api/cities?query=${encodeURIComponent(query)}`, {
+                headers: { 'ngrok-skip-browser-warning': 'true' }
+            });
+            if (!response.ok) return [];
+            const data = await response.json();
+            const uniqueCities = [];
+            const seenNames = new Set();
+            data.forEach(city => {
+                if (!seenNames.has(city.name)) {
+                    seenNames.add(city.name);
+                    uniqueCities.push(city.name);
+                }
+            });
+            return uniqueCities.map(name => ({ name }));
         }
 
         function setupSuggestions(inputId, suggestionsId) {
@@ -496,12 +441,12 @@
             const date = document.getElementById('date').value.trim();
             const seats = parseInt(document.getElementById('seats').value.trim());
 
-            if (!departure || !arrival || !date || isNaN(seats)) return alert('Заповніть усі поля!');
+            if (!departure || !arrival || !date || !seats) return alert('Заповніть усі поля!');
             if (departure.length > 255 || arrival.length > 255) return alert('Назви місць мають бути до 255 символів!');
-            if (seats < 1 || seats > 10) return alert('Кількість місць має бути від 1 до 10!');
+            if (isNaN(seats) || seats < 1 || seats > 10) return alert('Кількість місць має бути від 1 до 10!');
 
             try {
-                const res = await fetch(`https://027f-194-44-220-198.ngrok-free.app/api/search-rides`, {
+                const res = await fetch('https://027f-194-44-220-198.ngrok-free.app/api/search-rides', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -543,8 +488,9 @@
                 subtitle.style.margin = '4px 0 0';
                 subtitle.style.fontSize = '14px';
                 subtitle.style.color = 'var(--text-color, #555)';
-                const seatWord = seats === 1 ? 'пасажир' : (seats >= 2 && seats <= 4 ? 'пасажири' : 'пасажирів');
-                subtitle.textContent = `${formatShortDate(date)}, ${seats} ${seatWord}`;
+                const seatsNumber = seats;
+                const seatWord = seatsNumber === 1 ? 'пасажир' : (seatsNumber >= 2 && seatsNumber <= 4 ? 'пасажири' : 'пасажирів');
+                subtitle.textContent = `${formatShortDate(date)}, ${seatsNumber} ${seatWord}`;
                 modalTitleBox.appendChild(subtitle);
 
                 const modal = document.getElementById('modal');
@@ -554,21 +500,25 @@
                 });
                 modal.classList.remove('closing');
 
-                webApp.BackButton.show();
-                webApp.BackButton.onClick(() => closeModal());
-
-                isModalOpen = true;
-                setTimeout(() => {
-                    window.history.pushState({ modalOpen: true }, '');
-                }, 100);
-
-                // Додаємо слухачі для кнопок бронювання
+                // Додаємо слухачі подій для кнопок бронювання
                 document.querySelectorAll('.book-button').forEach(button => {
                     button.addEventListener('click', () => {
                         const rideId = parseInt(button.dataset.rideId);
                         const seats = parseInt(button.dataset.seats);
                         bookRide(rideId, seats);
                     });
+                });
+
+                webApp.BackButton.show();
+                webApp.BackButton.onClick(() => closeModal());
+                isModalOpen = true;
+                setTimeout(() => {
+                    window.history.pushState({ modalOpen: true }, '');
+                }, 100);
+
+                // Додаємо можливість закривати модальне вікно при кліку на фон
+                modal.addEventListener('click', (e) => {
+                    if (e.target === modal) closeModal();
                 });
             } catch (err) {
                 console.error('Помилка при пошуку поїздок:', err);
@@ -580,7 +530,7 @@
             const tgId = webApp.initDataUnsafe.user?.id;
             if (!tgId) return alert('Не вдалося отримати ваш Telegram ID!');
             try {
-                const res = await fetch(`https://027f-194-44-220-198.ngrok-free.app/api/book-ride`, {
+                const res = await fetch('https://027f-194-44-220-198.ngrok-free.app/api/book-ride', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
