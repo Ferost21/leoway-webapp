@@ -11,7 +11,7 @@
     <style>
         body {
             font-family: Arial, sans-serif;
-            padding: 60px 20px 20px;
+            padding: 60px 20px 80px;
             background: var(--bg-color, #f5f5f5);
             max-width: 600px;
             margin: 0 auto;
@@ -300,6 +300,48 @@
             font-size: 18px;
             margin: 0;
         }
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: var(--nav-bg-color, #fff);
+            box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            height: 60px;
+            z-index: 1000;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        .nav-item {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            font-size: 12px;
+            color: var(--text-color, #666);
+            cursor: pointer;
+            transition: background 0.2s ease;
+        }
+        .nav-item.active {
+            color: var(--button-bg-color, #27ae60);
+        }
+        .nav-item:hover {
+            background: var(--hover-bg-color, #f0f0f0);
+        }
+        .nav-item svg {
+            width: 24px;
+            height: 24px;
+            margin-bottom: 4px;
+            fill: var(--text-color, #666);
+        }
+        .nav-item.active svg {
+            fill: var(--button-bg-color, #27ae60);
+        }
     </style>
 </head>
 <body>
@@ -327,6 +369,26 @@
         </div>
     </div>
 
+    <!-- Нижнє меню навігації -->
+    <div class="bottom-nav">
+        <div class="nav-item active" onclick="navigate('search')">
+            <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0016 9.5 6.5 6.5 0 109.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+            <span>Пошук</span>
+        </div>
+        <div class="nav-item" onclick="navigate('create')">
+            <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm5 11h-4v4h-2v-4H7v-2h4V7h2v4h4v2z"/></svg>
+            <span>Створити</span>
+        </div>
+        <div class="nav-item" onclick="navigate('my-rides')">
+            <svg viewBox="0 0 24 24"><path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49A1.003 1.003 0 0020 3H6.21l-.94-2H1zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2z"/></svg>
+            <span>Мої поїздки</span>
+        </div>
+        <div class="nav-item" onclick="navigate('profile')">
+            <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/></svg>
+            <span>Профіль</span>
+        </div>
+    </div>
+
     <script>
         const webApp = window.Telegram.WebApp;
         webApp.ready();
@@ -339,7 +401,6 @@
             const isDark = webApp.colorScheme === 'dark';
 
             const root = document.documentElement;
-            // Використовуємо themeParams, якщо доступні, інакше резервні значення
             root.style.setProperty('--bg-color', themeParams.bg_color || (isDark ? '#1f2a2d' : '#f5f5f5'));
             root.style.setProperty('--text-color', themeParams.text_color || (isDark ? '#e0e0e0' : '#222'));
             root.style.setProperty('--border-color', themeParams.border_color || (isDark ? '#555' : '#ccc'));
@@ -350,22 +411,17 @@
             root.style.setProperty('--hover-bg-color', themeParams.section_bg_color || (isDark ? '#2c3839' : '#f0f0f0'));
             root.style.setProperty('--modal-bg-color', themeParams.section_bg_color || (isDark ? '#2c3839' : '#eee'));
             root.style.setProperty('--ride-bg-color', themeParams.section_bg_color || (isDark ? '#2c3839' : 'white'));
+            root.style.setProperty('--nav-bg-color', themeParams.section_bg_color || (isDark ? '#2c3839' : '#fff'));
 
-            // Синхронізація кольорів заголовка та фону з Telegram
             webApp.setHeaderColor(themeParams.bg_color || (isDark ? '#1f2a2d' : '#ffffff'), 'bg_color');
             webApp.setBackgroundColor(themeParams.bg_color || (isDark ? '#1f2a2d' : '#f5f5f5'));
         }
 
         document.addEventListener('DOMContentLoaded', () => {
             webApp.ready();
-
-            // Оновлюємо тему при завантаженні
             updateTheme();
-
-            // Слухаємо зміни теми
             webApp.onEvent('themeChanged', updateTheme);
 
-            // Ініціалізація flatpickr з відлагодженням
             try {
                 const fp = flatpickr("#date", {
                     dateFormat: "d-m-Y",
@@ -375,7 +431,6 @@
                         const dateInput = document.getElementById('date');
                         dateInput.placeholder = "Дата (ДД-ММ-РРРР)";
                         console.log('flatpickr ініціалізовано успішно');
-                        // Активувати повноекранний режим після ініціалізації
                         if (webApp.requestFullscreen && window.innerWidth <= 600) {
                             webApp.requestFullscreen()
                                 .then(() => {
@@ -405,7 +460,6 @@
 
             Telegram.WebApp.BackButton.hide();
 
-            // Функція для управління видимістю кнопки
             function updateSwapButtonVisibility() {
                 const departure = document.getElementById('departure').value.trim();
                 const arrival = document.getElementById('arrival').value.trim();
@@ -423,7 +477,6 @@
 
             updateSwapButtonVisibility();
 
-            // Обробка кнопки "назад" для повернення до головного меню
             window.addEventListener('popstate', (event) => {
                 const modal = document.getElementById('modal');
                 if (isModalOpen) {
@@ -609,6 +662,18 @@
                 Telegram.WebApp.BackButton.hide();
                 window.history.pushState({ page: 'home' }, document.title);
             }, 300);
+        }
+
+        function navigate(page) {
+            const navItems = document.querySelectorAll('.nav-item');
+            navItems.forEach(item => item.classList.remove('active'));
+            document.querySelector(`.nav-item[onclick="navigate('${page}')"]`).classList.add('active');
+
+            // Поки що лише змінюємо активний стан, реальну навігацію потрібно реалізувати
+            console.log(`Перехід до сторінки: ${page}`);
+            if (page !== 'search') {
+                alert(`Перехід до ${page} ще не реалізовано!`);
+            }
         }
     </script>
 </body>
