@@ -19,6 +19,7 @@
             height: 100vh;
             box-sizing: border-box;
             color: var(--text-color, #222);
+            overflow-x: hidden;
         }
         input, button {
             width: 100%;
@@ -309,6 +310,7 @@
             z-index: 1000;
             max-width: 600px;
             margin: 0 auto;
+            overflow: hidden; /* Забороняє прокручування всередині меню */
         }
         .nav-item {
             flex: 1;
@@ -321,6 +323,7 @@
             color: var(--text-color, #666);
             cursor: pointer;
             transition: background 0.2s ease;
+            overflow: hidden; /* Забороняє прокручування для окремих елементів */
         }
         .nav-item.active {
             color: var(--button-bg-color, #27ae60);
@@ -339,6 +342,7 @@
         }
         .page {
             display: none;
+            padding-bottom: 80px; /* Додано відступ знизу, щоб уникнути перекриття вмісту меню */
         }
         .page.active {
             display: block;
@@ -714,7 +718,7 @@
                 const res = await fetch(`https://027f-194-44-220-198.ngrok-free.app/api/my-rides?tgId=${tgId}`, {
                     headers: { 'ngrok-skip-browser-warning': 'true' }
                 });
-                if (!res.ok) throw new Error('Не вдалося отримати ваші поїздки');
+                if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
                 const rides = await res.json();
                 const myRidesResults = document.getElementById('my-rides-results');
                 myRidesResults.innerHTML = rides.length === 0
@@ -741,7 +745,7 @@
                     }).join('');
             } catch (err) {
                 console.error(err);
-                document.getElementById('my-rides-results').innerHTML = '<div class="no-rides">Помилка при завантаженні поїздок: ' + err.message + '</div>';
+                document.getElementById('my-rides-results').innerHTML = `<div class="no-rides">Помилка при завантаженні поїздок: ${err.message}</div>`;
             }
         }
 
