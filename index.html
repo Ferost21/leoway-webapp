@@ -11,7 +11,7 @@
     <style>
         body {
             font-family: Arial, sans-serif;
-            padding: 60px 20px 80px; /* Залишаємо відступ знизу для нижнього меню */
+            padding: 60px 20px 80px;
             background: var(--bg-color, #f5f5f5);
             max-width: 600px;
             margin: 0 auto;
@@ -19,7 +19,6 @@
             height: 100vh;
             box-sizing: border-box;
             color: var(--text-color, #222);
-            overflow-x: hidden; /* Забороняємо горизонтальне прокручування */
         }
         input, button {
             width: 100%;
@@ -310,7 +309,6 @@
             z-index: 1000;
             max-width: 600px;
             margin: 0 auto;
-            overflow: hidden; /* Забороняємо прокручування всередині меню */
         }
         .nav-item {
             flex: 1;
@@ -323,7 +321,6 @@
             color: var(--text-color, #666);
             cursor: pointer;
             transition: background 0.2s ease;
-            overflow: hidden; /* Забороняємо прокручування для елементів меню */
         }
         .nav-item.active {
             color: var(--button-bg-color, #27ae60);
@@ -348,12 +345,34 @@
         }
         #my-rides-page {
             padding: 20px;
+            position: relative;
         }
-        #my-rides-title {
-            font-size: 18px;
-            margin: 0 0 20px;
+        .my-rides-title-box {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: var(--modal-bg-color, #fff);
+            border-bottom-left-radius: 12px;
+            border-bottom-right-radius: 12px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
             text-align: center;
-            color: var(--text-color, #222);
+            padding: 30px 18px 12px;
+            width: 100%;
+            max-width: 600px;
+            margin: 0 auto;
+            box-sizing: border-box;
+            z-index: 1003;
+            display: none; /* Приховуємо за замовчуванням */
+        }
+        #my-rides-page.active .my-rides-title-box {
+            display: block; /* Показуємо, коли сторінка активна */
+        }
+        #my-rides-results {
+            padding: 20px;
+            margin-top: 90px; /* Відступ для фіксованого заголовка */
+            flex: 1;
+            overflow-y: auto;
         }
     </style>
 </head>
@@ -377,7 +396,9 @@
 
     <!-- Сторінка мої поїздки -->
     <div id="my-rides-page" class="page">
-        <h2 id="my-rides-title">Мої поїздки</h2>
+        <div class="my-rides-title-box">
+            <h2 id="my-rides-title">Мої поїздки</h2>
+        </div>
         <div id="my-rides-results"></div>
     </div>
 
@@ -599,7 +620,7 @@
                     },
                     body: JSON.stringify({ departure, arrival, date, seats })
                 });
-                if (!res.ok) throw new Error(`Не вдалося отримати поїздки: ${res.status}`);
+                if (!res.ok) throw new Error('Не вдалося отримати поїздки');
                 const rides = await res.json();
                 const modalResults = document.getElementById('modal-results');
                 modalResults.innerHTML = rides.length === 0
@@ -673,7 +694,7 @@
                     },
                     body: JSON.stringify({ rideId, tgId, seats })
                 });
-                if (!res.ok) throw new Error(`Помилка бронювання: ${res.status}`);
+                if (!res.ok) throw new Error('Помилка бронювання');
                 const result = await res.json();
                 alert(`Бронювання створено! Номер: ${result.bookingId}`);
                 // Оновити список поїздок після бронювання
@@ -697,7 +718,7 @@
                     },
                     body: JSON.stringify({ bookingId, tgId })
                 });
-                if (!res.ok) throw new Error(`Помилка скасування бронювання: ${res.status}`);
+                if (!res.ok) throw new Error('Помилка скасування бронювання');
                 const result = await res.json();
                 alert(`Бронювання ${bookingId} скасовано!`);
                 // Оновити список поїздок після скасування
