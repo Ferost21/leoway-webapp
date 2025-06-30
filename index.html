@@ -11,7 +11,7 @@
     <style>
         body {
             font-family: Arial, sans-serif;
-            padding: 60px 20px 80px;
+            padding: 60px 20px 80px; /* Залишаємо відступ знизу для нижнього меню */
             background: var(--bg-color, #f5f5f5);
             max-width: 600px;
             margin: 0 auto;
@@ -19,7 +19,7 @@
             height: 100vh;
             box-sizing: border-box;
             color: var(--text-color, #222);
-            overflow-x: hidden;
+            overflow-x: hidden; /* Забороняємо горизонтальне прокручування */
         }
         input, button {
             width: 100%;
@@ -310,7 +310,7 @@
             z-index: 1000;
             max-width: 600px;
             margin: 0 auto;
-            overflow: hidden; /* Забороняє прокручування всередині меню */
+            overflow: hidden; /* Забороняємо прокручування всередині меню */
         }
         .nav-item {
             flex: 1;
@@ -323,7 +323,7 @@
             color: var(--text-color, #666);
             cursor: pointer;
             transition: background 0.2s ease;
-            overflow: hidden; /* Забороняє прокручування для окремих елементів */
+            overflow: hidden; /* Забороняємо прокручування для елементів меню */
         }
         .nav-item.active {
             color: var(--button-bg-color, #27ae60);
@@ -342,7 +342,6 @@
         }
         .page {
             display: none;
-            padding-bottom: 80px; /* Додано відступ знизу, щоб уникнути перекриття вмісту меню */
         }
         .page.active {
             display: block;
@@ -600,7 +599,7 @@
                     },
                     body: JSON.stringify({ departure, arrival, date, seats })
                 });
-                if (!res.ok) throw new Error('Не вдалося отримати поїздки');
+                if (!res.ok) throw new Error(`Не вдалося отримати поїздки: ${res.status}`);
                 const rides = await res.json();
                 const modalResults = document.getElementById('modal-results');
                 modalResults.innerHTML = rides.length === 0
@@ -674,7 +673,7 @@
                     },
                     body: JSON.stringify({ rideId, tgId, seats })
                 });
-                if (!res.ok) throw new Error('Помилка бронювання');
+                if (!res.ok) throw new Error(`Помилка бронювання: ${res.status}`);
                 const result = await res.json();
                 alert(`Бронювання створено! Номер: ${result.bookingId}`);
                 // Оновити список поїздок після бронювання
@@ -698,7 +697,7 @@
                     },
                     body: JSON.stringify({ bookingId, tgId })
                 });
-                if (!res.ok) throw new Error('Помилка скасування бронювання');
+                if (!res.ok) throw new Error(`Помилка скасування бронювання: ${res.status}`);
                 const result = await res.json();
                 alert(`Бронювання ${bookingId} скасовано!`);
                 // Оновити список поїздок після скасування
