@@ -9,7 +9,6 @@
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/uk.js"></script>
     <style>
-        /* Загальні стилі */
         body {
             font-family: Arial, sans-serif;
             padding: 60px 20px 20px;
@@ -20,7 +19,8 @@
             height: 100vh;
             box-sizing: border-box;
             color: var(--text-color, #222);
-            transition: transform 0.3s ease; /* Додаємо анімацію масштабування для головного екрану */
+            transition: transform 0.3s ease; /* Додаємо перехід для масштабування */
+            will-change: transform; /* Оптимізація анімації */
         }
         body.modal-open {
             transform: scale(1.05); /* Збільшення головного екрану при відкритті модального вікна */
@@ -103,7 +103,6 @@
                 display: block !important;
             }
         }
-        /* Стилі модального вікна */
         .modal {
             display: flex;
             justify-content: center;
@@ -115,49 +114,46 @@
             height: 100%;
             background: rgba(0, 0, 0, 0); /* Початкова прозорість */
             z-index: 1000;
-            transition: background 0.3s ease;
+            transition: background 0.3s ease, opacity 0.3s ease;
+            opacity: 0; /* Початкова непрозорість модального вікна */
         }
         .modal.show {
             background: rgba(0, 0, 0, 0.5);
+            opacity: 1; /* Повна видимість при відкритті */
         }
         .modal.closing {
             background: rgba(0, 0, 0, 0);
+            opacity: 0; /* Зникає при закритті */
         }
         .modal-content {
             background: var(--modal-bg-color, #eee);
-            width: 100%;
-            max-width: 600px; /* Обмежуємо ширину */
-            height: 100%;
+            width: 90%;
+            max-width: 600px;
+            max-height: 80vh;
             overflow-y: auto;
             box-sizing: border-box;
             padding: 0 0 20px;
-            border-radius: 0;
+            border-radius: 12px;
             position: relative;
             transform: scale(0.7); /* Початковий масштаб для ефекту появи */
             opacity: 0; /* Початкова прозорість */
-            transition: transform 0.3s ease, opacity 0.3s ease; /* Анімація масштабу та прозорості */
-            will-change: transform, opacity; /* Оптимізація продуктивності */
+            transition: transform 0.3s ease, opacity 0.3s ease;
+            will-change: transform, opacity; /* Оптимізація анімації */
         }
         .modal.show .modal-content {
-            transform: scale(1); /* Фінальний масштаб */
-            opacity: 1; /* Фінальна прозорість */
+            transform: scale(1); /* Нормальний розмір при відкритті */
+            opacity: 1; /* Повна видимість */
         }
         .modal.closing .modal-content {
-            transform: scale(0.7);
-            opacity: 0;
+            transform: scale(0.7); /* Зменшення при закритті */
+            opacity: 0; /* Зникає */
         }
-        .modal-title-box {
-            position: sticky; /* Фіксуємо заголовок */
-            top: 0;
-            background: var(--modal-bg-color, #fff);
-            border-bottom-left-radius: 12px;
-            border-bottom-right-radius: 12px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-            text-align: center;
-            padding: 30px 18px 12px;
-            width: 100%;
-            box-sizing: border-box;
-            z-index: 1001;
+        .modal-header {
+            margin: 0 0 20px 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
         }
         #modal-title {
             flex-grow: 1;
@@ -177,9 +173,6 @@
             align-items: center;
             cursor: pointer;
             border-radius: 5px;
-            position: absolute;
-            left: 10px;
-            top: 30px;
         }
         .back-button:hover {
             background-color: var(--hover-bg-color, #f0f0f0);
@@ -190,8 +183,7 @@
             background: var(--ride-bg-color, white);
             border: none;
             padding: 15px 20px;
-            margin: 12px auto; /* Центруємо плитки */
-            max-width: 100%; /* Обмежуємо ширину плиток */
+            margin: 12px 0;
             position: relative;
             display: flex;
             flex-direction: column;
@@ -244,7 +236,7 @@
             position: relative;
         }
         .input-wrapper input {
-            padding-right: 40px;
+            padding-right: 40......
         }
         .swap-button {
             position: absolute;
@@ -296,35 +288,46 @@
             color: var(--text-color, #666);
             margin-top: 30vh;
         }
+        .modal-title-box {
+            margin-top: 0;
+            background: var(--modal-bg-color, #fff);
+            border-bottom-left-radius: 12px;
+            border-bottom-right-radius: 12px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            padding: 30px 18px 12px;
+            width: 100%;
+            box-sizing: border-box;
+            z-index: 1001;
+        }
         #modal-results {
             padding: 0 20px;
+        }
+        #modal-title {
+            font-size: 18px;
+            margin: 0;
         }
     </style>
 </head>
 <body>
-    <main>
-        <h1>Пошук поїздки</h1>
-        <section class="search-form">
-            <div class="input-wrapper">
-                <input id="departure" placeholder="Місце відправлення" autocomplete="off" aria-label="Місце відправлення">
-                <button class="swap-button" onclick="swapLocations()" aria-label="Змінити місця"></button>
-                <div id="departure-suggestions" class="suggestions"></div>
-            </div>
-            <div class="input-wrapper">
-                <input id="arrival" placeholder="Місце прибуття" autocomplete="off" aria-label="Місце прибуття">
-                <div id="arrival-suggestions" class="suggestions"></div>
-            </div>
-            <input id="date" type="text" placeholder="Дата (ДД-ММ-РРРР)" readonly aria-readonly="true">
-            <input id="seats" type="number" placeholder="Кількість місць" min="1" max="10" aria-label="Кількість місць">
-            <button onclick="submitSearch()">Пошук</button>
-        </section>
-    </main>
+    <h1>Пошук поїздки</h1>
+    <div class="input-wrapper">
+        <input id="departure" placeholder="Місце відправлення" autocomplete="off">
+        <button class="swap-button" onclick="swapLocations()" aria-label="Змінити місця"></button>
+        <div id="departure-suggestions" class="suggestions"></div>
+    </div>
+    <div class="input-wrapper">
+        <input id="arrival" placeholder="Місце прибуття" autocomplete="off">
+        <div id="arrival-suggestions" class="suggestions"></div>
+    </div>
+    <input id="date" type="text" placeholder="Дата (ДД-ММ-РРРР)" readonly aria-readonly="true">
+    <input id="seats" type="number" placeholder="Кількість місць" min="1" max="10">
+    <button onclick="submitSearch()">Пошук</button>
 
     <!-- Модальне вікно -->
     <div id="modal" class="modal" style="display: none;">
         <div class="modal-content">
             <div class="modal-title-box">
-                <button class="back-button" onclick="closeModal()">←</button>
                 <h2 id="modal-title"></h2>
             </div>
             <div id="modal-results"></div>
@@ -332,111 +335,136 @@
     </div>
 
     <script>
-        const API_BASE_URL = 'https://027f-194-44-220-198.ngrok-free.app/api';
         const webApp = window.Telegram.WebApp;
         webApp.ready();
+
         let isModalOpen = false;
 
-        // Кешування елементів DOM
-        const elements = {
-            modal: document.getElementById('modal'),
-            modalResults: document.getElementById('modal-results'),
-            modalTitle: document.getElementById('modal-title'),
-            departure: document.getElementById('departure'),
-            arrival: document.getElementById('arrival'),
-            date: document.getElementById('date'),
-            seats: document.getElementById('seats'),
-            body: document.body
-        };
-
-        // Оновлення теми
+        // Функція для оновлення стилів на основі теми
         function updateTheme() {
             const themeParams = webApp.themeParams || {};
             const isDark = webApp.colorScheme === 'dark';
+
             const root = document.documentElement;
+            // Використовуємо themeParams, якщо доступні, інакше резервні значення
+            root.style.setProperty('--bg-color', themeParams.bg_color || (isDark ? '#1f2a2d' : '#f5f5f5'));
+            root.style.setProperty('--text-color', themeParams.text_color || (isDark ? '#e0e0e0' : '#222'));
+            root.style.setProperty('--border-color', themeParams.border_color || (isDark ? '#555' : '#ccc'));
+            root.style.setProperty('--input-bg-color', themeParams.section_bg_color || (isDark ? '#2c3839' : 'white'));
+            root.style.setProperty('--button-bg-color', themeParams.button_color || (isDark ? '#2ecc71' : '#27ae60'));
+            root.style.setProperty('--button-text-color', themeParams.button_text_color || 'white');
+            root.style.setProperty('--button-hover-bg-color', themeParams.button_color || (isDark ? '#27ae60' : '#219653'));
+            root.style.setProperty('--hover-bg-color', themeParams.section_bg_color || (isDark ? '#2c3839' : '#f0f0f0'));
+            root.style.setProperty('--modal-bg-color', themeParams.section_bg_color || (isDark ? '#2c3839' : '#eee'));
+            root.style.setProperty('--ride-bg-color', themeParams.section_bg_color || (isDark ? '#2c3839' : 'white'));
 
-            const theme = {
-                '--bg-color': themeParams.bg_color || (isDark ? '#1f2a2d' : '#f5f5f5'),
-                '--text-color': themeParams.text_color || (isDark ? '#e0e0e0' : '#222'),
-                '--border-color': themeParams.border_color || (isDark ? '#555' : '#ccc'),
-                '--input-bg-color': themeParams.section_bg_color || (isDark ? '#2c3839' : 'white'),
-                '--button-bg-color': themeParams.button_color || (isDark ? '#2ecc71' : '#27ae60'),
-                '--button-text-color': themeParams.button_text_color || 'white',
-                '--button-hover-bg-color': themeParams.button_color || (isDark ? '#27ae60' : '#219653'),
-                '--hover-bg-color': themeParams.section_bg_color || (isDark ? '#2c3839' : '#f0f0f0'),
-                '--modal-bg-color': themeParams.section_bg_color || (isDark ? '#2c3839' : '#eee'),
-                '--ride-bg-color': themeParams.section_bg_color || (isDark ? '#2c3839' : 'white')
-            };
-
-            Object.entries(theme).forEach(([key, value]) => {
-                root.style.setProperty(key, value);
-            });
-
-            webApp.setHeaderColor(theme['--bg-color'], 'bg_color');
-            webApp.setBackgroundColor(theme['--bg-color']);
+            // Синхронізація кольорів заголовка та фону з Telegram
+            webApp.setHeaderColor(themeParams.bg_color || (isDark ? '#1f2a2d' : '#ffffff'), 'bg_color');
+            webApp.setBackgroundColor(themeParams.bg_color || (isDark ? '#1f2a2d' : '#f5f5f5'));
         }
 
-        // Ініціалізація flatpickr
-        function initFlatpickr() {
+        document.addEventListener('DOMContentLoaded', () => {
+            webApp.ready();
+
+            // Оновлюємо тему при завантаженні
+            updateTheme();
+
+            // Слухаємо зміни теми
+            webApp.onEvent('themeChanged', updateTheme);
+
+            // Ініціалізація flatpickr з відлагодженням
             try {
-                flatpickr(elements.date, {
-                    dateFormat: 'd-m-Y',
-                    minDate: 'today',
-                    locale: 'uk',
+                const fp = flatpickr("#date", {
+                    dateFormat: "d-m-Y",
+                    minDate: "today",
+                    locale: "uk",
                     onReady: () => {
-                        elements.date.placeholder = 'Дата (ДД-ММ-РРРР)';
-                        if (window.innerWidth <= 600 && webApp.requestFullscreen) {
-                            webApp.requestFullscreen().catch(err => {
-                                console.warn('Повноекранний режим не підтримується:', err);
-                            });
+                        const dateInput = document.getElementById('date');
+                        dateInput.placeholder = "Дата (ДД-ММ-РРРР)";
+                        console.log('flatpickr ініціалізовано успішно');
+                        // Активувати повноекранний режим після ініціалізації
+                        if (webApp.requestFullscreen && window.innerWidth <= 600) {
+                            webApp.requestFullscreen()
+                                .then(() => {
+                                    console.log('Повноекранний режим активовано');
+                                })
+                                .catch(err => {
+                                    console.warn('Повноекранний режим не підтримується:', err);
+                                });
                         }
                     },
-                    onChange: (selectedDates, dateStr) => {
+                    onChange: (selectedDates, dateStr, instance) => {
                         console.log('Дата змінена:', dateStr);
                     },
-                    onOpen: () => console.log('Календар відкрито'),
-                    onClose: () => console.log('Календар закрито')
+                    onOpen: () => {
+                        console.log('Календар відкрито');
+                    },
+                    onClose: () => {
+                        console.log('Календар закрито');
+                    }
                 });
+                if (!fp) {
+                    console.error('flatpickr не ініціалізовано');
+                }
             } catch (err) {
                 console.error('Помилка ініціалізації flatpickr:', err);
             }
-        }
 
-        // Управління видимістю кнопки обміну
-        function updateSwapButtonVisibility() {
-            const departure = elements.departure.value.trim();
-            const arrival = elements.arrival.value.trim();
-            const swapButton = document.querySelector('.swap-button');
-            if (departure.length > 0 || arrival.length > 0) {
-                swapButton.classList.add('visible');
-            } else {
-                swapButton.classList.remove('visible');
+            Telegram.WebApp.BackButton.hide();
+
+            // Функція для управління видимістю кнопки
+            function updateSwapButtonVisibility() {
+                const departure = document.getElementById('departure').value.trim();
+                const arrival = document.getElementById('arrival').value.trim();
+                const swapButton = document.querySelector('.swap-button');
+                if (departure.length > 0 || arrival.length > 0) {
+                    swapButton.classList.add('visible');
+                } else {
+                    swapButton.classList.remove('visible');
+                }
             }
-        }
 
-        // Налаштування автодоповнення
+            ['departure', 'arrival'].forEach(id => {
+                document.getElementById(id).addEventListener('input', updateSwapButtonVisibility);
+            });
+
+            updateSwapButtonVisibility();
+
+            // Обробка кнопки "назад" для повернення до головного меню
+            window.addEventListener('popstate', (event) => {
+                const modal = document.getElementById('modal');
+                if (isModalOpen) {
+                    closeModal();
+                } else {
+                    console.log('Повернення до головного меню');
+                }
+            });
+
+            window.history.replaceState({ page: 'home' }, document.title);
+
+            // Додаємо можливість закривати модальне вікно при кліку на фон
+            const modal = document.getElementById('modal');
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) closeModal();
+            });
+        });
+
         async function fetchCities(query) {
             if (query.length < 2) return [];
-            try {
-                const response = await fetch(`${API_BASE_URL}/cities?query=${encodeURIComponent(query)}`, {
-                    headers: { 'ngrok-skip-browser-warning': 'true' }
-                });
-                if (!response.ok) throw new Error('Помилка запиту до API міст');
-                const data = await response.json();
-                if (!Array.isArray(data)) throw new Error('Некоректний формат даних');
-                const uniqueCities = [];
-                const seenNames = new Set();
-                data.forEach(city => {
-                    if (!seenNames.has(city.name)) {
-                        seenNames.add(city.name);
-                        uniqueCities.push(city.name);
-                    }
-                });
-                return uniqueCities.map(name => ({ name }));
-            } catch (err) {
-                console.error('Помилка fetchCities:', err);
-                return [];
-            }
+            const response = await fetch(`https://027f-194-44-220-198.ngrok-free.app/api/cities?query=${encodeURIComponent(query)}`, {
+                headers: { 'ngrok-skip-browser-warning': 'true' }
+            });
+            if (!response.ok) return [];
+            const data = await response.json();
+            const uniqueCities = [];
+            const seenNames = new Set();
+            data.forEach(city => {
+                if (!seenNames.has(city.name)) {
+                    seenNames.add(city.name);
+                    uniqueCities.push(city.name);
+                }
+            });
+            return uniqueCities.map(name => ({ name }));
         }
 
         function setupSuggestions(inputId, suggestionsId) {
@@ -447,11 +475,10 @@
                 const query = e.target.value;
                 const cities = await fetchCities(query);
                 suggestions.style.display = cities.length > 0 ? 'block' : 'none';
-                suggestions.innerHTML = cities.map(city => `
-                    <div class="suggestion-item" data-name="${city.name}">
+                suggestions.innerHTML = cities.map(city => 
+                    `<div class="suggestion-item" data-name="${city.name}">
                         ${city.name}
-                    </div>
-                `).join('');
+                    </div>`).join('');
             });
 
             suggestions.addEventListener('click', (e) => {
@@ -469,34 +496,34 @@
             });
         }
 
-        // Обмін місцями
-        function swapLocations() {
-            const departure = elements.departure.value;
-            const arrival = elements.arrival.value;
-            elements.departure.value = arrival;
-            elements.arrival.value = departure;
-            updateSwapButtonVisibility();
-        }
+        setupSuggestions('departure', 'departure-suggestions');
+        setupSuggestions('arrival', 'arrival-suggestions');
 
-        // Форматування дати
         function formatShortDate(dateStr) {
             const parts = dateStr.split('-');
             return parts.length === 3 ? `${parts[0]}.${parts[1]}` : dateStr;
         }
 
-        // Пошук поїздок
-        async function submitSearch() {
-            const departure = elements.departure.value.trim();
-            const arrival = elements.arrival.value.trim();
-            const date = elements.date.value.trim();
-            const seats = parseInt(elements.seats.value.trim());
+        function swapLocations() {
+            const departure = document.getElementById('departure').value;
+            const arrival = document.getElementById('arrival').value;
+            document.getElementById('departure').value = arrival;
+            document.getElementById('arrival').value = departure;
+        }
 
-            if (!departure || !arrival || !date || isNaN(seats)) return alert('Заповніть усі поля!');
+        async function submitSearch() {
+            const departure = document.getElementById('departure').value.trim();
+            const arrival = document.getElementById('arrival').value.trim();
+            const date = document.getElementById('date').value.trim();
+            const seats = document.getElementById('seats').value.trim();
+
+            if (!departure || !arrival || !date || !seats) return alert('Заповніть усі поля!');
             if (departure.length > 255 || arrival.length > 255) return alert('Назви місць мають бути до 255 символів!');
-            if (seats < 1 || seats > 10) return alert('Кількість місць має бути від 1 до 10!');
+            const seatsNumber = parseInt(seats);
+            if (isNaN(seatsNumber) || seatsNumber < 1 || seatsNumber > 10) return alert('Кількість місць має бути від 1 до 10!');
 
             try {
-                const res = await fetch(`${API_BASE_URL}/search-rides`, {
+                const res = await fetch(`https://027f-194-44-220-198.ngrok-free.app/api/search-rides`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -506,7 +533,8 @@
                 });
                 if (!res.ok) throw new Error('Не вдалося отримати поїздки');
                 const rides = await res.json();
-                elements.modalResults.innerHTML = rides.length === 0
+                const modalResults = document.getElementById('modal-results');
+                modalResults.innerHTML = rides.length === 0
                     ? '<div class="no-rides">Поїздок не знайдено.</div>'
                     : rides.map(ride => {
                         const dt = new Date(ride.departure_time);
@@ -525,35 +553,10 @@
                                     <div class="price-tag">${ride.price} ₴</div>
                                 </div>
                                 <button class="book-button" data-ride-id="${ride.id}" data-seats="${seats}">Забронювати</button>
-                            </div>
-                        `;
+                            </div>`;
                     }).join('');
 
-                elements.modalTitle.textContent = `${departure} → ${arrival}`;
-                const modalTitleBox = document.querySelector('.modal-title-box');
-                const oldSubtitle = modalTitleBox.querySelector('p');
-                if (oldSubtitle) oldSubtitle.remove();
-
-                const subtitle = document.createElement('p');
-                subtitle.style.margin = '4px 0 0';
-                subtitle.style.fontSize = '14px';
-                subtitle.style.color = 'var(--text-color, #555)';
-                const seatWord = seats === 1 ? 'пасажир' : (seats >= 2 && seats <= 4 ? 'пасажири' : 'пасажирів');
-                subtitle.textContent = `${formatShortDate(date)}, ${seats} ${seatWord}`;
-                modalTitleBox.appendChild(subtitle);
-
-                elements.modal.style.display = 'flex';
-                requestAnimationFrame(() => {
-                    elements.modal.classList.add('show');
-                    elements.body.classList.add('modal-open'); // Анімація наближення головного екрану
-                });
-                elements.modal.classList.remove('closing');
-
-                webApp.BackButton.show();
-                webApp.BackButton.onClick(() => closeModal());
-                isModalOpen = true;
-
-                // Додаємо обробники для кнопок бронювання
+                // Додаємо слухачі для кнопок бронювання
                 document.querySelectorAll('.book-button').forEach(button => {
                     button.addEventListener('click', () => {
                         const rideId = parseInt(button.dataset.rideId);
@@ -562,21 +565,49 @@
                     });
                 });
 
+                document.getElementById('modal-title').textContent = `${departure} → ${arrival}`;
+
+                const modalTitleBox = document.querySelector('.modal-title-box');
+                const oldSubtitle = modalTitleBox.querySelector('p');
+                if (oldSubtitle) oldSubtitle.remove();
+
+                const subtitle = document.createElement('p');
+                subtitle.style.margin = '4px 0 0';
+                subtitle.style.fontSize = '14px';
+                subtitle.style.color = 'var(--text-color, #555)';
+
+                const seatWord = seatsNumber === 1 ? 'пасажир' : (seatsNumber >= 2 && seatsNumber <= 4 ? 'пасажири' : 'пасажирів');
+                subtitle.textContent = `${formatShortDate(date)}, ${seatsNumber} ${seatWord}`;
+                modalTitleBox.appendChild(subtitle);
+
+                const modal = document.getElementById('modal');
+                modal.style.display = 'flex';
+                requestAnimationFrame(() => {
+                    modal.classList.add('show');
+                    document.body.classList.add('modal-open'); // Додаємо клас для масштабування головного екрану
+                });
+                modal.classList.remove('closing');
+
+                Telegram.WebApp.BackButton.show();
+                Telegram.WebApp.BackButton.onClick(() => {
+                    closeModal();
+                });
+
+                isModalOpen = true;
                 setTimeout(() => {
                     window.history.pushState({ modalOpen: true }, '');
                 }, 100);
             } catch (err) {
-                console.error('Помилка при пошуку поїздок:', err);
+                console.error(err);
                 alert('Помилка при пошуку поїздок: ' + err.message);
             }
         }
 
-        // Бронювання поїздки
         async function bookRide(rideId, seats) {
             const tgId = webApp.initDataUnsafe.user?.id;
             if (!tgId) return alert('Не вдалося отримати ваш Telegram ID!');
             try {
-                const res = await fetch(`${API_BASE_URL}/book-ride`, {
+                const res = await fetch(`https://027f-194-44-220-198.ngrok-free.app/api/book-ride`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -588,53 +619,23 @@
                 const result = await res.json();
                 alert(`Бронювання створено! Номер: ${result.bookingId}`);
             } catch (err) {
-                console.error('Помилка при бронюванні:', err);
                 alert('Помилка при бронюванні: ' + err.message);
             }
         }
 
-        // Закриття модального вікна
         function closeModal() {
-            elements.modal.classList.add('closing');
-            elements.modal.classList.remove('show');
-            elements.body.classList.remove('modal-open'); // Повернення головного екрану до початкового стану
+            const modal = document.getElementById('modal');
+            modal.classList.add('closing');
+            modal.classList.remove('show');
+            document.body.classList.remove('modal-open'); // Повертаємо головний екран до початкового стану
             setTimeout(() => {
-                elements.modal.style.display = 'none';
-                elements.modal.classList.remove('closing');
+                modal.style.display = 'none';
+                modal.classList.remove('closing');
                 isModalOpen = false;
-                webApp.BackButton.hide();
+                Telegram.WebApp.BackButton.hide();
                 window.history.pushState({ page: 'home' }, document.title);
             }, 300);
         }
-
-        // Ініціалізація
-        document.addEventListener('DOMContentLoaded', () => {
-            webApp.ready();
-            updateTheme();
-            initFlatpickr();
-            webApp.onEvent('themeChanged', updateTheme);
-            webApp.BackButton.hide();
-
-            ['departure', 'arrival'].forEach(id => {
-                document.getElementById(id).addEventListener('input', updateSwapButtonVisibility);
-            });
-
-            setupSuggestions('departure', 'departure-suggestions');
-            setupSuggestions('arrival', 'arrival-suggestions');
-
-            updateSwapButtonVisibility();
-
-            window.addEventListener('popstate', () => {
-                if (isModalOpen) closeModal();
-            });
-
-            window.history.replaceState({ page: 'home' }, document.title);
-
-            // Закриття модального вікна при кліку на фон
-            elements.modal.addEventListener('click', (e) => {
-                if (e.target === elements.modal) closeModal();
-            });
-        });
     </script>
 </body>
 </html>
