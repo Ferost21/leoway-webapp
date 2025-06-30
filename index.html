@@ -143,34 +143,33 @@
             from { transform: translateX(0); }
             to { transform: translateX(100%); }
         }
-        .modal-header {
-            margin: 0 0 20px 0;
-            padding: 0;
-            display: flex;
-            justify-content: center;
-            align-items: flex-start;
+        .modal-title-box {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: var(--modal-bg-color, #fff);
+            border-bottom-left-radius: 12px;
+            border-bottom-right-radius: 12px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            padding: 30px 18px 12px;
+            width: 100%;
+            max-width: 600px;
+            margin: 0 auto;
+            box-sizing: border-box;
+            z-index: 1003;
+        }
+        #modal-results {
+            padding: 20px;
+            margin-top: 90px;
+            flex: 1;
+            overflow-y: auto;
         }
         #modal-title {
-            flex-grow: 1;
-            text-align: center;
             font-size: 18px;
             margin: 0;
             color: var(--text-color, #222);
-        }
-        .back-button {
-            width: 30px;
-            height: 30px;
-            font-size: 24px;
-            font-weight: bold;
-            color: var(--text-color, #444);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            cursor: pointer;
-            border-radius: 5px;
-        }
-        .back-button:hover {
-            background-color: var(--hover-bg-color, #f0f0f0);
         }
         .ride-item {
             border-radius: 12px;
@@ -226,6 +225,19 @@
         }
         .book-button:hover {
             background: var(--button-hover-bg-color, #219653);
+        }
+        .cancel-button {
+            background: var(--cancel-button-bg-color, #e74c3c);
+            color: var(--button-text-color, white);
+            border: none;
+            padding: 10px;
+            font-size: 15px;
+            border-radius: 6px;
+            margin-top: 4px;
+            cursor: pointer;
+        }
+        .cancel-button:hover {
+            background: var(--cancel-button-hover-bg-color, #c0392b);
         }
         .input-wrapper {
             position: relative;
@@ -283,33 +295,6 @@
             color: var(--text-color, #666);
             margin-top: 30vh;
         }
-        .modal-title-box {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            background: var(--modal-bg-color, #fff);
-            border-bottom-left-radius: 12px;
-            border-bottom-right-radius: 12px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-            text-align: center;
-            padding: 30px 18px 12px;
-            width: 100%;
-            max-width: 600px;
-            margin: 0 auto;
-            box-sizing: border-box;
-            z-index: 1003;
-        }
-        #modal-results {
-            padding: 20px;
-            margin-top: 90px; /* Відступ для фіксованого заголовка */
-            flex: 1;
-            overflow-y: auto;
-        }
-        #modal-title {
-            font-size: 18px;
-            margin: 0;
-        }
         .bottom-nav {
             position: fixed;
             bottom: 0;
@@ -352,22 +337,46 @@
         .nav-item.active svg {
             fill: var(--button-bg-color, #27ae60);
         }
+        .page {
+            display: none;
+        }
+        .page.active {
+            display: block;
+        }
+        #my-rides-page {
+            padding: 20px;
+        }
+        #my-rides-title {
+            font-size: 18px;
+            margin: 0 0 20px;
+            text-align: center;
+            color: var(--text-color, #222);
+        }
     </style>
 </head>
 <body>
-    <h1>Пошук поїздки</h1>
-    <div class="input-wrapper">
-        <input id="departure" placeholder="Місце відправлення" autocomplete="off">
-        <button class="swap-button" onclick="swapLocations()" aria-label="Змінити місця"></button>
-        <div id="departure-suggestions" class="suggestions"></div>
+    <!-- Сторінка пошуку -->
+    <div id="search-page" class="page active">
+        <h1>Пошук поїздки</h1>
+        <div class="input-wrapper">
+            <input id="departure" placeholder="Місце відправлення" autocomplete="off">
+            <button class="swap-button" onclick="swapLocations()" aria-label="Змінити місця"></button>
+            <div id="departure-suggestions" class="suggestions"></div>
+        </div>
+        <div class="input-wrapper">
+            <input id="arrival" placeholder="Місце прибуття" autocomplete="off">
+            <div id="arrival-suggestions" class="suggestions"></div>
+        </div>
+        <input id="date" type="text" placeholder="Дата (ДД-ММ-РРРР)" readonly>
+        <input id="seats" type="number" placeholder="Кількість місць" min="1" max="10">
+        <button onclick="submitSearch()">Пошук</button>
     </div>
-    <div class="input-wrapper">
-        <input id="arrival" placeholder="Місце прибуття" autocomplete="off">
-        <div id="arrival-suggestions" class="suggestions"></div>
+
+    <!-- Сторінка мої поїздки -->
+    <div id="my-rides-page" class="page">
+        <h2 id="my-rides-title">Мої поїздки</h2>
+        <div id="my-rides-results"></div>
     </div>
-    <input id="date" type="text" placeholder="Дата (ДД-ММ-РРРР)" readonly>
-    <input id="seats" type="number" placeholder="Кількість місць" min="1" max="10">
-    <button onclick="submitSearch()">Пошук</button>
 
     <!-- Модальне вікно -->
     <div id="modal" class="modal" style="display: none;">
@@ -404,6 +413,7 @@
         webApp.ready();
 
         let isModalOpen = false;
+        let currentPage = 'search';
 
         // Функція для оновлення стилів на основі теми
         function updateTheme() {
@@ -422,6 +432,8 @@
             root.style.setProperty('--modal-bg-color', themeParams.section_bg_color || (isDark ? '#2c3839' : '#eee'));
             root.style.setProperty('--ride-bg-color', themeParams.section_bg_color || (isDark ? '#2c3839' : 'white'));
             root.style.setProperty('--nav-bg-color', themeParams.section_bg_color || (isDark ? '#2c3839' : '#fff'));
+            root.style.setProperty('--cancel-button-bg-color', themeParams.destructive_text_color || (isDark ? '#e74c3c' : '#e74c3c'));
+            root.style.setProperty('--cancel-button-hover-bg-color', themeParams.destructive_text_color || (isDark ? '#c0392b' : '#c0392b'));
 
             webApp.setHeaderColor(themeParams.bg_color || (isDark ? '#1f2a2d' : '#ffffff'), 'bg_color');
             webApp.setBackgroundColor(themeParams.bg_color || (isDark ? '#1f2a2d' : '#f5f5f5'));
@@ -492,11 +504,16 @@
                 if (isModalOpen) {
                     closeModal();
                 } else {
-                    console.log('Повернення до головного меню');
+                    navigate('search'); // Повернення до сторінки пошуку за замовчуванням
                 }
             });
 
-            window.history.replaceState({ page: 'home' }, document.title);
+            window.history.replaceState({ page: 'search' }, document.title);
+
+            // Завантаження поїздок при першому відкритті сторінки "Мої поїздки"
+            if (currentPage === 'my-rides') {
+                loadMyRides();
+            }
         });
 
         async function fetchCities(query) {
@@ -656,8 +673,75 @@
                 if (!res.ok) throw new Error('Помилка бронювання');
                 const result = await res.json();
                 alert(`Бронювання створено! Номер: ${result.bookingId}`);
+                // Оновити список поїздок після бронювання
+                if (currentPage === 'my-rides') {
+                    loadMyRides();
+                }
             } catch (err) {
                 alert('Помилка при бронюванні: ' + err.message);
+            }
+        }
+
+        async function cancelRide(bookingId) {
+            const tgId = webApp.initDataUnsafe.user?.id;
+            if (!tgId) return alert('Не вдалося отримати ваш Telegram ID!');
+            try {
+                const res = await fetch(`https://027f-194-44-220-198.ngrok-free.app/api/cancel-ride`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'ngrok-skip-browser-warning': 'true'
+                    },
+                    body: JSON.stringify({ bookingId, tgId })
+                });
+                if (!res.ok) throw new Error('Помилка скасування бронювання');
+                const result = await res.json();
+                alert(`Бронювання ${bookingId} скасовано!`);
+                // Оновити список поїздок після скасування
+                loadMyRides();
+            } catch (err) {
+                alert('Помилка при скасуванні бронювання: ' + err.message);
+            }
+        }
+
+        async function loadMyRides() {
+            const tgId = webApp.initDataUnsafe.user?.id;
+            if (!tgId) {
+                document.getElementById('my-rides-results').innerHTML = '<div class="no-rides">Не вдалося отримати ваш Telegram ID!</div>';
+                return;
+            }
+            try {
+                const res = await fetch(`https://027f-194-44-220-198.ngrok-free.app/api/my-rides?tgId=${tgId}`, {
+                    headers: { 'ngrok-skip-browser-warning': 'true' }
+                });
+                if (!res.ok) throw new Error('Не вдалося отримати ваші поїздки');
+                const rides = await res.json();
+                const myRidesResults = document.getElementById('my-rides-results');
+                myRidesResults.innerHTML = rides.length === 0
+                    ? '<div class="no-rides">У вас немає заброньованих поїздок.</div>'
+                    : rides.map(ride => {
+                        const dt = new Date(ride.departure_time);
+                        const timeStr = dt.toLocaleTimeString('uk-UA', { hour: '2-digit', minute: '2-digit' });
+                        const dateStr = dt.toLocaleDateString('uk-UA', { day: '2-digit', month: '2-digit' });
+                        return `
+                            <div class="ride-item">
+                                <div class="ride-top">
+                                    <div class="ride-route">
+                                        <p class="route">${ride.departure} → ${ride.arrival}</p>
+                                        <p>${timeStr}, ${dateStr}</p>
+                                        <p>Місць: ${ride.seats_booked}</p>
+                                        ${ride.description ? `<p>Опис: ${ride.description}</p>` : ''}
+                                        <p>Водій: ${ride.driver_name} ★ ${ride.driver_rating.toFixed(1)}</p>
+                                        <p>Номер бронювання: ${ride.booking_id}</p>
+                                    </div>
+                                    <div class="price-tag">${ride.price} ₴</div>
+                                </div>
+                                <button class="cancel-button" onclick="cancelRide(${ride.booking_id})">Скасувати</button>
+                            </div>`;
+                    }).join('');
+            } catch (err) {
+                console.error(err);
+                document.getElementById('my-rides-results').innerHTML = '<div class="no-rides">Помилка при завантаженні поїздок: ' + err.message + '</div>';
             }
         }
 
@@ -670,18 +754,29 @@
                 modal.classList.remove('closing');
                 isModalOpen = false;
                 Telegram.WebApp.BackButton.hide();
-                window.history.pushState({ page: 'home' }, document.title);
+                window.history.pushState({ page: currentPage }, document.title);
             }, 300);
         }
 
         function navigate(page) {
+            if (isModalOpen) {
+                closeModal();
+            }
+
             const navItems = document.querySelectorAll('.nav-item');
             navItems.forEach(item => item.classList.remove('active'));
             document.querySelector(`.nav-item[onclick="navigate('${page}')"]`).classList.add('active');
 
-            // Поки що лише змінюємо активний стан, реальну навігацію потрібно реалізувати
-            console.log(`Перехід до сторінки: ${page}`);
-            if (page !== 'search') {
+            const pages = document.querySelectorAll('.page');
+            pages.forEach(p => p.classList.remove('active'));
+            document.getElementById(`${page}-page`).classList.add('active');
+
+            currentPage = page;
+            window.history.pushState({ page }, document.title);
+
+            if (page === 'my-rides') {
+                loadMyRides();
+            } else if (page === 'create' || page === 'profile') {
                 alert(`Перехід до ${page} ще не реалізовано!`);
             }
         }
