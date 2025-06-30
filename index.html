@@ -19,8 +19,7 @@
             height: 100vh;
             box-sizing: border-box;
             color: var(--text-color, #222);
-            transition: transform 0.3s ease; /* Додаємо перехід для масштабування */
-            will-change: transform; /* Оптимізація анімації */
+            transition: transform 0.3s ease; /* Додаємо анімацію масштабування */
         }
         body.modal-open {
             transform: scale(1.05); /* Збільшення головного екрану при відкритті модального вікна */
@@ -106,47 +105,45 @@
         .modal {
             display: flex;
             justify-content: center;
-            align-items: center; /* Центруємо по вертикалі */
+            align-items: center;
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0); /* Початкова прозорість */
+            background: rgba(0, 0, 0, 0);
             z-index: 1000;
             transition: background 0.3s ease, opacity 0.3s ease;
-            opacity: 0; /* Початкова непрозорість модального вікна */
+            opacity: 0;
         }
         .modal.show {
             background: rgba(0, 0, 0, 0.5);
-            opacity: 1; /* Повна видимість при відкритті */
+            opacity: 1;
         }
         .modal.closing {
             background: rgba(0, 0, 0, 0);
-            opacity: 0; /* Зникає при закритті */
+            opacity: 0;
         }
         .modal-content {
             background: var(--modal-bg-color, #eee);
-            width: 90%;
-            max-width: 600px;
-            max-height: 80vh;
+            width: 100%;
+            height: 100%;
             overflow-y: auto;
             box-sizing: border-box;
             padding: 0 0 20px;
-            border-radius: 12px;
+            border-radius: 0;
             position: relative;
-            transform: scale(0.7); /* Початковий масштаб для ефекту появи */
-            opacity: 0; /* Початкова прозорість */
+            transform: scale(0.7);
+            opacity: 0;
             transition: transform 0.3s ease, opacity 0.3s ease;
-            will-change: transform, opacity; /* Оптимізація анімації */
         }
         .modal.show .modal-content {
-            transform: scale(1); /* Нормальний розмір при відкритті */
-            opacity: 1; /* Повна видимість */
+            transform: scale(1);
+            opacity: 1;
         }
         .modal.closing .modal-content {
-            transform: scale(0.7); /* Зменшення при закритті */
-            opacity: 0; /* Зникає */
+            transform: scale(0.7);
+            opacity: 0;
         }
         .modal-header {
             margin: 0 0 20px 0;
@@ -236,7 +233,7 @@
             position: relative;
         }
         .input-wrapper input {
-            padding-right: 40......
+            padding-right: 40px;
         }
         .swap-button {
             position: absolute;
@@ -256,7 +253,7 @@
             transition: opacity 0.3s ease;
             z-index: 2;
         }
-        .swap-button.visible {
+        .swap-button.visible ,[title="index.html"] {
             opacity: 1;
         }
         .swap-button:hover {
@@ -320,7 +317,7 @@
         <input id="arrival" placeholder="Місце прибуття" autocomplete="off">
         <div id="arrival-suggestions" class="suggestions"></div>
     </div>
-    <input id="date" type="text" placeholder="Дата (ДД-ММ-РРРР)" readonly aria-readonly="true">
+    <input id="date" type="text" placeholder="Дата (ДД-ММ-РРРР)" readonly>
     <input id="seats" type="number" placeholder="Кількість місць" min="1" max="10">
     <button onclick="submitSearch()">Пошук</button>
 
@@ -346,7 +343,6 @@
             const isDark = webApp.colorScheme === 'dark';
 
             const root = document.documentElement;
-            // Використовуємо themeParams, якщо доступні, інакше резервні значення
             root.style.setProperty('--bg-color', themeParams.bg_color || (isDark ? '#1f2a2d' : '#f5f5f5'));
             root.style.setProperty('--text-color', themeParams.text_color || (isDark ? '#e0e0e0' : '#222'));
             root.style.setProperty('--border-color', themeParams.border_color || (isDark ? '#555' : '#ccc'));
@@ -358,21 +354,15 @@
             root.style.setProperty('--modal-bg-color', themeParams.section_bg_color || (isDark ? '#2c3839' : '#eee'));
             root.style.setProperty('--ride-bg-color', themeParams.section_bg_color || (isDark ? '#2c3839' : 'white'));
 
-            // Синхронізація кольорів заголовка та фону з Telegram
             webApp.setHeaderColor(themeParams.bg_color || (isDark ? '#1f2a2d' : '#ffffff'), 'bg_color');
             webApp.setBackgroundColor(themeParams.bg_color || (isDark ? '#1f2a2d' : '#f5f5f5'));
         }
 
         document.addEventListener('DOMContentLoaded', () => {
             webApp.ready();
-
-            // Оновлюємо тему при завантаженні
             updateTheme();
-
-            // Слухаємо зміни теми
             webApp.onEvent('themeChanged', updateTheme);
 
-            // Ініціалізація flatpickr з відлагодженням
             try {
                 const fp = flatpickr("#date", {
                     dateFormat: "d-m-Y",
@@ -382,7 +372,6 @@
                         const dateInput = document.getElementById('date');
                         dateInput.placeholder = "Дата (ДД-ММ-РРРР)";
                         console.log('flatpickr ініціалізовано успішно');
-                        // Активувати повноекранний режим після ініціалізації
                         if (webApp.requestFullscreen && window.innerWidth <= 600) {
                             webApp.requestFullscreen()
                                 .then(() => {
@@ -412,7 +401,6 @@
 
             Telegram.WebApp.BackButton.hide();
 
-            // Функція для управління видимістю кнопки
             function updateSwapButtonVisibility() {
                 const departure = document.getElementById('departure').value.trim();
                 const arrival = document.getElementById('arrival').value.trim();
@@ -430,7 +418,6 @@
 
             updateSwapButtonVisibility();
 
-            // Обробка кнопки "назад" для повернення до головного меню
             window.addEventListener('popstate', (event) => {
                 const modal = document.getElementById('modal');
                 if (isModalOpen) {
@@ -440,13 +427,14 @@
                 }
             });
 
-            window.history.replaceState({ page: 'home' }, document.title);
-
-            // Додаємо можливість закривати модальне вікно при кліку на фон
-            const modal = document.getElementById('modal');
-            modal.addEventListener('click', (e) => {
-                if (e.target === modal) closeModal();
+            // Додаємо обробник для закриття модального вікна при кліку на фон
+            document.getElementById('modal').addEventListener('click', (e) => {
+                if (e.target === e.currentTarget) {
+                    closeModal();
+                }
             });
+
+            window.history.replaceState({ page: 'home' }, document.title);
         });
 
         async function fetchCities(query) {
@@ -519,8 +507,6 @@
 
             if (!departure || !arrival || !date || !seats) return alert('Заповніть усі поля!');
             if (departure.length > 255 || arrival.length > 255) return alert('Назви місць мають бути до 255 символів!');
-            const seatsNumber = parseInt(seats);
-            if (isNaN(seatsNumber) || seatsNumber < 1 || seatsNumber > 10) return alert('Кількість місць має бути від 1 до 10!');
 
             try {
                 const res = await fetch(`https://027f-194-44-220-198.ngrok-free.app/api/search-rides`, {
@@ -552,19 +538,9 @@
                                     </div>
                                     <div class="price-tag">${ride.price} ₴</div>
                                 </div>
-                                <button class="book-button" data-ride-id="${ride.id}" data-seats="${seats}">Забронювати</button>
+                                <button class="book-button" onclick="bookRide(${ride.id}, ${seats})">Забронювати</button>
                             </div>`;
                     }).join('');
-
-                // Додаємо слухачі для кнопок бронювання
-                document.querySelectorAll('.book-button').forEach(button => {
-                    button.addEventListener('click', () => {
-                        const rideId = parseInt(button.dataset.rideId);
-                        const seats = parseInt(button.dataset.seats);
-                        bookRide(rideId, seats);
-                    });
-                });
-
                 document.getElementById('modal-title').textContent = `${departure} → ${arrival}`;
 
                 const modalTitleBox = document.querySelector('.modal-title-box');
@@ -576,15 +552,16 @@
                 subtitle.style.fontSize = '14px';
                 subtitle.style.color = 'var(--text-color, #555)';
 
+                const seatsNumber = parseInt(seats);
                 const seatWord = seatsNumber === 1 ? 'пасажир' : (seatsNumber >= 2 && seatsNumber <= 4 ? 'пасажири' : 'пасажирів');
+
                 subtitle.textContent = `${formatShortDate(date)}, ${seatsNumber} ${seatWord}`;
                 modalTitleBox.appendChild(subtitle);
-
                 const modal = document.getElementById('modal');
                 modal.style.display = 'flex';
                 requestAnimationFrame(() => {
                     modal.classList.add('show');
-                    document.body.classList.add('modal-open'); // Додаємо клас для масштабування головного екрану
+                    document.body.classList.add('modal-open'); // Додаємо масштабування до body
                 });
                 modal.classList.remove('closing');
 
@@ -627,7 +604,7 @@
             const modal = document.getElementById('modal');
             modal.classList.add('closing');
             modal.classList.remove('show');
-            document.body.classList.remove('modal-open'); // Повертаємо головний екран до початкового стану
+            document.body.classList.remove('modal-open'); // Повертаємо body до нормального масштабу
             setTimeout(() => {
                 modal.style.display = 'none';
                 modal.classList.remove('closing');
