@@ -124,11 +124,13 @@
             height: 100%;
             overflow-y: auto;
             box-sizing: border-box;
-            padding: 0 0 20px;
+            padding: 0;
             border-radius: 0;
             position: relative;
             transform: translateX(100%);
             animation: slideIn 0.3s forwards;
+            display: flex;
+            flex-direction: column;
         }
         .modal.closing .modal-content {
             animation: slideOut 0.3s forwards;
@@ -282,7 +284,10 @@
             margin-top: 30vh;
         }
         .modal-title-box {
-            margin-top: 0;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
             background: var(--modal-bg-color, #fff);
             border-bottom-left-radius: 12px;
             border-bottom-right-radius: 12px;
@@ -290,11 +295,16 @@
             text-align: center;
             padding: 30px 18px 12px;
             width: 100%;
+            max-width: 600px;
+            margin: 0 auto;
             box-sizing: border-box;
             z-index: 1003;
         }
         #modal-results {
-            padding: 0 20px;
+            padding: 20px;
+            margin-top: 90px; /* Відступ для фіксованого заголовка */
+            flex: 1;
+            overflow-y: auto;
         }
         #modal-title {
             font-size: 18px;
