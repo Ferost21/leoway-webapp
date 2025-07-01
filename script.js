@@ -279,14 +279,31 @@ async function cancelRide(bookingId) {
     }
 }
 
-async function contactDriver(driverTelegramId, bookingId) {
+async function contactDriver(driverTelegramId, driverUsername, bookingId) {
     const userTgId = webApp.initDataUnsafe.user?.id;
     if (!userTgId) {
         alert('Не вдалося отримати ваш Telegram ID!');
         return;
     }
     if (!driverTelegramId || !/^\d+$/.test(driverTelegramId)) {
-        alert('Не вдалося відкрити чат: водій не вказав дійсний Telegram ID');
+        if (driverUsername && driverUsername.startsWith('@')) {
+            try {
+                await fetch(`https://027f-194-44-220-198.ngrok-free.app/api/log-contact-attempt`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'ngrok-skip-browser-warning': 'true'
+                    },
+                    body: JSON.stringify({ userTgId, bookingId, driverTelegramId: driverUsername })
+                });
+                webApp.openTelegramLink(`https://t.me/${driverUsername}`);
+                return;
+            } catch (err) {
+                alert(`Не вдалося відкрити чат з водієм через ім'я користувача: ${err.message}`);
+                return;
+            }
+        }
+        alert('Не вдалося відкрити чат: водій не вказав дійсний Telegram ID або ім\'я користувача');
         return;
     }
     if (driverTelegramId === String(userTgId)) {
@@ -294,7 +311,6 @@ async function contactDriver(driverTelegramId, bookingId) {
         return;
     }
     try {
-        // Log the contact attempt to the backend
         await fetch(`https://027f-194-44-220-198.ngrok-free.app/api/log-contact-attempt`, {
             method: 'POST',
             headers: {
@@ -305,7 +321,23 @@ async function contactDriver(driverTelegramId, bookingId) {
         });
         webApp.openTelegramLink(`tg://user?id=${driverTelegramId}`);
     } catch (err) {
-        alert(`Не вдалося відкрити чат з водієм: ${err.message}. Можливо, Telegram ID водія недійсний або його акаунт обмежено.`);
+        if (driverUsername && driverUsername.startsWith('@')) {
+            try {
+                await fetch(`https://027f-194-44-220-198.ngrok-free.app/api/log-contact-attempt`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'ngrok-skip-browser-warning': 'true'
+                    },
+                    body: JSON.stringify({ userTgId, bookingId, driverTelegramId: driverUsername })
+                });
+                webApp.openTelegramLink(`https://t.me/${driverUsername}`);
+            } catch (err) {
+                alert(`Не вдалося відкрити чат з водієм: ${err.message}. Telegram ID або ім'я користувача водія недійсні.`);
+            }
+        } else {
+            alert(`Не вдалося відкрити чат з водієм: ${err.message}. Можливо, Telegram ID водія недійсний або його акаунт обмежено.`);
+        }
     }
 }
 
@@ -359,7 +391,7 @@ async function loadMyRides() {
                         </div>
                         <div class="ride-actions">
                             ${ride.status !== 'cancelled' ? `<button class="cancel-button" onclick="cancelRide(${ride.booking_id})">Скасувати</button>` : ''}
-                            ${ride.status === 'approved' && ride.driver_telegram_id ? `<button class="contact-button" onclick="contactDriver('${ride.driver_telegram_id}', ${ride.booking_id})">Зв’язатися з водієм</button>` : ''}
+                            ${ride.status === 'approved' && (ride.driver_telegram_id || ride.driver_username) ? `<button class="contact-button" onclick="contactDriver('${ride.driver_telegram_id}', '${ride.driver_username || ''}', ${ride.booking_id})">Зв’язатися з водієм</button>` : ''}
                         </div>
                     </div>`;
             }).join('');
