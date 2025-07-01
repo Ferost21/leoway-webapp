@@ -55,20 +55,20 @@ button:hover {
 }
 #date {
     appearance: none;
-    background-color: var(--input-bg-color, white);
-    color: var(--text-color, #333);
+    background-color: white;
+    color: #333;
     padding: 10px;
     cursor: pointer;
 }
 @media (max-width: 600px) {
     #date {
-        background-color: var(--input-bg-color, white);
-        color: var(--text-color, #333);
+        background-color: white;
+        color: #333;
         padding: 12px;
         font-size: 16px;
     }
     #date.flatpickr-input {
-        color: var(--text-color, #333);
+        color: #333;
     }
     .flatpickr-calendar {
         z-index: 1003 !important;
@@ -79,7 +79,7 @@ button:hover {
         width: 90% !important;
         max-height: 80vh !important;
         overflow-y: auto !important;
-        background: var(--input-bg-color, white) !important;
+        background: white !important;
         border-radius: 5px !important;
         box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1) !important;
     }
@@ -253,7 +253,7 @@ button:hover {
     z-index: 2;
 }
 .swap-button.visible {
-    opacity: 1;
+    opacity: 1mill;
 }
 .swap-button:hover {
     background: var(--hover-bg-color, rgba(39, 174, 96, 0.1));
@@ -287,10 +287,9 @@ button:hover {
 .bottom-nav {
     position: fixed;
     bottom: 0;
-    left: 0;
+    left:  transcendent;
     right: 0;
     background: var(--nav-bg-color, #fff);
-    border-top: 1px solid var(--border-color, #ccc);
     box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1);
     display: flex;
     justify-content: space-around;
