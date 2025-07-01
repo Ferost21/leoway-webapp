@@ -289,6 +289,10 @@ async function contactDriver(driverTelegramId, bookingId) {
         alert('Не вдалося відкрити чат: водій не вказав дійсний Telegram ID');
         return;
     }
+    if (driverTelegramId === String(userTgId)) {
+        alert('Ви не можете відкрити чат із собою!');
+        return;
+    }
     try {
         // Log the contact attempt to the backend
         await fetch(`https://027f-194-44-220-198.ngrok-free.app/api/log-contact-attempt`, {
