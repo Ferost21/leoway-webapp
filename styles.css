@@ -32,6 +32,10 @@ button {
 button:hover {
     background: var(--button-hover-bg-color, #219653);
 }
+button:disabled {
+    background: var(--border-color, #ccc);
+    cursor: not-allowed;
+}
 .suggestions {
     border: 1px solid var(--border-color, #ccc);
     border-radius: 5px;
@@ -228,6 +232,24 @@ button:hover {
 .cancel-button:hover {
     background: var(--cancel-button-hover-bg-color, #c0392b);
 }
+.cancel-button:disabled {
+    background: var(--border-color, #ccc);
+    cursor: not-allowed;
+}
+.status {
+    margin: 4px 0;
+    font-size: 14px;
+    color: var(--text-color, #222);
+}
+.status-pending {
+    color: var(--button-bg-color, #27ae60);
+}
+.status-confirmed {
+    color: var(--button-bg-color, #27ae60);
+}
+.status-canceled {
+    color: var(--cancel-button-bg-color, #e74c3c);
+}
 .input-wrapper {
     position: relative;
 }
@@ -336,14 +358,9 @@ button:hover {
 #my-rides-page {
     padding: 20px;
 }
-#my-rides-page h2 {
+#my-rides-title {
     font-size: 18px;
     margin: 0 0 20px;
     text-align: center;
     color: var(--text-color, #222);
-}
-.status {
-    margin: 4px 0;
-    color: var(--text-color, #222);
-    font-weight: bold;
 }

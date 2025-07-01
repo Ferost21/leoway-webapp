@@ -93,13 +93,12 @@ document.addEventListener('DOMContentLoaded', () => {
         if (isModalOpen) {
             closeModal();
         } else {
-            navigate('search'); // Повернення до сторінки пошуку за замовчуванням
+            navigate('search');
         }
     });
 
     window.history.replaceState({ page: 'search' }, document.title);
 
-    // Завантаження поїздок при першому відкритті сторінки "Мої поїздки"
     if (currentPage === 'my-rides') {
         loadMyRides();
     }
@@ -262,7 +261,6 @@ async function bookRide(rideId, seats) {
         if (!res.ok) throw new Error('Помилка бронювання');
         const result = await res.json();
         alert(`Бронювання створено! Номер: ${result.bookingId}`);
-        // Оновити список поїздок після бронювання
         if (currentPage === 'my-rides') {
             loadMyRides();
         }
@@ -286,7 +284,6 @@ async function cancelRide(bookingId) {
         if (!res.ok) throw new Error('Помилка скасування бронювання');
         const result = await res.json();
         alert(`Бронювання ${bookingId} скасовано!`);
-        // Оновити список поїздок після скасування
         loadMyRides();
     } catch (err) {
         alert('Помилка при скасуванні бронювання: ' + err.message);
@@ -312,7 +309,11 @@ async function loadMyRides() {
                 const dt = new Date(ride.departure_time);
                 const timeStr = dt.toLocaleTimeString('uk-UA', { hour: '2-digit', minute: '2-digit' });
                 const dateStr = dt.toLocaleDateString('uk-UA', { day: '2-digit', month: '2-digit' });
-                const statusText = ride.status ? `Статус: ${ride.status}` : 'Статус: невідомо';
+                const statusText = {
+                    'pending': 'Очікує',
+                    'confirmed': 'Підтверджено',
+                    'canceled': 'Скасовано'
+                }[ride.status] || ride.status;
                 return `
                     <div class="ride-item">
                         <div class="ride-top">
@@ -323,11 +324,11 @@ async function loadMyRides() {
                                 ${ride.description ? `<p>Опис: ${ride.description}</p>` : ''}
                                 <p>Водій: ${ride.driver_name} ★ ${ride.driver_rating.toFixed(1)}</p>
                                 <p>Номер бронювання: ${ride.booking_id}</p>
-                                <p class="status">${statusText}</p>
+                                <p class="status status-${ride.status}">Статус: ${statusText}</p>
                             </div>
                             <div class="price-tag">${ride.price} ₴</div>
                         </div>
-                        <button class="cancel-button" onclick="cancelRide(${ride.booking_id})">Скасувати</button>
+                        <button class="cancel-button" onclick="cancelRide(${ride.booking_id})" ${ride.status !== 'pending' ? 'disabled' : ''}>Скасувати</button>
                     </div>`;
             }).join('');
     } catch (err) {
