@@ -360,7 +360,7 @@ async function loadMyRides() {
                         </div>
                         <div class="ride-actions">
                             ${ride.status !== 'cancelled' ? `<button class="cancel-button" onclick="cancelRide(${ride.booking_id})">Скасувати</button>` : ''}
-                            ${ride.status === 'approved' && ride.driver_telegram_id ? `<button class="contact-button" onclick="contactDriver('${ride.driver_telegram_id}', ${ride.booking_id})">Зв’язатися з водієм</button>` : ''}
+                            ${(ride.status === 'approved' || ride.status === 'cancelled') && ride.driver_telegram_id ? `<button class="contact-button" onclick="contactDriver('${ride.driver_telegram_id}', ${ride.booking_id})">Зв’язатися з водієм</button>` : ''}
                         </div>
                     </div>`;
             }).join('');
