@@ -8,6 +8,7 @@ body {
     height: 100vh;
     box-sizing: border-box;
     color: var(--text-color, #222);
+    padding-bottom: 80px;
 }
 input, button {
     width: 100%;
