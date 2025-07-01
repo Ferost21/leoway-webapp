@@ -46,32 +46,24 @@ document.addEventListener('DOMContentLoaded', () => {
             onReady: () => {
                 const dateInput = document.getElementById('date');
                 dateInput.placeholder = "Дата (ДД-ММ-РРРР)";
-                console.log('flatpickr ініціалізовано успішно');
                 if (webApp.requestFullscreen && window.innerWidth <= 600) {
                     webApp.requestFullscreen()
                         .then(() => {
-                            console.log('Повноекранний режим активовано');
                         })
                         .catch(err => {
-                            console.warn('Повноекранний режим не підтримується:', err);
                         });
                 }
             },
             onChange: (selectedDates, dateStr, instance) => {
-                console.log('Дата змінена:', dateStr);
             },
             onOpen: () => {
-                console.log('Календар відкрито');
             },
             onClose: () => {
-                console.log('Календар закрито');
             }
         });
         if (!fp) {
-            console.error('flatpickr не ініціалізовано');
         }
     } catch (err) {
-        console.error('Помилка ініціалізації flatpickr:', err);
     }
 
     Telegram.WebApp.BackButton.hide();
@@ -246,7 +238,6 @@ async function submitSearch() {
             window.history.pushState({ modalOpen: true }, '');
         }, 100);
     } catch (err) {
-        console.error(err);
         alert('Помилка при пошуку поїздок: ' + err.message);
     }
 }
@@ -296,18 +287,14 @@ async function cancelRide(bookingId) {
 }
 
 function contactDriver(driverTelegramId) {
-    if (!driverTelegramId) {
-        console.error('Driver Telegram ID is missing:', driverTelegramId);
-        alert('Не вдалося отримати Telegram ID водія!');
+    if (!driverTelegramId || !/^\d+$/.test(driverTelegramId)) {
+        alert('Не вдалося відкрити чат: водій не вказав дійсний Telegram ID');
         return;
     }
-    const telegramLink = `tg://user?id=${driverTelegramId}`;
-    console.log('Attempting to open Telegram link:', telegramLink);
     try {
-        webApp.openTelegramLink(telegramLink);
+        webApp.openTelegramLink(`tg://user?id=${driverTelegramId}`);
     } catch (err) {
-        console.error('Error opening Telegram chat:', err);
-        alert('Не вдалося відкрити чат з водієм: ' + (err.message || 'Помилка WebAppTgUrlInvalid. Перевірте налаштування або зверніться до підтримки.'));
+        alert('Не вдалося відкрити чат з водієм: ' + err.message);
     }
 }
 
@@ -366,7 +353,6 @@ async function loadMyRides() {
                     </div>`;
             }).join('');
     } catch (err) {
-        console.error(err);
         document.getElementById('my-rides-results').innerHTML = '<div class="no-rides">Помилка при завантаженні поїздок: ' + err.message + '</div>';
     }
 }
