@@ -132,7 +132,7 @@ button:hover {
     from { transform: translateX(0); }
     to { transform: translateX(100%); }
 }
-.modal-title-box {
+.modal-title-box, .my-rides-title-box {
     position: fixed;
     top: 0;
     left: 0;
@@ -149,13 +149,13 @@ button:hover {
     box-sizing: border-box;
     z-index: 1003;
 }
-#modal-results {
+#modal-results, #my-rides-results {
     padding: 20px;
     margin-top: 90px;
     flex: 1;
     overflow-y: auto;
 }
-#modal-title {
+#modal-title, #my-rides-title {
     font-size: 18px;
     margin: 0;
     color: var(--text-color, #222);
@@ -188,12 +188,6 @@ button:hover {
 }
 .ride-item:hover {
     box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
-}
-.ride-item > .ride-info {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 10px;
 }
 .ride-actions {
     display: flex;
@@ -277,7 +271,7 @@ button:hover {
     background: var(--hover-bg-color, rgba(39, 174, 96, 0.1));
 }
 .swap-button:active {
-    background: var(--hover-bg-color, rgba(33, 150, 83, 0.2));
+    background: var(--hover-bg-color, rgba(33, 50, 83, 0.2));
 }
 .swap-button::after {
     content: "⇅";
@@ -350,15 +344,6 @@ button:hover {
 }
 .page.active {
     display: block;
-}
-#my-rides-page {
-    padding: 20px;
-}
-#my-rides-title {
-    font-size: 18px;
-    margin: 0 0 20px;
-    text-align: center;
-    color: var(--text-color, #222);
 }
 .status {
     margin: 4px 0;
