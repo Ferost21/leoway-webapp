@@ -149,41 +149,13 @@ button:hover {
     box-sizing: border-box;
     z-index: 1003;
 }
-.my-rides-title-box {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    background: var(--modal-bg-color, #fff);
-    border-bottom-left-radius: 12px;
-    border-bottom-right-radius: 12px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-    text-align: center;
-    padding: 30px 18px 12px;
-    width: 100%;
-    max-width: 600px;
-    margin: 0 auto;
-    box-sizing: border-box;
-    z-index: 1003;
-}
 #modal-results {
     padding: 20px;
     margin-top: 90px;
     flex: 1;
     overflow-y: auto;
 }
-#my-rides-results {
-    padding: 20px;
-    margin-top: 90px;
-    flex: 1;
-    overflow-y: auto;
-}
 #modal-title {
-    font-size: 18px;
-    margin: 0;
-    color: var(--text-color, #222);
-}
-#my-rides-title {
     font-size: 18px;
     margin: 0;
     color: var(--text-color, #222);
@@ -363,6 +335,12 @@ button:hover {
 }
 #my-rides-page {
     padding: 20px;
+}
+#my-rides-title {
+    font-size: 18px;
+    margin: 0 0 20px;
+    text-align: center;
+    color: var(--text-color, #222);
 }
 .status {
     margin: 4px 0;
