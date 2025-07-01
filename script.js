@@ -297,14 +297,17 @@ async function cancelRide(bookingId) {
 
 function contactDriver(driverTelegramId) {
     if (!driverTelegramId) {
+        console.error('Driver Telegram ID is missing:', driverTelegramId);
         alert('Не вдалося отримати Telegram ID водія!');
         return;
     }
+    const telegramLink = `tg://user?id=${driverTelegramId}`;
+    console.log('Attempting to open Telegram link:', telegramLink);
     try {
-        webApp.openTelegramLink(`tg://user?id=${driverTelegramId}`);
+        webApp.openTelegramLink(telegramLink);
     } catch (err) {
-        console.error('Помилка при відкритті чату з водієм:', err);
-        alert('Не вдалося відкрити чат з водієм: ' + err.message);
+        console.error('Error opening Telegram chat:', err);
+        alert('Не вдалося відкрити чат з водієм: ' + (err.message || 'Помилка WebAppTgUrlInvalid. Перевірте налаштування або зверніться до підтримки.'));
     }
 }
 
