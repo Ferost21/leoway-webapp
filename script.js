@@ -337,7 +337,6 @@ async function loadMyRides() {
                                 <p class="status ${statusClass}">Статус: ${statusText}</p>
                                 ${ride.description ? `<p>Опис: ${ride.description}</p>` : ''}
                                 <p>Водій: ${ride.driver_name} ★ ${ride.driver_rating.toFixed(1)}</p>
-                                <p>Номер бронювання: ${ride.booking_id}</p>
                             </div>
                             <div class="price-tag">${ride.price} ₴</div>
                         </div>
