@@ -23,6 +23,9 @@ function updateTheme() {
     root.style.setProperty('--nav-bg-color', themeParams.section_bg_color || (isDark ? '#2c3839' : '#fff'));
     root.style.setProperty('--cancel-button-bg-color', themeParams.destructive_text_color || (isDark ? '#e74c3c' : '#e74c3c'));
     root.style.setProperty('--cancel-button-hover-bg-color', themeParams.destructive_text_color || (isDark ? '#c0392b' : '#c0392b'));
+    root.style.setProperty('--status-approved-color', isDark ? '#2ecc71' : '#27ae60');
+    root.style.setProperty('--status-pending-color', isDark ? '#f1c40f' : '#f39c12');
+    root.style.setProperty('--status-cancelled-color', isDark ? '#e74c3c' : '#e74c3c');
 
     webApp.setHeaderColor(themeParams.bg_color || (isDark ? '#1f2a2d' : '#ffffff'), 'bg_color');
     webApp.setBackgroundColor(themeParams.bg_color || (isDark ? '#1f2a2d' : '#f5f5f5'));
@@ -290,6 +293,19 @@ async function cancelRide(bookingId) {
     }
 }
 
+function getStatusText(status) {
+    switch (status) {
+        case 'approved':
+            return 'Підтверджено';
+        case 'pending':
+            return 'Очікує';
+        case 'cancelled':
+            return 'Скасовано';
+        default:
+            return 'Невідомо';
+    }
+}
+
 async function loadMyRides() {
     const tgId = webApp.initDataUnsafe.user?.id;
     if (!tgId) {
@@ -309,11 +325,8 @@ async function loadMyRides() {
                 const dt = new Date(ride.departure_time);
                 const timeStr = dt.toLocaleTimeString('uk-UA', { hour: '2-digit', minute: '2-digit' });
                 const dateStr = dt.toLocaleDateString('uk-UA', { day: '2-digit', month: '2-digit' });
-                const statusText = {
-                    'pending': 'Очікує',
-                    'confirmed': 'Підтверджено',
-                    'canceled': 'Скасовано'
-                }[ride.status] || ride.status;
+                const statusText = getStatusText(ride.status);
+                const statusClass = `status-${ride.status}`;
                 return `
                     <div class="ride-item">
                         <div class="ride-top">
@@ -321,14 +334,14 @@ async function loadMyRides() {
                                 <p class="route">${ride.departure} → ${ride.arrival}</p>
                                 <p>${timeStr}, ${dateStr}</p>
                                 <p>Місць: ${ride.seats_booked}</p>
+                                <p class="status ${statusClass}">Статус: ${statusText}</p>
                                 ${ride.description ? `<p>Опис: ${ride.description}</p>` : ''}
                                 <p>Водій: ${ride.driver_name} ★ ${ride.driver_rating.toFixed(1)}</p>
                                 <p>Номер бронювання: ${ride.booking_id}</p>
-                                <p class="status status-${ride.status}">Статус: ${statusText}</p>
                             </div>
                             <div class="price-tag">${ride.price} ₴</div>
                         </div>
-                        <button class="cancel-button" onclick="cancelRide(${ride.booking_id})" ${ride.status !== 'pending' ? 'disabled' : ''}>Скасувати</button>
+                        ${ride.status !== 'cancelled' ? `<button class="cancel-button" onclick="cancelRide(${ride.booking_id})">Скасувати</button>` : ''}
                     </div>`;
             }).join('');
     } catch (err) {

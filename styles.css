@@ -32,10 +32,6 @@ button {
 button:hover {
     background: var(--button-hover-bg-color, #219653);
 }
-button:disabled {
-    background: var(--border-color, #ccc);
-    cursor: not-allowed;
-}
 .suggestions {
     border: 1px solid var(--border-color, #ccc);
     border-radius: 5px;
@@ -232,24 +228,6 @@ button:disabled {
 .cancel-button:hover {
     background: var(--cancel-button-hover-bg-color, #c0392b);
 }
-.cancel-button:disabled {
-    background: var(--border-color, #ccc);
-    cursor: not-allowed;
-}
-.status {
-    margin: 4px 0;
-    font-size: 14px;
-    color: var(--text-color, #222);
-}
-.status-pending {
-    color: var(--button-bg-color, #27ae60);
-}
-.status-confirmed {
-    color: var(--button-bg-color, #27ae60);
-}
-.status-canceled {
-    color: var(--cancel-button-bg-color, #e74c3c);
-}
 .input-wrapper {
     position: relative;
 }
@@ -363,4 +341,17 @@ button:disabled {
     margin: 0 0 20px;
     text-align: center;
     color: var(--text-color, #222);
+}
+.status {
+    margin: 4px 0;
+    font-weight: bold;
+}
+.status-approved {
+    color: var(--status-approved-color, #27ae60);
+}
+.status-pending {
+    color: var(--status-pending-color, #f39c12);
+}
+.status-cancelled {
+    color: var(--status-cancelled-color, #e74c3c);
 }
