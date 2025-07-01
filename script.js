@@ -312,6 +312,7 @@ async function loadMyRides() {
                 const dt = new Date(ride.departure_time);
                 const timeStr = dt.toLocaleTimeString('uk-UA', { hour: '2-digit', minute: '2-digit' });
                 const dateStr = dt.toLocaleDateString('uk-UA', { day: '2-digit', month: '2-digit' });
+                const statusText = ride.status ? `Статус: ${ride.status}` : 'Статус: невідомо';
                 return `
                     <div class="ride-item">
                         <div class="ride-top">
@@ -322,6 +323,7 @@ async function loadMyRides() {
                                 ${ride.description ? `<p>Опис: ${ride.description}</p>` : ''}
                                 <p>Водій: ${ride.driver_name} ★ ${ride.driver_rating.toFixed(1)}</p>
                                 <p>Номер бронювання: ${ride.booking_id}</p>
+                                <p class="status">${statusText}</p>
                             </div>
                             <div class="price-tag">${ride.price} ₴</div>
                         </div>
