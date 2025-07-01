@@ -195,6 +195,11 @@ button:hover {
     align-items: center;
     margin-bottom: 10px;
 }
+.ride-actions {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
 .price-tag {
     font-weight: bold;
     font-size: 18px;
@@ -227,6 +232,19 @@ button:hover {
 }
 .cancel-button:hover {
     background: var(--cancel-button-hover-bg-color, #c0392b);
+}
+.contact-button {
+    background: var(--contact-button-bg-color, #2980b9);
+    color: var(--button-text-color, white);
+    border: none;
+    padding: 10px;
+    font-size: 15px;
+    border-radius: 6px;
+    margin-top: 4px;
+    cursor: pointer;
+}
+.contact-button:hover {
+    background: var(--contact-button-hover-bg-color, #2471a3);
 }
 .input-wrapper {
     position: relative;

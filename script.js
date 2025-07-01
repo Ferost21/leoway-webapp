@@ -26,6 +26,8 @@ function updateTheme() {
     root.style.setProperty('--status-approved-color', isDark ? '#2ecc71' : '#27ae60');
     root.style.setProperty('--status-pending-color', isDark ? '#f1c40f' : '#f39c12');
     root.style.setProperty('--status-cancelled-color', isDark ? '#e74c3c' : '#e74c3c');
+    root.style.setProperty('--contact-button-bg-color', themeParams.link_color || (isDark ? '#3498db' : '#2980b9'));
+    root.style.setProperty('--contact-button-hover-bg-color', themeParams.link_color || (isDark ? '#2980b9' : '#2471a3'));
 
     webApp.setHeaderColor(themeParams.bg_color || (isDark ? '#1f2a2d' : '#ffffff'), 'bg_color');
     webApp.setBackgroundColor(themeParams.bg_color || (isDark ? '#1f2a2d' : '#f5f5f5'));
@@ -293,6 +295,19 @@ async function cancelRide(bookingId) {
     }
 }
 
+function contactDriver(driverTelegramId) {
+    if (!driverTelegramId) {
+        alert('Не вдалося отримати Telegram ID водія!');
+        return;
+    }
+    try {
+        webApp.openTelegramLink(`tg://user?id=${driverTelegramId}`);
+    } catch (err) {
+        console.error('Помилка при відкритті чату з водієм:', err);
+        alert('Не вдалося відкрити чат з водієм: ' + err.message);
+    }
+}
+
 function getStatusText(status) {
     switch (status) {
         case 'approved':
@@ -337,10 +352,14 @@ async function loadMyRides() {
                                 <p class="status ${statusClass}">Статус: ${statusText}</p>
                                 ${ride.description ? `<p>Опис: ${ride.description}</p>` : ''}
                                 <p>Водій: ${ride.driver_name} ★ ${ride.driver_rating.toFixed(1)}</p>
+                                <p>Номер бронювання: ${ride.booking_id}</p>
                             </div>
                             <div class="price-tag">${ride.price} ₴</div>
                         </div>
-                        ${ride.status !== 'cancelled' ? `<button class="cancel-button" onclick="cancelRide(${ride.booking_id})">Скасувати</button>` : ''}
+                        <div class="ride-actions">
+                            ${ride.status !== 'cancelled' ? `<button class="cancel-button" onclick="cancelRide(${ride.booking_id})">Скасувати</button>` : ''}
+                            ${ride.status === 'approved' && ride.driver_telegram_id ? `<button class="contact-button" onclick="contactDriver('${ride.driver_telegram_id}')">Зв’язатися з водієм</button>` : ''}
+                        </div>
                     </div>`;
             }).join('');
     } catch (err) {
