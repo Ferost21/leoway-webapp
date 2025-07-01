@@ -304,7 +304,7 @@ async function contactDriver(driverTelegramId, bookingId) {
             body: JSON.stringify({ userTgId, bookingId, driverTelegramId })
         });
         // Use Deeplink to the bot instead of direct user link
-        webApp.openTelegramLink(`https://t.me/LeowayBot?start=contact_${driverTelegramId}_${bookingId}`);
+        webApp.openTelegramLink(`https://t.me/pdsdk_bot?start=contact_${driverTelegramId}_${bookingId}`);
     } catch (err) {
         alert(`Не вдалося відкрити чат з водієм: ${err.message}. Спробуйте ще раз або зв’яжіться з підтримкою.`);
     }
