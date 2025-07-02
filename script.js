@@ -96,7 +96,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 async function fetchCities(query) {
     if (query.length < 2) return [];
-    const response = await fetch(`https://027f-194-44-220-198.ngrok-free.app/api/cities?query=${encodeURIComponent(query)}`, {
+    const response = await fetch(`https://770c-194-44-220-198.ngrok-free.app/api/cities?query=${encodeURIComponent(query)}`, {
         headers: { 'ngrok-skip-browser-warning': 'true' }
     });
     if (!response.ok) return [];
@@ -166,7 +166,7 @@ async function submitSearch() {
     if (departure.length > 255 || arrival.length > 255) return alert('Назви місць мають бути до 255 символів!');
 
     try {
-        const res = await fetch(`https://027f-194-44-220-198.ngrok-free.app/api/search-rides`, {
+        const res = await fetch(`https://770c-194-44-220-198.ngrok-free.app/api/search-rides`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -239,7 +239,7 @@ async function bookRide(rideId, seats) {
     const tgId = webApp.initDataUnsafe.user?.id;
     if (!tgId) return alert('Не вдалося отримати ваш Telegram ID!');
     try {
-        const res = await fetch(`https://027f-194-44-220-198.ngrok-free.app/api/book-ride`, {
+        const res = await fetch(`https://770c-194-44-220-198.ngrok-free.app/api/book-ride`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -262,7 +262,7 @@ async function cancelRide(bookingId) {
     const tgId = webApp.initDataUnsafe.user?.id;
     if (!tgId) return alert('Не вдалося отримати ваш Telegram ID!');
     try {
-        const res = await fetch(`https://027f-194-44-220-198.ngrok-free.app/api/cancel-ride`, {
+        const res = await fetch(`https://770c-194-44-220-198.ngrok-free.app/api/cancel-ride`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -295,7 +295,7 @@ async function contactDriver(driverTelegramId, bookingId) {
     }
     try {
         // Log the contact attempt to the backend
-        await fetch(`https://027f-194-44-220-198.ngrok-free.app/api/log-contact-attempt`, {
+        await fetch(`https://770c-194-44-220-198.ngrok-free.app/api/log-contact-attempt`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -330,7 +330,7 @@ async function loadMyRides() {
         return;
     }
     try {
-        const res = await fetch(`https://027f-194-44-220-198.ngrok-free.app/api/my-rides?tgId=${tgId}`, {
+        const res = await fetch(`https://770c-194-44-220-198.ngrok-free.app/api/my-rides?tgId=${tgId}`, {
             headers: { 'ngrok-skip-browser-warning': 'true' }
         });
         if (!res.ok) throw new Error('Не вдалося отримати ваші поїздки');
