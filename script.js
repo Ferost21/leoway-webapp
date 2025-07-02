@@ -427,7 +427,14 @@ setupSuggestions('create-departure', 'create-departure-suggestions');
 setupSuggestions('create-arrival', 'create-arrival-suggestions');
 
 function submitCreateRide() {
+    const tgId = webApp.initDataUnsafe.user?.id;
+    if (!tgId) {
+        alert("Не вдалося отримати ваш Telegram ID!");
+        return;
+    }
+
     const data = {
+        tgId,
         departure: document.getElementById("create-departure").value.trim(),
         arrival: document.getElementById("create-arrival").value.trim(),
         date: document.getElementById("create-date").value,
@@ -444,7 +451,10 @@ function submitCreateRide() {
 
     fetch("https://2326-194-44-220-198.ngrok-free.app/api/create-ride", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+            "Content-Type": "application/json",
+            "ngrok-skip-browser-warning": "true"
+        },
         body: JSON.stringify(data)
     })
     .then(res => res.json())
