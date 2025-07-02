@@ -44,14 +44,13 @@ document.addEventListener('DOMContentLoaded', () => {
             dateFormat: "d-m-Y",
             minDate: "today",
             locale: "uk",
+            disableMobile: true, // ВАЖЛИВО!
             onReady: () => {
                 const dateInput = document.getElementById('date');
                 dateInput.placeholder = "Дата (ДД-ММ-РРРР)";
-                if (webApp.requestFullscreen && window.innerWidth <= 600) {
-                    webApp.requestFullscreen().catch(() => {});
-                }
             }
         });
+
     } catch (err) {}
 
     // Ініціалізація календаря і часу для створення поїздки
