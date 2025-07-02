@@ -352,8 +352,11 @@ button:hover {
     display: block;
 }
 #my-rides-page {
-    padding: 20px;
+    padding-top: 50px; /* висота фіксованого меню + відступ */
+    padding-left: 20px;
+    padding-right: 20px;
 }
+
 #my-rides-title {
     font-size: 18px;
     margin: 0 0 20px;
@@ -375,11 +378,20 @@ button:hover {
 }
 
 .tab-header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    max-width: 600px;
+    margin: 0 auto;
+    background: var(--nav-bg-color, #fff);
+    z-index: 1001;
     display: flex;
     justify-content: center;
-    margin-bottom: 10px;
     border-bottom: 1px solid var(--border-color);
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
 }
+
 
 .tab-button {
     flex: 1;
