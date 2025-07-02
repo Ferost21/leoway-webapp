@@ -367,6 +367,7 @@ button:hover {
 
 #my-rides-page.active {
     display: flex;
+    overflow: hidden;
 }
 
 #my-rides-title {
@@ -400,7 +401,7 @@ button:hover {
 }
 .scrollable-rides {
     flex: 1;
-    overflow-y: auto; /* Єдиний прокручуваний контейнер */
+    overflow-y: auto;
     box-sizing: border-box;
     padding: 20px;
     padding-bottom: 80px; /* Для нижнього меню */
