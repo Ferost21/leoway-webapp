@@ -442,7 +442,7 @@ function submitCreateRide() {
         return;
     }
 
-    fetch("http://localhost:8000/api/create-ride", {
+    fetch("https://2326-194-44-220-198.ngrok-free.app/api/create-ride", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data)
