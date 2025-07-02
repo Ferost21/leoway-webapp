@@ -1,12 +1,11 @@
 body {
     font-family: Arial, sans-serif;
-    padding: 60px 20px 80px;
     background: var(--bg-color, #f5f5f5);
     max-width: 600px;
     margin: 0 auto;
-    position: relative;
     height: 100vh;
-    box-sizing: border-box;
+    overflow: hidden; /* <-- прибираємо скрол тут */
+    position: relative;
     color: var(--text-color, #222);
 }
 input, button {
@@ -308,16 +307,16 @@ button:hover {
     left: 0;
     right: 0;
     height: 60px;
+    z-index: 10;
     background: var(--nav-bg-color, #fff);
     border-top: 1px solid var(--border-color, #ccc);
-    box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1);
     display: flex;
     justify-content: space-around;
     align-items: center;
-    z-index: 100;
     max-width: 600px;
     margin: 0 auto;
 }
+
 .nav-item {
     flex: 1;
     display: flex;
@@ -365,6 +364,10 @@ button:hover {
 
 #my-rides-page.active {
     display: flex;
+    flex-direction: column;
+    height: 100vh;
+    position: relative;
+    overflow: hidden;
 }
 
 #my-rides-title {
@@ -388,20 +391,29 @@ button:hover {
 }
 
 .tab-header {
-    position: sticky;
+    position: fixed;
     top: 0;
+    left: 0;
+    right: 0;
+    height: 50px;
     z-index: 10;
+    background: var(--bg-color, #fff);
     display: flex;
     justify-content: center;
-    background: var(--bg-color, #fff);
     border-bottom: 1px solid var(--border-color, #ccc);
+    max-width: 600px;
+    margin: 0 auto;
 }
+
 .scrollable-rides {
-    flex: 1;
+    position: absolute;
+    top: 50px; /* висота табів */
+    bottom: 60px; /* висота нижнього меню */
+    left: 0;
+    right: 0;
     overflow-y: auto;
     padding: 20px;
     box-sizing: border-box;
-    padding-bottom: 80px; /* запас під нижнє меню */
 }
 
 .rides-scroll {
