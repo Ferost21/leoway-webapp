@@ -5,9 +5,10 @@ body {
     max-width: 600px;
     margin: 0 auto;
     position: relative;
-    height: 100vh;
+    min-height: 100vh; /* Змінено з height на min-height */
     box-sizing: border-box;
     color: var(--text-color, #222);
+    overflow: hidden; /* Вимикаємо прокручування на рівні body */
 }
 input, button {
     width: 100%;
@@ -354,18 +355,18 @@ button:hover {
 #my-rides-page {
     display: none;
     flex-direction: column;
-    height: 100vh;
+    min-height: 100vh; /* Змінено з height на min-height */
     padding: 0;
     max-width: 600px;
     margin: 0 auto;
     background: var(--bg-color, #f5f5f5);
     box-sizing: border-box;
     position: relative;
+    overflow: hidden; /* Вимикаємо прокручування на рівні сторінки */
 }
 
 #my-rides-page.active {
     display: flex;
-    overflow: hidden;
 }
 
 #my-rides-title {
@@ -399,7 +400,7 @@ button:hover {
 }
 .scrollable-rides {
     flex: 1;
-    overflow-y: auto;
+    overflow-y: auto; /* Єдиний прокручуваний контейнер */
     box-sizing: border-box;
     padding: 20px;
     padding-bottom: 80px; /* Для нижнього меню */
