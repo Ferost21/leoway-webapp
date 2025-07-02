@@ -373,3 +373,34 @@ button:hover {
 .status-cancelled {
     color: var(--status-cancelled-color, #e74c3c);
 }
+
+.tab-header {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 10px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.tab-button {
+    flex: 1;
+    padding: 10px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-weight: bold;
+    color: var(--text-color);
+    border-bottom: 2px solid transparent;
+}
+
+.tab-button.active {
+    border-bottom: 2px solid var(--button-bg-color);
+    color: var(--button-bg-color);
+}
+
+.rides-tab {
+    display: none;
+}
+
+.rides-tab.active {
+    display: block;
+}

@@ -347,44 +347,62 @@ async function loadMyRides() {
         document.getElementById('my-rides-results').innerHTML = '<div class="no-rides">Не вдалося отримати ваш Telegram ID!</div>';
         return;
     }
+
     try {
         const res = await fetch(`https://2326-194-44-220-198.ngrok-free.app/api/my-rides?tgId=${tgId}`, {
             headers: { 'ngrok-skip-browser-warning': 'true' }
         });
+
         if (!res.ok) throw new Error('Не вдалося отримати ваші поїздки');
+
         const rides = await res.json();
-        const myRidesResults = document.getElementById('my-rides-results');
-        myRidesResults.innerHTML = rides.length === 0
+
+        // Розділити поїздки за роллю
+        const bookings = rides.filter(r => r.role === 'passenger');
+        const driverRides = rides.filter(r => r.role === 'driver');
+
+        document.getElementById('my-rides-results').innerHTML = bookings.length === 0
             ? '<div class="no-rides">У вас немає заброньованих поїздок.</div>'
-            : rides.map(ride => {
-                const dt = new Date(ride.departure_time);
-                const timeStr = dt.toLocaleTimeString('uk-UA', { hour: '2-digit', minute: '2-digit' });
-                const dateStr = dt.toLocaleDateString('uk-UA', { day: '2-digit', month: '2-digit' });
-                const statusText = getStatusText(ride.status);
-                const statusClass = `status-${ride.status}`;
-                return `
-                    <div class="ride-item">
-                        <div class="ride-top">
-                            <div class="ride-route">
-                                <p class="route">${ride.departure} → ${ride.arrival}</p>
-                                <p>${timeStr}, ${dateStr}</p>
-                                <p>Місць: ${ride.seats_booked}</p>
-                                <p class="status ${statusClass}">Статус: ${statusText}</p>
-                                ${ride.description ? `<p>Опис: ${ride.description}</p>` : ''}
-                                <p>Водій: ${ride.driver_name} ★ ${ride.driver_rating.toFixed(1)}</p>
-                                <p>Номер бронювання: ${ride.booking_id}</p>
-                            </div>
-                            <div class="price-tag">${ride.price} ₴</div>
-                        </div>
-                        <div class="ride-actions">
-                            ${ride.status !== 'cancelled' ? `<button class="cancel-button" onclick="cancelRide(${ride.booking_id})">Скасувати</button>` : ''}
-                            ${(ride.status === 'approved' || ride.status === 'cancelled') && ride.driver_telegram_id ? `<button class="contact-button" onclick="contactDriver('${ride.driver_telegram_id}', ${ride.booking_id})">Зв’язатися з водієм</button>` : ''}
-                        </div>
-                    </div>`;
-            }).join('');
+            : renderRides(bookings, true);
+
+        document.getElementById('my-driver-results').innerHTML = driverRides.length === 0
+            ? '<div class="no-rides">У вас немає створених поїздок.</div>'
+            : renderRides(driverRides, false);
+
     } catch (err) {
         document.getElementById('my-rides-results').innerHTML = '<div class="no-rides">Помилка при завантаженні поїздок: ' + err.message + '</div>';
     }
+}
+
+function renderRides(rides, isBooking) {
+    return rides.map(ride => {
+        const dt = new Date(ride.departure_time);
+        const timeStr = dt.toLocaleTimeString('uk-UA', { hour: '2-digit', minute: '2-digit' });
+        const dateStr = dt.toLocaleDateString('uk-UA', { day: '2-digit', month: '2-digit' });
+        const statusText = getStatusText(ride.status || '');
+        const statusClass = ride.status ? `status-${ride.status}` : '';
+        return `
+            <div class="ride-item">
+                <div class="ride-top">
+                    <div class="ride-route">
+                        <p class="route">${ride.departure} → ${ride.arrival}</p>
+                        <p>${timeStr}, ${dateStr}</p>
+                        <p>Місць: ${isBooking ? ride.seats_booked : ride.seats_available}/${ride.seats_total}</p>
+                        ${ride.status ? `<p class="status ${statusClass}">Статус: ${statusText}</p>` : ''}
+                        ${ride.description ? `<p>Опис: ${ride.description}</p>` : ''}
+                        ${isBooking ? `
+                            <p>Водій: ${ride.driver_name} ★ ${ride.driver_rating.toFixed(1)}</p>
+                            <p>Номер бронювання: ${ride.booking_id}</p>` : ''}
+                    </div>
+                    <div class="price-tag">${ride.price} ₴</div>
+                </div>
+                ${isBooking && ride.status !== 'cancelled' ? `
+                    <div class="ride-actions">
+                        <button class="cancel-button" onclick="cancelRide(${ride.booking_id})">Скасувати</button>
+                        ${ride.driver_telegram_id ? `<button class="contact-button" onclick="contactDriver('${ride.driver_telegram_id}', ${ride.booking_id})">Зв’язатися з водієм</button>` : ''}
+                    </div>` : ''}
+            </div>`;
+    }).join('');
 }
 
 function closeModal() {
@@ -470,4 +488,23 @@ function submitCreateRide() {
         alert("Помилка при з'єднанні з сервером.");
         console.error(err);
     });
+}
+
+function switchRidesTab(tab) {
+    const bookingsTab = document.getElementById('tab-bookings');
+    const driverTab = document.getElementById('tab-driver');
+    const bookingsContent = document.getElementById('my-rides-results');
+    const driverContent = document.getElementById('my-driver-results');
+
+    if (tab === 'bookings') {
+        bookingsTab.classList.add('active');
+        driverTab.classList.remove('active');
+        bookingsContent.classList.add('active');
+        driverContent.classList.remove('active');
+    } else {
+        bookingsTab.classList.remove('active');
+        driverTab.classList.add('active');
+        bookingsContent.classList.remove('active');
+        driverContent.classList.add('active');
+    }
 }
