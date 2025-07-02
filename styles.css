@@ -402,13 +402,9 @@ button:hover {
     overflow-y: auto;
     box-sizing: border-box;
     padding: 20px;
-    padding-bottom: 80px; /* Запас для нижнього меню */
+    padding-bottom: 80px; /* Для нижнього меню */
 }
 
-.rides-scroll {
-    flex: 1;
-    padding: 20px;
-}
 .tab-button {
     flex: 1;
     padding: 10px;
