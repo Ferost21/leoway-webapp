@@ -64,27 +64,5 @@
             <span>Профіль</span>
         </div>
     </div>
-
-    <!-- Модальне вікно створення поїздки -->
-    <div id="create-ride-modal" class="create-modal">
-        <div class="create-modal-content">
-            <h2>Створити поїздку</h2>
-            <div class="input-wrapper">
-                <input id="create-departure" placeholder="Звідки" autocomplete="off">
-                <div id="create-departure-suggestions" class="suggestions"></div>
-            </div>
-            <div class="input-wrapper">
-                <input id="create-arrival" placeholder="Куди" autocomplete="off">
-                <div id="create-arrival-suggestions" class="suggestions"></div>
-            </div>
-            <input id="create-date" type="text" placeholder="Дата (ДД-ММ-РРРР)" readonly>
-            <input id="create-time" type="time" placeholder="Час">
-            <textarea id="create-description" placeholder="Опис (необов'язково)"></textarea>
-            <input id="create-seats" type="number" placeholder="Кількість місць" min="1" max="10">
-            <input id="create-price" type="number" placeholder="Ціна (грн)" min="0">
-            <button onclick="submitCreateRide()">Опублікувати</button>
-            <button onclick="closeCreateRideModal()" class="cancel-button">Скасувати</button>
-        </div>
-    </div>
 </body>
 </html>
