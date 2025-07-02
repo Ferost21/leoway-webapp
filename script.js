@@ -404,3 +404,60 @@ function navigate(page) {
         alert(`Перехід до ${page} ще не реалізовано!`);
     }
 }
+
+flatpickr("#create-date", {
+    dateFormat: "d-m-Y",
+    locale: "uk"
+});
+
+flatpickr("#create-time", {
+    enableTime: true,
+    noCalendar: true,
+    dateFormat: "H:i",
+    time_24hr: true,
+    locale: "uk"
+});
+
+document.getElementById("create-departure").addEventListener("input", (e) => {
+    handleCityAutocomplete(e.target.value, "create-departure-suggestions", "create-departure");
+});
+
+document.getElementById("create-arrival").addEventListener("input", (e) => {
+    handleCityAutocomplete(e.target.value, "create-arrival-suggestions", "create-arrival");
+});
+
+function submitCreateRide() {
+    const data = {
+        departure: document.getElementById("create-departure").value.trim(),
+        arrival: document.getElementById("create-arrival").value.trim(),
+        date: document.getElementById("create-date").value,
+        time: document.getElementById("create-time").value,
+        description: document.getElementById("create-description").value.trim(),
+        seats: parseInt(document.getElementById("create-seats").value),
+        price: parseFloat(document.getElementById("create-price").value)
+    };
+
+    if (!data.departure || !data.arrival || !data.date || !data.time || !data.seats || !data.price) {
+        alert("Будь ласка, заповніть усі обов'язкові поля.");
+        return;
+    }
+
+    fetch("http://localhost:8000/api/create-ride", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data)
+    })
+    .then(res => res.json())
+    .then(response => {
+        if (response.error) {
+            alert("Помилка: " + response.error);
+        } else {
+            alert("Поїздка створена успішно!");
+            navigate("search");
+        }
+    })
+    .catch(err => {
+        alert("Помилка при з'єднанні з сервером.");
+        console.error(err);
+    });
+}

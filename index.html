@@ -35,6 +35,25 @@
         <div id="my-rides-results"></div>
     </div>
 
+    <!-- Сторінка створення поїздки -->
+    <div id="create-page" class="page">
+        <h2>Створити поїздку</h2>
+        <div class="input-wrapper">
+            <input id="create-departure" placeholder="Місце відправлення" autocomplete="off">
+            <div id="create-departure-suggestions" class="suggestions"></div>
+        </div>
+        <div class="input-wrapper">
+            <input id="create-arrival" placeholder="Місце прибуття" autocomplete="off">
+            <div id="create-arrival-suggestions" class="suggestions"></div>
+        </div>
+        <input id="create-date" type="text" placeholder="Дата (ДД-ММ-РРРР)" readonly>
+        <input id="create-time" type="text" placeholder="Час (ГГ:ХХ)" readonly>
+        <input id="create-description" type="text" placeholder="Опис (необов'язково)">
+        <input id="create-seats" type="number" placeholder="Кількість місць" min="1" max="10">
+        <input id="create-price" type="number" placeholder="Ціна (грн)" min="0" step="1">
+        <button onclick="submitCreateRide()">Створити</button>
+    </div>
+
     <!-- Модальне вікно -->
     <div id="modal" class="modal" style="display: none;">
         <div class="modal-content">
