@@ -404,3 +404,37 @@ function navigate(page) {
         alert(`Перехід до ${page} ще не реалізовано!`);
     }
 }
+
+function openCreateRideModal() {
+    document.getElementById("create-ride-modal").classList.add("show");
+    Telegram.WebApp.HapticFeedback.impactOccurred('medium');
+}
+
+function closeCreateRideModal() {
+    document.getElementById("create-ride-modal").classList.remove("show");
+}
+
+function navigate(page) {
+    document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
+    document.querySelectorAll(".nav-item").forEach(i => i.classList.remove("active"));
+
+    if (page === "create") {
+        openCreateRideModal();
+    } else {
+        closeCreateRideModal();
+        document.getElementById(`${page}-page`).classList.add("active");
+    }
+
+    const currentItem = document.querySelector(`.nav-item[onclick="navigate('${page}')"]`);
+    if (currentItem) currentItem.classList.add("active");
+}
+
+// flatpickr для дати
+flatpickr("#create-date", {
+    locale: "uk",
+    dateFormat: "d-m-Y",
+    minDate: "today"
+});
+
+// автодоповнення — використай таку ж логіку, як і для пошуку
+// ти можеш скопіювати обробники з поля #departure до #create-departure і аналогічно для arrival

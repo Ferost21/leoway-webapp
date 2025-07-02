@@ -44,31 +44,6 @@
             <div id="modal-results"></div>
         </div>
     </div>
-
-    <!-- Модальне вікно для створення поїздки -->
-    <div id="create-ride-modal" class="modal" style="display: none;">
-        <div class="modal-content">
-            <div class="modal-title-box">
-                <h2>Створити поїздку</h2>
-            </div>
-            <div class="modal-form">
-                <div class="input-wrapper">
-                    <input id="create-departure" placeholder="Місце відправлення" autocomplete="off">
-                    <div id="create-departure-suggestions" class="suggestions"></div>
-                </div>
-                <div class="input-wrapper">
-                    <input id="create-arrival" placeholder="Місце прибуття" autocomplete="off">
-                    <div id="create-arrival-suggestions" class="suggestions"></div>
-                </div>
-                <input id="create-date" type="text" placeholder="Дата (ДД-ММ-РРРР)" readonly>
-                <input id="create-time" type="text" placeholder="Час (ГГ:ХХ)" readonly>
-                <input id="create-seats" type="number" placeholder="Кількість місць" min="1" max="10">
-                <input id="create-price" type="number" placeholder="Ціна за місце (грн)" min="1">
-                <textarea id="create-description" placeholder="Опис поїздки (необов’язково)"></textarea>
-                <button onclick="submitCreateRide()">Створити поїздку</button>
-            </div>
-        </div>
-    </div>
     
     <!-- Нижнє меню навігації -->
     <div class="bottom-nav">
@@ -87,6 +62,28 @@
         <div class="nav-item" onclick="navigate('profile')">
             <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/></svg>
             <span>Профіль</span>
+        </div>
+    </div>
+
+    <!-- Модальне вікно створення поїздки -->
+    <div id="create-ride-modal" class="create-modal">
+        <div class="create-modal-content">
+            <h2>Створити поїздку</h2>
+            <div class="input-wrapper">
+                <input id="create-departure" placeholder="Звідки" autocomplete="off">
+                <div id="create-departure-suggestions" class="suggestions"></div>
+            </div>
+            <div class="input-wrapper">
+                <input id="create-arrival" placeholder="Куди" autocomplete="off">
+                <div id="create-arrival-suggestions" class="suggestions"></div>
+            </div>
+            <input id="create-date" type="text" placeholder="Дата (ДД-ММ-РРРР)" readonly>
+            <input id="create-time" type="time" placeholder="Час">
+            <textarea id="create-description" placeholder="Опис (необов'язково)"></textarea>
+            <input id="create-seats" type="number" placeholder="Кількість місць" min="1" max="10">
+            <input id="create-price" type="number" placeholder="Ціна (грн)" min="0">
+            <button onclick="submitCreateRide()">Опублікувати</button>
+            <button onclick="closeCreateRideModal()" class="cancel-button">Скасувати</button>
         </div>
     </div>
 </body>
