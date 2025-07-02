@@ -39,7 +39,8 @@ document.addEventListener('DOMContentLoaded', () => {
     webApp.onEvent('themeChanged', updateTheme);
 
     try {
-        const fp = flatpickr("#date", {
+        // Ініціалізація календаря для пошуку поїздки
+        flatpickr("#date", {
             dateFormat: "d-m-Y",
             minDate: "today",
             locale: "uk",
@@ -47,17 +48,34 @@ document.addEventListener('DOMContentLoaded', () => {
                 const dateInput = document.getElementById('date');
                 dateInput.placeholder = "Дата (ДД-ММ-РРРР)";
                 if (webApp.requestFullscreen && window.innerWidth <= 600) {
-                    webApp.requestFullscreen()
-                        .then(() => {})
-                        .catch(err => {});
+                    webApp.requestFullscreen().catch(() => {});
                 }
-            },
-            onChange: (selectedDates, dateStr, instance) => {},
-            onOpen: () => {},
-            onClose: () => {}
+            }
         });
-        if (!fp) {}
     } catch (err) {}
+
+    // Ініціалізація календаря і часу для створення поїздки
+    flatpickr("#create-date", {
+        dateFormat: "d-m-Y",
+        minDate: "today",
+        locale: "uk"
+    });
+
+    flatpickr("#create-time", {
+        enableTime: true,
+        noCalendar: true,
+        dateFormat: "H:i",
+        time_24hr: true,
+        locale: "uk"
+    });
+
+    // Автодоповнення для пошуку
+    setupSuggestions('departure', 'departure-suggestions');
+    setupSuggestions('arrival', 'arrival-suggestions');
+
+    // Автодоповнення для створення поїздки
+    setupSuggestions('create-departure', 'create-departure-suggestions');
+    setupSuggestions('create-arrival', 'create-arrival-suggestions');
 
     Telegram.WebApp.BackButton.hide();
 
@@ -400,31 +418,13 @@ function navigate(page) {
 
     if (page === 'my-rides') {
         loadMyRides();
-    } else if (page === 'create' || page === 'profile') {
-        alert(`Перехід до ${page} ще не реалізовано!`);
     }
+    // Для create та profile не показуємо alert, сторінка просто відкривається
 }
 
-flatpickr("#create-date", {
-    dateFormat: "d-m-Y",
-    locale: "uk"
-});
 
-flatpickr("#create-time", {
-    enableTime: true,
-    noCalendar: true,
-    dateFormat: "H:i",
-    time_24hr: true,
-    locale: "uk"
-});
-
-document.getElementById("create-departure").addEventListener("input", (e) => {
-    handleCityAutocomplete(e.target.value, "create-departure-suggestions", "create-departure");
-});
-
-document.getElementById("create-arrival").addEventListener("input", (e) => {
-    handleCityAutocomplete(e.target.value, "create-arrival-suggestions", "create-arrival");
-});
+setupSuggestions('create-departure', 'create-departure-suggestions');
+setupSuggestions('create-arrival', 'create-arrival-suggestions');
 
 function submitCreateRide() {
     const data = {
