@@ -5,11 +5,11 @@ body {
     max-width: 600px;
     margin: 0 auto;
     position: relative;
-    min-height: 100vh; /* Змінено з height на min-height */
+    min-height: 100vh;
     box-sizing: border-box;
     color: var(--text-color, #222);
-    overflow: hidden; /* Вимикаємо прокручування на рівні body */
 }
+
 input, button {
     width: 100%;
     padding: 10px;
@@ -21,18 +21,22 @@ input, button {
     background-color: var(--input-bg-color, white);
     color: var(--text-color, #222);
 }
+
 input {
     background-color: var(--input-bg-color, white);
 }
+
 button {
     background: var(--button-bg-color, #27ae60);
     color: var(--button-text-color, white);
     border: none;
     cursor: pointer;
 }
+
 button:hover {
     background: var(--button-hover-bg-color, #219653);
 }
+
 .suggestions {
     border: 1px solid var(--border-color, #ccc);
     border-radius: 5px;
@@ -47,13 +51,16 @@ button:hover {
     z-index: 10;
     color: var(--text-color, #222);
 }
+
 .suggestion-item {
     padding: 10px;
     cursor: pointer;
 }
+
 .suggestion-item:hover {
     background: var(--hover-bg-color, #f0f0f0);
 }
+
 #date {
     appearance: none;
     background-color: var(--input-bg-color, white);
@@ -61,6 +68,7 @@ button:hover {
     padding: 10px;
     cursor: pointer;
 }
+
 @media (max-width: 600px) {
     #date {
         background-color: var(--input-bg-color, white);
@@ -88,6 +96,7 @@ button:hover {
         display: block !important;
     }
 }
+
 .modal {
     display: flex;
     justify-content: center;
@@ -101,12 +110,15 @@ button:hover {
     z-index: 1002;
     transition: background 0.3s ease;
 }
+
 .modal.show {
     background: rgba(0, 0, 0, 0.5);
 }
+
 .modal.closing {
     background: rgba(0, 0, 0, 0);
 }
+
 .modal-content {
     background: var(--modal-bg-color, #eee);
     width: 100%;
@@ -122,17 +134,21 @@ button:hover {
     display: flex;
     flex-direction: column;
 }
+
 .modal.closing .modal-content {
     animation: slideOut 0.3s forwards;
 }
+
 @keyframes slideIn {
     from { transform: translateX(100%); }
     to { transform: translateX(0); }
 }
+
 @keyframes slideOut {
     from { transform: translateX(0); }
     to { transform: translateX(100%); }
 }
+
 .modal-title-box {
     position: fixed;
     top: 0;
@@ -150,17 +166,20 @@ button:hover {
     box-sizing: border-box;
     z-index: 1003;
 }
+
 #modal-results {
     padding: 20px;
     margin-top: 90px;
     flex: 1;
     overflow-y: auto;
 }
+
 #modal-title {
     font-size: 18px;
     margin: 0;
     color: var(--text-color, #222);
 }
+
 .ride-item {
     border-radius: 12px;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
@@ -174,33 +193,40 @@ button:hover {
     gap: 8px;
     color: var(--text-color, #222);
 }
+
 .ride-top {
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
 }
+
 .ride-route p {
     margin: 4px 0;
     color: var(--text-color, #222);
 }
+
 .route {
     font-weight: bold;
     font-size: 16px;
 }
+
 .ride-item:hover {
     box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
 }
+
 .ride-item > .ride-info {
     display: flex;
     justify-content: space-between;
     align-items: center;
     margin-bottom: 10px;
 }
+
 .ride-actions {
     display: flex;
     gap: 10px;
     flex-wrap: wrap;
 }
+
 .price-tag {
     font-weight: bold;
     font-size: 18px;
@@ -208,6 +234,7 @@ button:hover {
     margin-right: 4px;
     color: var(--text-color, #222);
 }
+
 .book-button {
     background: var(--button-bg-color, #27ae60);
     color: var(--button-text-color, white);
@@ -218,9 +245,11 @@ button:hover {
     margin-top: 4px;
     cursor: pointer;
 }
+
 .book-button:hover {
     background: var(--button-hover-bg-color, #219653);
 }
+
 .cancel-button {
     background: var(--cancel-button-bg-color, #e74c3c);
     color: var(--button-text-color, white);
@@ -231,9 +260,11 @@ button:hover {
     margin-top: 4px;
     cursor: pointer;
 }
+
 .cancel-button:hover {
     background: var(--cancel-button-hover-bg-color, #c0392b);
 }
+
 .contact-button {
     background: var(--contact-button-bg-color, #2980b9);
     color: var(--button-text-color, white);
@@ -244,15 +275,19 @@ button:hover {
     margin-top: 4px;
     cursor: pointer;
 }
+
 .contact-button:hover {
     background: var(--contact-button-hover-bg-color, #2471a3);
 }
+
 .input-wrapper {
     position: relative;
 }
+
 .input-wrapper input {
     padding-right: 40px;
 }
+
 .swap-button {
     position: absolute;
     top: 33%;
@@ -271,15 +306,19 @@ button:hover {
     transition: opacity 0.3s ease;
     z-index: 2;
 }
+
 .swap-button.visible {
     opacity: 1;
 }
+
 .swap-button:hover {
     background: var(--hover-bg-color, rgba(39, 174, 96, 0.1));
 }
+
 .swap-button:active {
     background: var(--hover-bg-color, rgba(33, 150, 83, 0.2));
 }
+
 .swap-button::after {
     content: "⇅";
     font-size: 20px;
@@ -291,18 +330,22 @@ button:hover {
     width: 100%;
     height: 100%;
 }
+
 .swap-button:hover::after {
     color: var(--button-bg-color, #27ae60);
 }
+
 .swap-button:active::after {
     color: var(--button-hover-bg-color, #219653);
 }
+
 .no-rides {
     text-align: center;
     font-size: 18px;
     color: var(--text-color, #666);
     margin-top: 30vh;
 }
+
 .bottom-nav {
     position: fixed;
     bottom: 0;
@@ -319,6 +362,7 @@ button:hover {
     max-width: 600px;
     margin: 0 auto;
 }
+
 .nav-item {
     flex: 1;
     display: flex;
@@ -331,43 +375,48 @@ button:hover {
     cursor: pointer;
     transition: background 0.2s ease;
 }
+
 .nav-item.active {
     color: var(--button-bg-color, #27ae60);
 }
+
 .nav-item:hover {
     background: var(--hover-bg-color, #f0f0f0);
 }
+
 .nav-item svg {
     width: 24px;
     height: 24px;
     margin-bottom: 4px;
     fill: var(--text-color, #666);
 }
+
 .nav-item.active svg {
     fill: var(--button-bg-color, #27ae60);
 }
+
 .page {
     display: none;
 }
+
 .page.active {
     display: block;
 }
+
 #my-rides-page {
     display: none;
     flex-direction: column;
-    min-height: 100vh; /* Змінено з height на min-height */
+    min-height: 100vh;
     padding: 0;
     max-width: 600px;
     margin: 0 auto;
     background: var(--bg-color, #f5f5f5);
     box-sizing: border-box;
     position: relative;
-    overflow: hidden; /* Вимикаємо прокручування на рівні сторінки */
 }
 
 #my-rides-page.active {
     display: flex;
-    overflow: hidden;
 }
 
 #my-rides-title {
@@ -376,16 +425,20 @@ button:hover {
     text-align: center;
     color: var(--text-color, #222);
 }
+
 .status {
     margin: 4px 0;
     font-weight: bold;
 }
+
 .status-approved {
     color: var(--status-approved-color, #27ae60);
 }
+
 .status-pending {
     color: var(--status-pending-color, #f39c12);
 }
+
 .status-cancelled {
     color: var(--status-cancelled-color, #e74c3c);
 }
@@ -399,12 +452,13 @@ button:hover {
     background: var(--bg-color, #fff);
     border-bottom: 1px solid var(--border-color, #ccc);
 }
+
 .scrollable-rides {
     flex: 1;
     overflow-y: auto;
     box-sizing: border-box;
-    padding: 20px;
-    padding-bottom: 80px; /* Для нижнього меню */
+    padding: 0; /* Прибрано відступи */
+    padding-bottom: 80px; /* Залишено для нижнього меню */
 }
 
 .tab-button {
@@ -425,9 +479,8 @@ button:hover {
 
 .rides-tab {
     display: none;
-    padding-top: 10px; /* Щоб не зливалось із заголовком */
+    padding-top: 10px;
 }
-
 
 .rides-tab.active {
     display: block;
