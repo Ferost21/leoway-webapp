@@ -120,8 +120,8 @@ function setupSuggestions(inputId, suggestionsId) {
         const query = e.target.value;
         const cities = await fetchCities(query);
         suggestions.style.display = cities.length > 0 ? 'block' : 'none';
-        suggestions.innerHTML = cities.map(city => `
-            <div class="suggestion-item" data-name="${city.name}">
+        suggestions.innerHTML = cities.map(city =>
+            `<div class="suggestion-item" data-name="${city.name}">
                 ${city.name}
             </div>`).join('');
     });
@@ -166,7 +166,7 @@ async function submitSearch() {
     if (departure.length > 255 || arrival.length > 255) return alert('Назви місць мають бути до 255 символів!');
 
     try {
-        const res = await fetch(`https://2326-194-44-220-198.ngrok-free.app/api/search-rides`, {
+        const res = await fetch('https://2326-194-44-220-198.ngrok-free.app/api/search-rides', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -239,7 +239,7 @@ async function bookRide(rideId, seats) {
     const tgId = webApp.initDataUnsafe.user?.id;
     if (!tgId) return alert('Не вдалося отримати ваш Telegram ID!');
     try {
-        const res = await fetch(`https://2326-194-44-220-198.ngrok-free.app/api/book-ride`, {
+        const res = await fetch('https://2326-194-44-220-198.ngrok-free.app/api/book-ride', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -262,7 +262,7 @@ async function cancelRide(bookingId) {
     const tgId = webApp.initDataUnsafe.user?.id;
     if (!tgId) return alert('Не вдалося отримати ваш Telegram ID!');
     try {
-        const res = await fetch(`https://2326-194-44-220-198.ngrok-free.app/api/cancel-ride`, {
+        const res = await fetch('https://2326-194-44-220-198.ngrok-free.app/api/cancel-ride', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -295,7 +295,7 @@ async function contactDriver(driverTelegramId, bookingId) {
     }
     try {
         // Log the contact attempt to the backend
-        await fetch(`https://2326-194-44-220-198.ngrok-free.app/api/log-contact-attempt`, {
+        await fetch('https://2326-194-44-220-198.ngrok-free.app/api/log-contact-attempt', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -404,4 +404,3 @@ function navigate(page) {
         alert(`Перехід до ${page} ще не реалізовано!`);
     }
 }
-
