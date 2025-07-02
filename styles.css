@@ -418,7 +418,6 @@ button:hover {
 
 .rides-scroll {
     flex: 1;
-    overflow-y: auto;
     padding: 20px;
 }
 .tab-button {
