@@ -87,14 +87,40 @@ button:hover {
         display: block !important;
     }
 }
-
+.modal {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0);
+    z-index: 1002;
+    transition: background 0.3s ease;
+}
 .modal.show {
     background: rgba(0, 0, 0, 0.5);
 }
 .modal.closing {
     background: rgba(0, 0, 0, 0);
 }
-
+.modal-content {
+    background: var(--modal-bg-color, #eee);
+    width: 100%;
+    max-width: 600px;
+    height: 100%;
+    overflow-y: auto;
+    box-sizing: border-box;
+    padding: 0;
+    border-radius: 0;
+    position: relative;
+    transform: translateX(100%);
+    animation: slideIn 0.3s forwards;
+    display: flex;
+    flex-direction: column;
+}
 .modal.closing .modal-content {
     animation: slideOut 0.3s forwards;
 }
@@ -181,8 +207,19 @@ button:hover {
     margin-right: 4px;
     color: var(--text-color, #222);
 }
-
-
+.book-button {
+    background: var(--button-bg-color, #27ae60);
+    color: var(--button-text-color, white);
+    border: none;
+    padding: 10px;
+    font-size: 15px;
+    border-radius: 6px;
+    margin-top: 4px;
+    cursor: pointer;
+}
+.book-button:hover {
+    background: var(--button-hover-bg-color, #219653);
+}
 .cancel-button {
     background: var(--cancel-button-bg-color, #e74c3c);
     color: var(--button-text-color, white);
@@ -388,123 +425,4 @@ button:hover {
 #profile-rating {
     font-size: 18px;
     color: var(--text-color, #666);
-}
-
-.ride-results {
-    padding: 10px;
-}
-
-.ride-tile {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 15px;
-    margin-bottom: 10px;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    background: #fff;
-    cursor: pointer;
-    transition: background 0.2s;
-}
-
-.ride-tile:hover {
-    background: #f9f9f9;
-}
-
-.ride-time {
-    font-size: 18px;
-    font-weight: bold;
-    color: #333;
-}
-
-.ride-time.secondary {
-    color: #666;
-    font-size: 14px;
-}
-
-.ride-route {
-    flex-grow: 1;
-    text-align: center;
-    font-size: 18px;
-    color: #000;
-}
-
-.ride-price {
-    font-size: 18px;
-    font-weight: bold;
-    color: #000;
-}
-
-.ride-driver {
-    display: flex;
-    align-items: center;
-    margin-top: 10px;
-}
-
-.ride-driver .initial {
-    width: 30px;
-    height: 30px;
-    background: #ff6347;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: #fff;
-    font-weight: bold;
-    margin-right: 10px;
-}
-
-.ride-driver .name {
-    font-size: 16px;
-    color: #333;
-}
-
-.ride-driver .rating {
-    font-size: 16px;
-    color: #666;
-    margin-left: 5px;
-}
-
-.modal {
-    display: none;
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.5);
-    z-index: 1000;
-}
-
-.modal-content {
-    background: #fff;
-    margin: 15% auto;
-    padding: 20px;
-    border-radius: 5px;
-    width: 80%;
-    max-width: 400px;
-    position: relative;
-}
-
-.close-modal {
-    position: absolute;
-    top: 10px;
-    right: 15px;
-    font-size: 24px;
-    cursor: pointer;
-}
-
-.book-button {
-    background: #ff6347;
-    color: #fff;
-    border: none;
-    padding: 10px 20px;
-    border-radius: 5px;
-    cursor: pointer;
-    width: 100%;
-    margin-top: 15px;
-}
-
-.book-button:hover {
-    background: #e5533e;
 }
