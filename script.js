@@ -254,16 +254,22 @@ async function submitSearch() {
 }
 
 async function bookRide(rideId, seats) {
-    const tgId = webApp.initDataUnsafe.user?.id;
-    if (!tgId) return alert('Не вдалося отримати ваш Telegram ID!');
+    const user = webApp.initDataUnsafe.user;
+    if (!user || !user.id) return alert('Не вдалося отримати ваш Telegram ID!');
     try {
         const res = await fetch('https://2326-194-44-220-198.ngrok-free.app/api/book-ride', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'ngrok-skip-browser-warning': 'true'
+                'ngrok -skip-browser-warning': 'true'
             },
-            body: JSON.stringify({ rideId, tgId, seats })
+            body: JSON.stringify({
+                rideId,
+                tgId: user.id,
+                firstName: user.first_name || "Невідомий користувач",
+                photoUrl: user.photo_url || null,
+                seats
+            })
         });
         if (!res.ok) throw new Error('Помилка бронювання');
         const result = await res.json();
@@ -445,14 +451,16 @@ setupSuggestions('create-departure', 'create-departure-suggestions');
 setupSuggestions('create-arrival', 'create-arrival-suggestions');
 
 function submitCreateRide() {
-    const tgId = webApp.initDataUnsafe.user?.id;
-    if (!tgId) {
+    const user = webApp.initDataUnsafe.user;
+    if (!user || !user.id) {
         alert("Не вдалося отримати ваш Telegram ID!");
         return;
     }
 
     const data = {
-        tgId,
+        tgId: user.id,
+        firstName: user.first_name || "Невідомий користувач", // Fallback if first_name is missing
+        photoUrl: user.photo_url || null, // Optional photo URL
         departure: document.getElementById("create-departure").value.trim(),
         arrival: document.getElementById("create-arrival").value.trim(),
         date: document.getElementById("create-date").value,
