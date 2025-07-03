@@ -145,9 +145,6 @@ document.addEventListener('DOMContentLoaded', () => {
             .catch(() => resolve(null));
         });
     }
-
-    // Update navigation to include profile
-    navigate('profile');
 });
 
 async function fetchCities(query) {
