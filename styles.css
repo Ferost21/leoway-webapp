@@ -189,7 +189,7 @@ button:hover {
 .ride-item:hover {
     box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
 }
-.ride-item > .ride-info {
+.ride-info {
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -373,38 +373,48 @@ button:hover {
 .status-cancelled {
     color: var(--status-cancelled-color, #e74c3c);
 }
-
 .tab-header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    background: var(--modal-bg-color, #fff);
+    border-bottom: 1px solid var(--border-color, #ccc);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
     display: flex;
-    justify-content: center;
-    margin-bottom: 10px;
-    border-bottom: 1px solid var(--border-color);
+    justify-content: space-around;
+    align-items: center;
+    padding: 10px 0;
+    z-index: 1001;
+    max-width: 600px;
+    margin: 0 auto;
 }
-
 .tab-button {
     flex: 1;
     padding: 10px;
     background: none;
     border: none;
     cursor: pointer;
-    font-weight: bold;
-    color: var(--text-color);
-    border-bottom: 2px solid transparent;
+    font-size: 16px;
+    font-weight: normal;
+    color: var(--text-color, #666);
+    text-align: center;
+    transition: color 0.2s ease;
 }
-
 .tab-button.active {
-    border-bottom: 2px solid var(--button-bg-color);
-    color: var(--button-bg-color);
+    color: var(--button-bg-color, #27ae60);
+    font-weight: bold;
 }
-
+.tab-button:hover {
+    color: var(--button-hover-bg-color, #219653);
+}
 .rides-tab {
     display: none;
+    margin-top: 60px; /* Додаємо відступ, щоб контент не перекривався плиткою */
 }
-
 .rides-tab.active {
     display: block;
 }
-
 .profile-header {
     text-align: center;
     padding: 20px;
@@ -426,4 +436,3 @@ button:hover {
     font-size: 18px;
     color: var(--text-color, #666);
 }
-
