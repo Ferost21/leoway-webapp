@@ -1,6 +1,6 @@
 body {
     font-family: Arial, sans-serif;
-    padding: 60px 20px 80px;
+    padding: 60px 0 80px;
     background: var(--bg-color, #f5f5f5);
     max-width: 600px;
     margin: 0 auto;
@@ -352,8 +352,8 @@ button:hover {
     display: block;
 }
 #my-rides-page {
-    padding: 20px;
-    padding-top: 110px; /* Відступ для фіксованої плитки, враховуючи її висоту та зміщення */
+    padding: 0;
+    padding-top: 140px;
 }
 #my-rides-title {
     font-size: 18px;
@@ -377,8 +377,8 @@ button:hover {
 
 .rides-tab {
     display: none;
+    padding: 0 20px;
 }
-
 .rides-tab.active {
     display: block;
 }
@@ -407,31 +407,29 @@ button:hover {
 
 .rides-tab-header {
     position: fixed;
-    top: 60px; /* Зміщення вниз на 60px для врахування верхньої панелі */
+    top: 0;
     left: 0;
     right: 0;
     background: var(--nav-bg-color, #fff);
     border-bottom: 1px solid var(--border-color, #ccc);
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-    display: flex;
-    justify-content: space-around;
-    align-items: center;
-    height: 50px;
     z-index: 1001;
-    max-width: 600px;
-    margin: 0 auto;
+    width: 100%;
+    height: 130px;
+    display: flex;
+    align-items: flex-end;
 }
 .tab-button {
     flex: 1;
-    padding: 10px;
-    background: transparent; /* Без фону */
+    padding: 15px;
+    background: none;
     border: none;
     cursor: pointer;
     font-size: 16px;
-    color: var(--text-color, #666); /* Колір тексту збігається з фоном */
+    color: var(--text-color, #222);
     text-align: center;
+    text-decoration: none;
 }
 .tab-button.active {
-    color: var(--button-bg-color, #27ae60); /* Активна вкладка виділяється кольором */
     font-weight: bold;
 }
