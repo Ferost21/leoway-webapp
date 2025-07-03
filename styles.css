@@ -404,3 +404,25 @@ button:hover {
 .rides-tab.active {
     display: block;
 }
+
+.profile-header {
+    text-align: center;
+    padding: 20px;
+    background: var(--modal-bg-color, #eee);
+}
+.profile-photo {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-bottom: 10px;
+}
+#profile-name {
+    font-size: 24px;
+    color: var(--text-color, #222);
+    margin: 10px 0;
+}
+#profile-rating {
+    font-size: 18px;
+    color: var(--text-color, #666);
+}
