@@ -39,7 +39,6 @@ document.addEventListener('DOMContentLoaded', () => {
     webApp.onEvent('themeChanged', updateTheme);
 
     try {
-        // Ініціалізація календаря для пошуку поїздки
         flatpickr("#date", {
             dateFormat: "d-m-Y",
             minDate: "today",
@@ -54,7 +53,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     } catch (err) {}
 
-    // Ініціалізація календаря і часу для створення поїздки
     flatpickr("#create-date", {
         dateFormat: "d-m-Y",
         minDate: "today",
@@ -69,11 +67,8 @@ document.addEventListener('DOMContentLoaded', () => {
         locale: "uk"
     });
 
-    // Автодоповнення для пошуку
     setupSuggestions('departure', 'departure-suggestions');
     setupSuggestions('arrival', 'arrival-suggestions');
-
-    // Автодоповнення для створення поїздки
     setupSuggestions('create-departure', 'create-departure-suggestions');
     setupSuggestions('create-arrival', 'create-arrival-suggestions');
 
@@ -83,11 +78,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const departure = document.getElementById('departure').value.trim();
         const arrival = document.getElementById('arrival').value.trim();
         const swapButton = document.querySelector('.swap-button');
-        if (departure.length > 0 || arrival.length > 0) {
-            swapButton.classList.add('visible');
-        } else {
-            swapButton.classList.remove('visible');
-        }
+        swapButton.classList.toggle('visible', departure.length > 0 || arrival.length > 0);
     }
 
     ['departure', 'arrival'].forEach(id => {
@@ -107,32 +98,36 @@ document.addEventListener('DOMContentLoaded', () => {
 
     window.history.replaceState({ page: 'search' }, document.title);
 
-    // Initialize user on first load
+    // Initialize user only if not already initialized
     const user = webApp.initDataUnsafe.user;
     if (user && user.id) {
-        fetch('https://2326-194-44-220-198.ngrok-free.app/api/init-user', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'ngrok-skip-browser-warning': 'true'
-            },
-            body: JSON.stringify({
-                tgId: user.id,
-                firstName: user.first_name || 'Невідомий користувач',
-                photoUrl: user.photo_url || null
+        const isInitialized = localStorage.getItem(`userInitialized_${user.id}`);
+        if (!isInitialized) {
+            fetch('https://2326-194-44-220-198.ngrok-free.app/api/init-user', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'ngrok-skip-browser-warning': 'true'
+                },
+                body: JSON.stringify({
+                    tgId: user.id,
+                    firstName: user.first_name || 'Невідомий користувач',
+                    photoUrl: user.photo_url || null
+                })
             })
-        })
-        .then(res => res.json())
-        .then(data => {
-            if (data.error) {
-                console.error('Error initializing user:', data.error);
-            } else {
-                console.log('User initialized successfully:', data.message);
-            }
-        })
-        .catch(err => {
-            console.error('Network error initializing user:', err);
-        });
+            .then(res => res.json())
+            .then(data => {
+                if (data.error) {
+                    console.error('Error initializing user:', data.error);
+                } else {
+                    localStorage.setItem(`userInitialized_${user.id}`, 'true');
+                    console.log('User initialized successfully:', data.message);
+                }
+            })
+            .catch(err => {
+                console.error('Network error initializing user:', err);
+            });
+        }
     }
 
     // Set default page to 'search' on load
@@ -145,7 +140,6 @@ document.addEventListener('DOMContentLoaded', () => {
     pages.forEach(p => p.classList.remove('active'));
     document.getElementById('search-page').classList.add('active');
 
-    // Load profile data
     loadProfile();
 
     if (currentPage === 'my-rides') {
@@ -164,7 +158,7 @@ function loadProfile() {
 
         // Fetch and display rating
         fetchRating(user.id).then(rating => {
-            profileRating.textContent = `Rating: ${rating || 'N/A'}`;
+            profileRating.textContent = `Рейтинг: ${rating || 'N/A'}`;
         });
 
         if (user.photo_url) {
