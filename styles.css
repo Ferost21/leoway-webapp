@@ -428,17 +428,23 @@ button:hover {
 .tab-button {
     flex: 1;
     max-width: 50%;
-    padding: 15px;
-    background: transparent; /* Без фону */
+    padding: 0; /* Без відступів */
+    margin: 0; /* Прибираємо можливі маржини */
+    background: transparent;
     border: none;
     cursor: pointer;
-    font-size: 16px;
-    color: var(--text-color, #222); /* Залишаємо адаптивний колір тексту */
+    font-size: 16px; /* Зберігаємо розмір тексту */
+    color: var(--text-color, #222);
     text-align: center;
     text-decoration: none;
-    transition: none; /* Без анімацій */
+    height: 60px; /* Фіксована висота, рівна плитці */
+    line-height: 60px; /* Текст по центру вертикально */
+    display: flex; /* Для точного вирівнювання */
+    align-items: center; /* Центрування по вертикалі */
+    justify-content: center; /* Центрування по горизонталі */
+    transition: none;
 }
 .tab-button:hover, .tab-button.active {
-    background: transparent; /* Без фону при наведенні чи активності */
-    font-weight: bold; /* Жирний шрифт для активної вкладки */
+    background: transparent;
+    font-weight: bold;
 }
