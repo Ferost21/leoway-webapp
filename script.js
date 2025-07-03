@@ -336,7 +336,7 @@ async function submitSearch() {
     }
 }
 
-// New function to open a modal menu for ride details and booking
+// Updated function to open a modal menu for ride details and booking
 function openRideModalMenu(rideId, seats) {
     const modalContent = document.getElementById('modal-results');
     modalContent.innerHTML = `
@@ -345,7 +345,6 @@ function openRideModalMenu(rideId, seats) {
             <p>Поїздка ID: ${rideId}</p>
             <p>Кількість місць: ${seats}</p>
             <button class="book-button" onclick="bookRide(${rideId}, ${seats})">Забронювати</button>
-            <button class="cancel-button" onclick="closeModal()">Закрити</button>
         </div>
     `;
     const modal = document.getElementById('modal');
@@ -357,7 +356,8 @@ function openRideModalMenu(rideId, seats) {
 
     Telegram.WebApp.BackButton.show();
     Telegram.WebApp.BackButton.onClick(() => {
-        closeModal();
+        // Restore search results modal
+        submitSearch();
     });
 
     isModalOpen = true;
