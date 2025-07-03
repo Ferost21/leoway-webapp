@@ -107,6 +107,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     window.history.replaceState({ page: 'search' }, document.title);
 
+    // Load profile data
+    loadProfile();
+
     // Set default page to 'search' on load
     currentPage = 'search';
     const navItems = document.querySelectorAll('.nav-item');
@@ -117,15 +120,11 @@ document.addEventListener('DOMContentLoaded', () => {
     pages.forEach(p => p.classList.remove('active'));
     document.getElementById('search-page').classList.add('active');
 
-    // Load profile data (but don't navigate to it)
-    loadProfile();
-
     if (currentPage === 'my-rides') {
         loadMyRides();
     }
 });
 
-// Load profile data function (unchanged)
 function loadProfile() {
     const user = webApp.initDataUnsafe.user;
     if (user && user.id) {
@@ -134,7 +133,11 @@ function loadProfile() {
         const profileRating = document.getElementById('profile-rating');
 
         profileName.textContent = user.first_name || 'Невідомий користувач';
-        profileRating.textContent = `Rating: ${fetchRating(user.id) || 'N/A'}`;
+
+        // Fetch and display rating
+        fetchRating(user.id).then(rating => {
+            profileRating.textContent = `Rating: ${rating || 'N/A'}`;
+        });
 
         if (user.photo_url) {
             profilePhoto.src = user.photo_url;
@@ -146,16 +149,17 @@ function loadProfile() {
 
 // Fetch rating function (unchanged)
 function fetchRating(tgId) {
-    return new Promise((resolve) => {
-        fetch(`https://2326-194-44-220-198.ngrok-free.app/api/my-rides?tgId=${tgId}`, {
-            headers: { 'ngrok-skip-browser-warning': 'true' }
-        })
-        .then(res => res.json())
-        .then(data => {
-            const rating = data.reduce((sum, ride) => sum + (ride.driver_rating || 0), 0) / (data.length || 1);
-            resolve(rating.toFixed(1));
-        })
-        .catch(() => resolve(null));
+    return fetch(`https://2326-194-44-220-198.ngrok-free.app/api/user-rating?tgId=${tgId}`, {
+        headers: { 'ngrok-skip-browser-warning': 'true' }
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.error) throw new Error(data.error);
+        return data.rating ? data.rating.toFixed(1) : null;
+    })
+    .catch(err => {
+        console.error('Error fetching rating:', err);
+        return null;
     });
 }
 
