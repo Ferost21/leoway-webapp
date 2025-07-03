@@ -420,33 +420,25 @@ button:hover {
     box-shadow: 0 2px 5px rgba(0,0,0,0.1);
     z-index: 1001;
     width: 100%;
-    max-width: 600px; /* Така ж ширина, як у .bottom-nav */
-    margin: 0 auto; /* Центрування */
-    height: 60px;
+    height: 130px;
     display: flex;
-    align-items: center;
+    align-items: flex-end;
     justify-content: center;
 }
 .tab-button {
     flex: 1;
     max-width: 50%;
-    padding: 0; /* Без відступів */
-    margin: 0; /* Прибираємо можливі маржини */
-    background: transparent;
+    padding: 15px;
+    background: transparent; /* Без фону */
     border: none;
     cursor: pointer;
-    font-size: 16px; /* Зберігаємо розмір тексту */
-    color: var(--text-color, #222);
+    font-size: 16px;
+    color: var(--text-color, #222); /* Залишаємо адаптивний колір тексту */
     text-align: center;
     text-decoration: none;
-    height: 60px; /* Фіксована висота, рівна плитці */
-    line-height: 60px; /* Текст по центру вертикально */
-    display: flex; /* Для точного вирівнювання */
-    align-items: center; /* Центрування по вертикалі */
-    justify-content: center; /* Центрування по горизонталі */
-    transition: none;
+    transition: none; /* Без анімацій */
 }
 .tab-button:hover, .tab-button.active {
-    background: transparent;
-    font-weight: bold;
+    background: transparent; /* Без фону при наведенні чи активності */
+    font-weight: bold; /* Жирний шрифт для активної вкладки */
 }
