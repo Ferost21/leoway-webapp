@@ -353,7 +353,9 @@ button:hover {
 }
 #my-rides-page {
     padding: 0;
-    padding-top: 130px;
+    padding-top: 60px; /* Зменшуємо до висоти плитки, щоб поїздки були вище */
+    height: calc(100vh - 60px); /* Обмежуємо висоту сторінки, щоб нижнє меню не перекривало */
+    overflow-y: auto; /* Додаємо прокрутку для сторінки */
 }
 #my-rides-title {
     font-size: 18px;
@@ -377,7 +379,10 @@ button:hover {
 
 .rides-tab {
     display: none;
-    padding: 0; /* Відступи для вмісту вкладок */
+    padding: 0 10px; /* Невеликий бічний відступ для поїздок */
+    margin-top: 5px; /* Зменшуємо, щоб перша поїздка була ближче до плитки */
+    height: calc(100% - 65px); /* Обмежуємо висоту, щоб не перекривалось нижнім меню */
+    overflow-y: auto; /* Прокрутка для списку поїздок */
 }
 .rides-tab.active {
     display: block;
