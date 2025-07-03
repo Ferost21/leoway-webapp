@@ -107,8 +107,33 @@ document.addEventListener('DOMContentLoaded', () => {
 
     window.history.replaceState({ page: 'search' }, document.title);
 
-    // Load profile data
-    loadProfile();
+    // Initialize user on first load
+    const user = webApp.initDataUnsafe.user;
+    if (user && user.id) {
+        fetch('https://2326-194-44-220-198.ngrok-free.app/api/init-user', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'ngrok-skip-browser-warning': 'true'
+            },
+            body: JSON.stringify({
+                tgId: user.id,
+                firstName: user.first_name || 'Невідомий користувач',
+                photoUrl: user.photo_url || null
+            })
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.error) {
+                console.error('Error initializing user:', data.error);
+            } else {
+                console.log('User initialized successfully:', data.message);
+            }
+        })
+        .catch(err => {
+            console.error('Network error initializing user:', err);
+        });
+    }
 
     // Set default page to 'search' on load
     currentPage = 'search';
@@ -119,6 +144,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const pages = document.querySelectorAll('.page');
     pages.forEach(p => p.classList.remove('active'));
     document.getElementById('search-page').classList.add('active');
+
+    // Load profile data
+    loadProfile();
 
     if (currentPage === 'my-rides') {
         loadMyRides();
