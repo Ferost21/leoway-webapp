@@ -3,8 +3,9 @@ webApp.ready();
 
 let isModalOpen = false;
 let currentPage = 'search';
+let currentRideId = null; // Track selected ride ID
 
-// Функція для оновлення стилів на основі теми
+// Функція для оновлення стилів на основі теми (unchanged)
 function updateTheme() {
     const themeParams = webApp.themeParams || {};
     const isDark = webApp.colorScheme === 'dark';
@@ -156,7 +157,6 @@ function loadProfile() {
 
         profileName.textContent = user.first_name || 'Невідомий користувач';
 
-        // Fetch and display rating
         fetchRating(user.id).then(rating => {
             profileRating.textContent = `Рейтинг: ${rating || 'N/A'}`;
         });
@@ -164,12 +164,11 @@ function loadProfile() {
         if (user.photo_url) {
             profilePhoto.src = user.photo_url;
         } else {
-            profilePhoto.src = 'https://via.placeholder.com/100'; // Placeholder if no photo
+            profilePhoto.src = 'https://via.placeholder.com/100';
         }
     }
 }
 
-// Fetch rating function (unchanged)
 function fetchRating(tgId) {
     return fetch(`https://2326-194-44-220-198.ngrok-free.app/api/user-rating?tgId=${tgId}`, {
         headers: { 'ngrok-skip-browser-warning': 'true' }
@@ -232,9 +231,6 @@ function setupSuggestions(inputId, suggestionsId) {
     });
 }
 
-setupSuggestions('departure', 'departure-suggestions');
-setupSuggestions('arrival', 'arrival-suggestions');
-
 function formatShortDate(dateStr) {
     const parts = dateStr.split('-');
     return parts.length === 3 ? `${parts[0]}.${parts[1]}` : dateStr;
@@ -247,83 +243,91 @@ function swapLocations() {
     document.getElementById('arrival').value = departure;
 }
 
-async function submitSearch() {
+function searchRides() {
     const departure = document.getElementById('departure').value.trim();
     const arrival = document.getElementById('arrival').value.trim();
-    const date = document.getElementById('date').value.trim();
-    const seats = document.getElementById('seats').value.trim();
+    const date = document.getElementById('date').value;
+    const seats = parseInt(document.getElementById('seats').value);
 
-    if (!departure || !arrival || !date || !seats) return alert('Заповніть усі поля!');
-    if (departure.length > 255 || arrival.length > 255) return alert('Назви місць мають бути до 255 символів!');
-
-    try {
-        const res = await fetch('https://2326-194-44-220-198.ngrok-free.app/api/search-rides', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'ngrok-skip-browser-warning': 'true'
-            },
-            body: JSON.stringify({ departure, arrival, date, seats })
-        });
-        if (!res.ok) throw new Error('Не вдалося отримати поїздки');
-        const rides = await res.json();
-        const modalResults = document.getElementById('modal-results');
-        modalResults.innerHTML = rides.length === 0
-            ? '<div class="no-rides">Поїздок не знайдено.</div>'
-            : rides.map(ride => {
-                const dt = new Date(ride.departure_time);
-                const timeStr = dt.toLocaleTimeString('uk-UA', { hour: '2-digit', minute: '2-digit' });
-                const dateStr = dt.toLocaleDateString('uk-UA', { day: '2-digit', month: '2-digit' });
-                return `
-                    <div class="ride-item">
-                        <div class="ride-top">
-                            <div class="ride-route">
-                                <p class="route">${ride.departure} → ${ride.arrival}</p>
-                                <p>${timeStr}, ${dateStr}</p>
-                                <p>Місць: ${ride.seats_available}/${ride.seats_total}</p>
-                                ${ride.description ? `<p>Опис: ${ride.description}</p>` : ''}
-                                <p>Водій: ${ride.driver_name} ★ ${ride.driver_rating.toFixed(1)}</p>
-                            </div>
-                            <div class="price-tag">${ride.price} ₴</div>
-                        </div>
-                        <button class="book-button" onclick="bookRide(${ride.id}, ${seats})">Забронювати</button>
-                    </div>`;
-            }).join('');
-        document.getElementById('modal-title').textContent = `${departure} → ${arrival}`;
-
-        const modalTitleBox = document.querySelector('.modal-title-box');
-        const oldSubtitle = modalTitleBox.querySelector('p');
-        if (oldSubtitle) oldSubtitle.remove();
-
-        const subtitle = document.createElement('p');
-        subtitle.style.margin = '4px 0 0';
-        subtitle.style.fontSize = '14px';
-        subtitle.style.color = 'var(--text-color, #555)';
-
-        const seatsNumber = parseInt(seats);
-        const seatWord = seatsNumber === 1 ? 'пасажир' : (seatsNumber >= 2 && seatsNumber <= 4 ? 'пасажири' : 'пасажирів');
-
-        subtitle.textContent = `${formatShortDate(date)}, ${seatsNumber} ${seatWord}`;
-        modalTitleBox.appendChild(subtitle);
-        const modal = document.getElementById('modal');
-        modal.style.display = 'flex';
-        requestAnimationFrame(() => {
-            modal.classList.add('show');
-        });
-        modal.classList.remove('closing');
-
-        Telegram.WebApp.BackButton.show();
-        Telegram.WebApp.BackButton.onClick(() => {
-            closeModal();
-        });
-
-        isModalOpen = true;
-        setTimeout(() => {
-            window.history.pushState({ modalOpen: true }, '');
-        }, 100);
-    } catch (err) {
-        alert('Помилка при пошуку поїздок: ' + err.message);
+    if (!departure || !arrival || !date || !seats) {
+        alert('Будь ласка, заповніть усі поля.');
+        return;
     }
+
+    fetch('https://2326-194-44-220-198.ngrok-free.app/api/search-rides', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'ngrok-skip-browser-warning': 'true'
+        },
+        body: JSON.stringify({ departure, arrival, date, seats })
+    })
+    .then(res => res.json())
+    .then(rides => {
+        const rideResults = document.getElementById('ride-results');
+        rideResults.innerHTML = '';
+
+        if (!rides.length) {
+            rideResults.innerHTML = '<p>Поїздок не знайдено.</p>';
+            return;
+        }
+
+        rides.forEach(ride => {
+            const dt = new Date(ride.departure_time);
+            const timeStr = dt.toLocaleTimeString('uk-UA', { hour: '2-digit', minute: '2-digit' });
+            const tile = document.createElement('div');
+            tile.className = 'ride-tile';
+            tile.onclick = () => openModal(ride);
+            tile.innerHTML = `
+                <div class="ride-time">${timeStr}</div>
+                <div class="ride-time secondary">${ride.seats_available} хв</div>
+                <div class="ride-route">${ride.departure} - ${ride.arrival}</div>
+                <div class="ride-price">${ride.price}₴</div>
+                <div class="ride-driver">
+                    <div class="initial">${ride.driver_name.charAt(0)}</div>
+                    <div class="name">${ride.driver_name}</div>
+                    <div class="rating">★${ride.driver_rating.toFixed(1)}</div>
+                </div>
+            `;
+            rideResults.appendChild(tile);
+        });
+    })
+    .catch(err => {
+        console.error('Error searching rides:', err);
+        alert('Помилка при пошуку поїздок.');
+    });
+}
+
+function openModal(ride) {
+    currentRideId = ride.id;
+    const dt = new Date(ride.departure_time);
+    const timeStr = dt.toLocaleTimeString('uk-UA', { hour: '2-digit', minute: '2-digit' });
+    document.getElementById('modal-departure-time').textContent = timeStr;
+    document.getElementById('modal-departure').textContent = ride.departure;
+    document.getElementById('modal-arrival').textContent = ride.arrival;
+    document.getElementById('modal-seats-available').textContent = ride.seats_available;
+    document.getElementById('modal-price').textContent = ride.price;
+    document.getElementById('modal-driver-name').textContent = ride.driver_name;
+    document.getElementById('modal-driver-rating').textContent = `★${ride.driver_rating.toFixed(1)}`;
+    document.getElementById('modal').style.display = 'block';
+    isModalOpen = true;
+    Telegram.WebApp.BackButton.show();
+    Telegram.WebApp.BackButton.onClick(closeModal);
+}
+
+function closeModal() {
+    document.getElementById('modal').style.display = 'none';
+    isModalOpen = false;
+    currentRideId = null;
+    Telegram.WebApp.BackButton.hide();
+    Telegram.WebApp.BackButton.offClick(closeModal);
+}
+
+function bookRideFromModal() {
+    if (!currentRideId) return alert('No ride selected');
+    const user = webApp.initDataUnsafe.user;
+    if (!user || !user.id) return alert('Не вдалося отримати ваш Telegram ID!');
+    bookRide(currentRideId, 1); // Default to 1 seat
 }
 
 async function bookRide(rideId, seats) {
@@ -334,12 +338,12 @@ async function bookRide(rideId, seats) {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'ngrok -skip-browser-warning': 'true'
+                'ngrok-skip-browser-warning': 'true'
             },
             body: JSON.stringify({
                 rideId,
                 tgId: user.id,
-                firstName: user.first_name || "Невідомий користувач",
+                firstName: user.first_name || 'Невідомий користувач',
                 photoUrl: user.photo_url || null,
                 seats
             })
@@ -347,9 +351,8 @@ async function bookRide(rideId, seats) {
         if (!res.ok) throw new Error('Помилка бронювання');
         const result = await res.json();
         alert(`Бронювання створено! Номер: ${result.bookingId}`);
-        if (currentPage === 'my-rides') {
-            loadMyRides();
-        }
+        closeModal();
+        if (currentPage === 'my-rides') loadMyRides();
     } catch (err) {
         alert('Помилка при бронюванні: ' + err.message);
     }
@@ -391,7 +394,6 @@ async function contactDriver(driverTelegramId, bookingId) {
         return;
     }
     try {
-        // Log the contact attempt to the backend
         await fetch('https://2326-194-44-220-198.ngrok-free.app/api/log-contact-attempt', {
             method: 'POST',
             headers: {
@@ -400,7 +402,6 @@ async function contactDriver(driverTelegramId, bookingId) {
             },
             body: JSON.stringify({ userTgId, bookingId, driverTelegramId })
         });
-        // Use Deeplink to the bot instead of direct user link
         webApp.openTelegramLink(`https://t.me/pdsdk_bot?start=contact_${driverTelegramId}_${bookingId}`);
     } catch (err) {
         alert(`Не вдалося відкрити чат з водієм: ${err.message}. Спробуйте ще раз або зв’яжіться з підтримкою.`);
@@ -436,7 +437,6 @@ async function loadMyRides() {
 
         const rides = await res.json();
 
-        // Розділити поїздки за роллю
         const bookings = rides.filter(r => r.role === 'passenger');
         const driverRides = rides.filter(r => r.role === 'driver');
 
@@ -484,19 +484,6 @@ function renderRides(rides, isBooking) {
     }).join('');
 }
 
-function closeModal() {
-    const modal = document.getElementById('modal');
-    modal.classList.add('closing');
-    modal.classList.remove('show');
-    setTimeout(() => {
-        modal.style.display = 'none';
-        modal.classList.remove('closing');
-        isModalOpen = false;
-        Telegram.WebApp.BackButton.hide();
-        window.history.pushState({ page: currentPage }, document.title);
-    }, 300);
-}
-
 function navigate(page) {
     if (isModalOpen) {
         closeModal();
@@ -516,7 +503,6 @@ function navigate(page) {
     if (page === 'my-rides') {
         loadMyRides();
     }
-    // Для create та profile не показуємо alert, сторінка просто відкривається
 }
 
 setupSuggestions('create-departure', 'create-departure-suggestions');
@@ -531,8 +517,8 @@ function submitCreateRide() {
 
     const data = {
         tgId: user.id,
-        firstName: user.first_name || "Невідомий користувач", // Fallback if first_name is missing
-        photoUrl: user.photo_url || null, // Optional photo URL
+        firstName: user.first_name || "Невідомий користувач",
+        photoUrl: user.photo_url || null,
         departure: document.getElementById("create-departure").value.trim(),
         arrival: document.getElementById("create-arrival").value.trim(),
         date: document.getElementById("create-date").value,

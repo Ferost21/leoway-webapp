@@ -14,19 +14,31 @@
 <body>
     <!-- Сторінка пошуку -->
     <div id="search-page" class="page active">
-        <h1>Пошук поїздки</h1>
-        <div class="input-wrapper">
-            <input id="departure" placeholder="Місце відправлення" autocomplete="off">
-            <button class="swap-button" onclick="swapLocations()" aria-label="Змінити місця"></button>
-            <div id="departure-suggestions" class="suggestions"></div>
+        <div class="search-container">
+            <input type="text" id="departure" placeholder="Звідки" class="search-input">
+            <button class="swap-button" onclick="swapLocations()">↔</button>
+            <input type="text" id="arrival" placeholder="Куди" class="search-input">
+            <input type="text" id="date" placeholder="Дата (ДД-ММ-РРРР)" class="search-input date-input">
+            <input type="number" id="seats" placeholder="Кількість місць" class="search-input" min="1" value="1">
+            <button onclick="searchRides()" class="search-button">Пошук</button>
         </div>
-        <div class="input-wrapper">
-            <input id="arrival" placeholder="Місце прибуття" autocomplete="off">
-            <div id="arrival-suggestions" class="suggestions"></div>
+        <div id="ride-results" class="ride-results"></div>
+    </div>
+
+    <!-- Modal for ride details -->
+    <div id="modal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeModal()">&times;</span>
+            <h2>Деталі поїздки</h2>
+            <p><strong>Час відправлення:</strong> <span id="modal-departure-time"></span></p>
+            <p><strong>Час прибуття:</strong> <span id="modal-arrival-time"></span></p>
+            <p><strong>Звідки:</strong> <span id="modal-departure"></span></p>
+            <p><strong>Куди:</strong> <span id="modal-arrival"></span></p>
+            <p><strong>Доступні місця:</strong> <span id="modal-seats-available"></span></p>
+            <p><strong>Вартість:</strong> <span id="modal-price"></span>€</p>
+            <p><strong>Водій:</strong> <span id="modal-driver-name"></span> <span id="modal-driver-rating"></span></p>
+            <button id="book-ride-button" class="book-button" onclick="bookRideFromModal()">Забронювати</button>
         </div>
-        <input id="date" type="text" placeholder="Дата (ДД-ММ-РРРР)" readonly>
-        <input id="seats" type="number" placeholder="Кількість місць" min="1" max="10">
-        <button onclick="submitSearch()">Пошук</button>
     </div>
 
     <!-- Сторінка мої поїздки -->
