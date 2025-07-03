@@ -426,3 +426,52 @@ button:hover {
     font-size: 18px;
     color: var(--text-color, #666);
 }
+
+.ride-modal-menu {
+    padding: 20px;
+    background: var(--modal-bg-color, #eee);
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    text-align: center;
+}
+
+.ride-modal-menu h3 {
+    font-size: 18px;
+    color: var(--text-color, #222);
+    margin-bottom: 15px;
+}
+
+.ride-modal-menu p {
+    margin: 10px 0;
+    color: var(--text-color, #666);
+}
+
+.ride-modal-menu .book-button,
+.ride-modal-menu .cancel-button {
+    width: 100%;
+    margin: 10px 0;
+    padding: 10px;
+    font-size: 15px;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.ride-modal-menu .book-button {
+    background: var(--button-bg-color, #27ae60);
+    color: var(--button-text-color, white);
+    border: none;
+}
+
+.ride-modal-menu .book-button:hover {
+    background: var(--button-hover-bg-color, #219653);
+}
+
+.ride-modal-menu .cancel-button {
+    background: var(--cancel-button-bg-color, #e74c3c);
+    color: var(--button-text-color, white);
+    border: none;
+}
+
+.ride-modal-menu .cancel-button:hover {
+    background: var(--cancel-button-hover-bg-color, #c0392b);
+}

@@ -275,7 +275,7 @@ async function submitSearch() {
                 const timeStr = dt.toLocaleTimeString('uk-UA', { hour: '2-digit', minute: '2-digit' });
                 const dateStr = dt.toLocaleDateString('uk-UA', { day: '2-digit', month: '2-digit' });
                 return `
-                    <div class="ride-item">
+                    <div class="ride-item" data-ride-id="${ride.id}">
                         <div class="ride-top">
                             <div class="ride-route">
                                 <p class="route">${ride.departure} → ${ride.arrival}</p>
@@ -286,9 +286,9 @@ async function submitSearch() {
                             </div>
                             <div class="price-tag">${ride.price} ₴</div>
                         </div>
-                        <button class="book-button" onclick="bookRide(${ride.id}, ${seats})">Забронювати</button>
                     </div>`;
             }).join('');
+
         document.getElementById('modal-title').textContent = `${departure} → ${arrival}`;
 
         const modalTitleBox = document.querySelector('.modal-title-box');
@@ -305,6 +305,7 @@ async function submitSearch() {
 
         subtitle.textContent = `${formatShortDate(date)}, ${seatsNumber} ${seatWord}`;
         modalTitleBox.appendChild(subtitle);
+
         const modal = document.getElementById('modal');
         modal.style.display = 'flex';
         requestAnimationFrame(() => {
@@ -321,9 +322,48 @@ async function submitSearch() {
         setTimeout(() => {
             window.history.pushState({ modalOpen: true }, '');
         }, 100);
+
+        // Add click event listeners to ride items to open modal menu
+        const rideItems = document.querySelectorAll('.ride-item');
+        rideItems.forEach(item => {
+            item.addEventListener('click', () => {
+                const rideId = item.getAttribute('data-ride-id');
+                openRideModalMenu(rideId, seats);
+            });
+        });
     } catch (err) {
         alert('Помилка при пошуку поїздок: ' + err.message);
     }
+}
+
+// New function to open a modal menu for ride details and booking
+function openRideModalMenu(rideId, seats) {
+    const modalContent = document.getElementById('modal-results');
+    modalContent.innerHTML = `
+        <div class="ride-modal-menu">
+            <h3>Деталі поїздки</h3>
+            <p>Поїздка ID: ${rideId}</p>
+            <p>Кількість місць: ${seats}</p>
+            <button class="book-button" onclick="bookRide(${rideId}, ${seats})">Забронювати</button>
+            <button class="cancel-button" onclick="closeModal()">Закрити</button>
+        </div>
+    `;
+    const modal = document.getElementById('modal');
+    modal.style.display = 'flex';
+    requestAnimationFrame(() => {
+        modal.classList.add('show');
+    });
+    modal.classList.remove('closing');
+
+    Telegram.WebApp.BackButton.show();
+    Telegram.WebApp.BackButton.onClick(() => {
+        closeModal();
+    });
+
+    isModalOpen = true;
+    setTimeout(() => {
+        window.history.pushState({ modalOpen: true }, '');
+    }, 100);
 }
 
 async function bookRide(rideId, seats) {
