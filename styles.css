@@ -352,8 +352,8 @@ button:hover {
     display: block;
 }
 #my-rides-page {
-    padding: 0; /* Прибрано всі відступи */
-    padding-top: 130px; /* Відступ для фіксованої плитки (80px + 50px висота кнопок) */
+    padding: 0;
+    padding-top: 130px;
 }
 #my-rides-title {
     font-size: 18px;
@@ -377,7 +377,7 @@ button:hover {
 
 .rides-tab {
     display: none;
-    padding: 0 20px; /* Відступи для вмісту вкладок */
+    padding: 0; /* Відступи для вмісту вкладок */
 }
 .rides-tab.active {
     display: block;
@@ -415,9 +415,9 @@ button:hover {
     box-shadow: 0 2px 5px rgba(0,0,0,0.1);
     z-index: 1001;
     width: 100%;
-    height: 130px; /* Висота плитки для кнопок на 80px нижче */
+    height: 130px;
     display: flex;
-    align-items: flex-end; /* Кнопки притискаються до нижнього краю */
+    align-items: flex-end;
     justify-content: center;
 }
 .tab-button {
@@ -428,10 +428,10 @@ button:hover {
     border: none;
     cursor: pointer;
     font-size: 16px;
-    color: var(--text-color, #222);
+    color: #222; /* Фіксований колір, без змін у темі */
     text-align: center;
     text-decoration: none;
 }
 .tab-button.active {
-    font-weight: bold; /* Тільки жирний шрифт для активної вкладки */
+    font-weight: bold; /* Тільки жирний шрифт */
 }
