@@ -417,17 +417,12 @@ button:hover {
     object-fit: cover;
     margin-bottom: 10px;
 }
-#profile-info {
+#profile-name {
     font-size: 24px;
     color: var(--text-color, #222);
     margin: 10px 0;
 }
-#profile-info::after {
-    content: " ★ ";
-    color: var(--text-color, #666);
-}
 #profile-rating {
-    font-size: 24px;
+    font-size: 18px;
     color: var(--text-color, #666);
-    margin-left: 5px;
 }
