@@ -158,7 +158,7 @@ function loadProfile() {
 
         // Fetch and display rating
         fetchRating(user.id).then(rating => {
-            profileRating.textContent = `Рейтинг: ${rating || 'N/A'}`;
+            profileRating.textContent = `Рейтинг: ★${rating || 'N/A'}`;
         });
 
         if (user.photo_url) {
