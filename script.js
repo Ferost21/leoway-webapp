@@ -334,7 +334,7 @@ async function bookRide(rideId, seats) {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'ngrok -skip-browser-warning': 'true'
+                'ngrok-skip-browser-warning': 'true' // Виправлено: прибрано пробіл
             },
             body: JSON.stringify({
                 rideId,
