@@ -286,7 +286,7 @@ async function submitSearch() {
                             </div>
                             <div class="price-tag">${ride.price} ₴</div>
                         </div>
-                        <button class="book-button" onclick="bookRide(${ride.id}, ${seats})">Забронювати</button>
+                        <button class="book-button" onclick="bookRide(${ride.id}, ${seats}, '${ride.driver_telegram_id}')">Забронювати</button>
                     </div>`;
             }).join('');
         document.getElementById('modal-title').textContent = `${departure} → ${arrival}`;
@@ -326,15 +326,18 @@ async function submitSearch() {
     }
 }
 
-async function bookRide(rideId, seats) {
+async function bookRide(rideId, seats, driverTelegramId) {
     const user = webApp.initDataUnsafe.user;
     if (!user || !user.id) return alert('Не вдалося отримати ваш Telegram ID!');
+    if (String(driverTelegramId) === String(user.id)) {
+        return alert('Ви не можете забронювати власну поїздку!');
+    }
     try {
         const res = await fetch('https://2326-194-44-220-198.ngrok-free.app/api/book-ride', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'ngrok-skip-browser-warning': 'true' // Виправлено: прибрано пробіл
+                'ngrok-skip-browser-warning': 'true'
             },
             body: JSON.stringify({
                 rideId,
