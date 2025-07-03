@@ -117,11 +117,12 @@ document.addEventListener('DOMContentLoaded', () => {
         const user = webApp.initDataUnsafe.user;
         if (user && user.id) {
             const profilePhoto = document.getElementById('profile-photo');
-            const profileName = document.getElementById('profile-name');
-            const profileRating = document.getElementById('profile-rating');
+            const profileInfo = document.getElementById('profile-info');
 
-            profileName.textContent = user.first_name || 'Невідомий користувач';
-            profileRating.textContent = `Rating: ${fetchRating(user.id) || 'N/A'}`;
+            profileInfo.innerHTML = `${user.first_name || 'Невідомий користувач'} <span id="profile-rating"></span>`;
+            fetchRating(user.id).then(rating => {
+                document.getElementById('profile-rating').textContent = rating || 'N/A';
+            });
 
             if (user.photo_url) {
                 profilePhoto.src = user.photo_url;
@@ -140,7 +141,7 @@ document.addEventListener('DOMContentLoaded', () => {
             .then(res => res.json())
             .then(data => {
                 const rating = data.reduce((sum, ride) => sum + (ride.driver_rating || 0), 0) / (data.length || 1);
-                resolve(rating.toFixed(1));
+                resolve(rating.toFixed(2));
             })
             .catch(() => resolve(null));
         });
