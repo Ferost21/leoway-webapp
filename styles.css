@@ -1,4 +1,7 @@
-html, body {
+html {
+    overscroll-behavior-y: contain;
+}
+body {
     overscroll-behavior-y: contain;
     font-family: Arial, sans-serif;
     background: var(--bg-color, #f5f5f5);
