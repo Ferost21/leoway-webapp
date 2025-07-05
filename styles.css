@@ -1,8 +1,4 @@
-html {
-    overscroll-behavior-y: contain;
-}
 body {
-    overscroll-behavior-y: contain;
     font-family: Arial, sans-serif;
     background: var(--bg-color, #f5f5f5);
     max-width: 600px;
@@ -11,8 +7,12 @@ body {
     height: 100vh;
     box-sizing: border-box;
     color: var(--text-color, #222);
+    /* Додаємо властивості для видалення overscroll */
+    -webkit-overflow-scrolling: touch; /* Для iOS, але працює і на Android */
+    overscroll-behavior: none; /* Сучасний стандарт для блокування overscroll */
+    overflow-y: auto; /* Гарантує коректну прокрутку лише при необхідності */
 
-    /* Ці властивості залишаємо, вони правильні */
+    /* Залишаємо інші властивості */
     display: flex;
     flex-direction: column;
     justify-content: space-between;
