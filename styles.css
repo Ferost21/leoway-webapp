@@ -1,21 +1,28 @@
+.page-container {
+    position: relative;
+    height: calc(100vh - 60px); /* Висота body мінус bottom-nav */
+    overflow: hidden; /* Запобігаємо прокручуванню за межами контенту */
+}
+/* Прокручуваний контент */
+.scrollable-content {
+    height: 100%;
+    overflow-y: auto; /* Лише цей блок прокручується */
+    overscroll-behavior: contain; /* Запобігає overscroll-ефекту за межами блоку */
+    padding: 20px;
+    box-sizing: border-box;
+}
+
 body {
     font-family: Arial, sans-serif;
     background: var(--bg-color, #f5f5f5);
     max-width: 600px;
     margin: 0 auto;
-    position: relative;
     height: 100vh;
     box-sizing: border-box;
     color: var(--text-color, #222);
-    /* Додаємо властивості для видалення overscroll */
-    -webkit-overflow-scrolling: touch; /* Для iOS, але працює і на Android */
-    overscroll-behavior: none; /* Сучасний стандарт для блокування overscroll */
-    overflow-y: auto; /* Гарантує коректну прокрутку лише при необхідності */
-
-    /* Залишаємо інші властивості */
+    overflow: hidden; /* Вимикаємо прокручування body */
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
 }
 
 input, button {
@@ -115,20 +122,9 @@ button:hover {
 .modal.closing {
     background: rgba(0, 0, 0, 0);
 }
-.modal-content {
-    background: var(--modal-bg-color, #eee);
-    width: 100%;
-    max-width: 600px;
-    height: 100%;
-    overflow-y: auto;
-    box-sizing: border-box;
-    padding: 0;
-    border-radius: 0;
-    position: relative;
-    transform: translateX(100%);
-    animation: slideIn 0.3s forwards;
-    display: flex;
-    flex-direction: column;
+.modal-content .scrollable-content {
+    margin-top: 90px; /* Компенсація modal-title-box */
+    padding-bottom: 20px;
 }
 .modal.closing .modal-content {
     animation: slideOut 0.3s forwards;
@@ -311,6 +307,7 @@ button:hover {
     color: var(--text-color, #666);
     margin-top: 30vh;
 }
+/* Нижнє меню */
 .bottom-nav {
     position: fixed;
     bottom: 0;
@@ -356,20 +353,19 @@ button:hover {
 }
 .page {
     display: none;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
 }
 .page.active {
-    display: flex;
-    flex-direction: column;
-    flex-grow: 1;
-    overflow-y: auto;
-    padding: 20px; /* Повертаємо загальний відступ 20px з усіх боків */
-    box-sizing: border-box;
+    display: block;
 }
-#search-page,
-#create-page {
-    /* Тепер 120px для компенсації висоти rides-tab-header */
-    padding-top: 120px;
-    padding-bottom: 60px; /* Висота bottom-nav залишається 60px */
+#search-page .scrollable-content,
+#create-page .scrollable-content {
+    padding-top: 20px;
+    padding-bottom: 80px; /* Компенсація bottom-nav */
 }
 #my-rides-page {
     padding: 0; /* Ця сторінка сама по собі не має внутрішніх відступів */
@@ -394,13 +390,12 @@ button:hover {
     color: var(--status-cancelled-color, #e74c3c);
 }
 
+/* Вкладки для бронювань і поїздок водія */
 .rides-tab {
     display: none;
-    /* Тепер 120px для компенсації висоти rides-tab-header */
-    padding-top: 120px;
-    padding-bottom: 60px; /* Висота bottom-nav залишається 60px */
-    padding-left: 20px;
-    padding-right: 20px;
+    height: calc(100% - 60px); /* Висота сторінки мінус rides-tab-header */
+    margin-top: 60px; /* Компенсація висоти rides-tab-header */
+    overflow: hidden; /* Запобігаємо прокручуванню вкладок */
 }
 .rides-tab.active {
     display: block;
@@ -428,6 +423,7 @@ button:hover {
     color: var(--text-color, #666);
 }
 
+/* Верхнє меню вкладок для "Мої поїздки" */
 .rides-tab-header {
     position: fixed;
     top: 0;
@@ -440,11 +436,10 @@ button:hover {
     width: 100%;
     max-width: 600px;
     margin: 0 auto;
-    height: 120px; /* Висота залишається 120px */
+    height: 60px; /* Зменшено висоту для компактності */
     display: flex;
-    align-items: flex-end; /* Вирівнюємо елементи по нижньому краю */
+    align-items: center;
     justify-content: space-around;
-    padding-bottom: 0; /* Змінено: прибираємо нижній відступ з шапки */
     box-sizing: border-box;
 }
 

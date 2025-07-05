@@ -519,7 +519,6 @@ function navigate(page) {
     if (page === 'my-rides') {
         loadMyRides();
     }
-    // Для create та profile не показуємо alert, сторінка просто відкривається
 }
 
 setupSuggestions('create-departure', 'create-departure-suggestions');
@@ -590,4 +589,8 @@ function switchRidesTab(tab) {
         bookingsContent.classList.remove('active');
         driverContent.classList.add('active');
     }
+
+    // Примусово оновити прокручування до верху
+    const scrollableContent = document.querySelector(`#${tab === 'bookings' ? 'my-rides-results' : 'my-driver-results'}`).parentElement;
+    scrollableContent.scrollTop = 0;
 }
