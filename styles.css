@@ -12,6 +12,15 @@
     padding: 20px;
     box-sizing: border-box;
 }
+/* Вимикаємо прокручування і центруємо .no-rides */
+.scrollable-content.no-rides-container {
+    overflow-y: hidden; /* Вимикаємо прокручування */
+    display: flex;
+    justify-content: center; /* Центруємо горизонтально */
+    align-items: center; /* Центруємо вертикально */
+    height: calc(100% - 180px); /* Висота мінус rides-tab-header (60px) і top offset (120px) */
+    margin-top: 180px; /* Компенсація rides-tab-header + top offset */
+}
 
 body {
     font-family: Arial, sans-serif;
@@ -323,7 +332,7 @@ button:hover {
     text-align: center;
     font-size: 18px;
     color: var(--text-color, #666);
-    margin-top: 30vh;
+    margin: 0; /* Видаляємо margin-top: 30vh */
 }
 /* Нижнє меню */
 .bottom-nav {

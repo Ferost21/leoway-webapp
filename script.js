@@ -427,6 +427,8 @@ async function loadMyRides() {
     const tgId = webApp.initDataUnsafe.user?.id;
     if (!tgId) {
         document.getElementById('my-rides-results').innerHTML = '<div class="no-rides">Не вдалося отримати ваш Telegram ID!</div>';
+        const scrollableContent = document.querySelector('#my-rides-page .scrollable-content');
+        scrollableContent.classList.add('no-rides-container');
         return;
     }
 
@@ -443,16 +445,30 @@ async function loadMyRides() {
         const bookings = rides.filter(r => r.role === 'passenger');
         const driverRides = rides.filter(r => r.role === 'driver');
 
+        const scrollableContent = document.querySelector('#my-rides-page .scrollable-content');
+
+        // Оновлюємо вкладку "Бронювання"
         document.getElementById('my-rides-results').innerHTML = bookings.length === 0
             ? '<div class="no-rides">У вас немає заброньованих поїздок.</div>'
             : renderRides(bookings, true);
 
+        // Оновлюємо вкладку "Мої поїздки"
         document.getElementById('my-driver-results').innerHTML = driverRides.length === 0
             ? '<div class="no-rides">У вас немає створених поїздок.</div>'
             : renderRides(driverRides, false);
 
+        // Додаємо/знімаємо клас no-rides-container залежно від вмісту активної вкладки
+        const activeTab = document.querySelector('.rides-tab.active');
+        if (activeTab.querySelector('.no-rides')) {
+            scrollableContent.classList.add('no-rides-container');
+        } else {
+            scrollableContent.classList.remove('no-rides-container');
+        }
+
     } catch (err) {
         document.getElementById('my-rides-results').innerHTML = '<div class="no-rides">Помилка при завантаженні поїздок: ' + err.message + '</div>';
+        const scrollableContent = document.querySelector('#my-rides-page .scrollable-content');
+        scrollableContent.classList.add('no-rides-container');
     }
 }
 
@@ -577,6 +593,7 @@ function switchRidesTab(tab) {
     const driverTab = document.getElementById('tab-driver');
     const bookingsContent = document.getElementById('my-rides-results');
     const driverContent = document.getElementById('my-driver-results');
+    const scrollableContent = document.querySelector('#my-rides-page .scrollable-content');
 
     if (tab === 'bookings') {
         bookingsTab.classList.add('active');
@@ -590,8 +607,15 @@ function switchRidesTab(tab) {
         driverContent.classList.add('active');
     }
 
+    // Додаємо/знімаємо клас no-rides-container залежно від вмісту активної вкладки
+    const activeTab = document.querySelector('.rides-tab.active');
+    if (activeTab.querySelector('.no-rides')) {
+        scrollableContent.classList.add('no-rides-container');
+    } else {
+        scrollableContent.classList.remove('no-rides-container');
+    }
+
     // Примусово оновити прокручування до верху
-    const scrollableContent = document.querySelector('#my-rides-page .scrollable-content');
     if (scrollableContent) {
         scrollableContent.scrollTop = 0;
     }
