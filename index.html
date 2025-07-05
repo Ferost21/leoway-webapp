@@ -36,19 +36,21 @@
     <div class="page-container">
         <!-- Сторінка пошуку -->
         <div id="search-page" class="page active">
-            <h1>Пошук поїздки</h1>
-            <div class="input-wrapper">
-                <input id="departure" placeholder="Місце відправлення" autocomplete="off">
-                <button class="swap-button" onclick="swapLocations()" aria-label="Змінити місця"></button>
-                <div id="departure-suggestions" class="suggestions"></div>
+            <div class="scrollable-content">
+                <h1>Пошук поїздки</h1>
+                <div class="input-wrapper">
+                    <input id="departure" placeholder="Місце відправлення" autocomplete="off">
+                    <button class="swap-button" onclick="swapLocations()" aria-label="Змінити місця"></button>
+                    <div id="departure-suggestions" class="suggestions"></div>
+                </div>
+                <div class="input-wrapper">
+                    <input id="arrival" placeholder="Місце прибуття" autocomplete="off">
+                    <div id="arrival-suggestions" class="suggestions"></div>
+                </div>
+                <input id="date" type="text" placeholder="Дата (ДД-ММ-РРРР)" readonly>
+                <input id="seats" type="number" placeholder="Кількість місць" min="1" max="10">
+                <button onclick="submitSearch()">Пошук</button>
             </div>
-            <div class="input-wrapper">
-                <input id="arrival" placeholder="Місце прибуття" autocomplete="off">
-                <div id="arrival-suggestions" class="suggestions"></div>
-            </div>
-            <input id="date" type="text" placeholder="Дата (ДД-ММ-РРРР)" readonly>
-            <input id="seats" type="number" placeholder="Кількість місць" min="1" max="10">
-            <button onclick="submitSearch()">Пошук</button>
         </div>
 
         <!-- Сторінка мої поїздки -->
@@ -57,37 +59,43 @@
                 <button id="tab-bookings" class="tab-button active" onclick="switchRidesTab('bookings')">Бронювання</button>
                 <button id="tab-driver" class="tab-button" onclick="switchRidesTab('driver')">Мої поїздки</button>
             </div>
-            <div id="my-rides-results" class="rides-tab active"></div>
-            <div id="my-driver-results" class="rides-tab"></div>
+            <div class="scrollable-content">
+                <div id="my-rides-results" class="rides-tab active"></div>
+                <div id="my-driver-results" class="rides-tab"></div>
+            </div>
         </div>
 
         <!-- Сторінка створення поїздки -->
         <div id="create-page" class="page">
-            <h1>Створити поїздку</h1>
-            <div class="input-wrapper">
-                <input id="create-departure" placeholder="Місце відправлення" autocomplete="off">
-                <div id="create-departure-suggestions" class="suggestions"></div>
+            <div class="scrollable-content">
+                <h1>Створити поїздку</h1>
+                <div class="input-wrapper">
+                    <input id="create-departure" placeholder="Місце відправлення" autocomplete="off">
+                    <div id="create-departure-suggestions" class="suggestions"></div>
+                </div>
+                <div class="input-wrapper">
+                    <input id="create-arrival" placeholder="Місце прибуття" autocomplete="off">
+                    <div id="create-arrival-suggestions" class="suggestions"></div>
+                </div>
+                <input id="create-date" type="text" placeholder="Дата (ДД-ММ-РРРР)" readonly>
+                <input id="create-time" type="text" placeholder="Час (ГГ:ХХ)" readonly>
+                <input id="create-description" type="text" placeholder="Опис (необов’язково)">
+                <input id="create-seats" type="number" placeholder="Кількість місць" min="1" max="10">
+                <input id="create-price" type="number" placeholder="Ціна (грн)" min="0" step="1">
+                <button onclick="submitCreateRide()">Створити</button>
             </div>
-            <div class="input-wrapper">
-                <input id="create-arrival" placeholder="Місце прибуття" autocomplete="off">
-                <div id="create-arrival-suggestions" class="suggestions"></div>
-            </div>
-            <input id="create-date" type="text" placeholder="Дата (ДД-ММ-РРРР)" readonly>
-            <input id="create-time" type="text" placeholder="Час (ГГ:ХХ)" readonly>
-            <input id="create-description" type="text" placeholder="Опис (необов'язково)">
-            <input id="create-seats" type="number" placeholder="Кількість місць" min="1" max="10">
-            <input id="create-price" type="number" placeholder="Ціна (грн)" min="0" step="1">
-            <button onclick="submitCreateRide()">Створити</button>
         </div>
 
         <!-- Сторінка профіль -->
         <div id="profile-page" class="page">
-            <div class="profile-header">
-                <img id="profile-photo" src="" alt="User Photo" class="profile-photo">
-                <h2 id="profile-name"></h2>
-                <p id="profile-rating">Rating: N/A</p>
+            <div class="scrollable-content">
+                <div class="profile-header">
+                    <img id="profile-photo" src="" alt="User Photo" class="profile-photo">
+                    <h2 id="profile-name"></h2>
+                    <p id="profile-rating">Rating: N/A</p>
+                </div>
             </div>
-        </div> 
+        </div>
 
         <!-- Модальне вікно -->
         <div id="modal" class="modal" style="display: none;">
@@ -95,7 +103,7 @@
                 <div class="modal-title-box">
                     <h2 id="modal-title"></h2>
                 </div>
-                <div id="modal-results"></div>
+                <div class="scrollable-content" id="modal-results"></div>
             </div>
         </div>
     </div>

@@ -1,3 +1,4 @@
+/* Основний контейнер сторінки */
 .page-container {
     position: relative;
     height: calc(100vh - 60px); /* Висота body мінус bottom-nav */
@@ -122,9 +123,26 @@ button:hover {
 .modal.closing {
     background: rgba(0, 0, 0, 0);
 }
+.modal-content {
+    background: var(--modal-bg-color, #eee);
+    width: 100%;
+    max-width: 600px;
+    height: 100%;
+    overflow: hidden; /* Запобігаємо прокручуванню модального контейнера */
+    box-sizing: border-box;
+    padding: 0;
+    border-radius: 0;
+    position: relative;
+    transform: translateX(100%);
+    animation: slideIn 0.3s forwards;
+    display: flex;
+    flex-direction: column;
+}
+
 .modal-content .scrollable-content {
     margin-top: 90px; /* Компенсація modal-title-box */
     padding-bottom: 20px;
+    flex: 1;
 }
 .modal.closing .modal-content {
     animation: slideOut 0.3s forwards;
@@ -363,7 +381,8 @@ button:hover {
     display: block;
 }
 #search-page .scrollable-content,
-#create-page .scrollable-content {
+#create-page .scrollable-content,
+#profile-page .scrollable-content {
     padding-top: 20px;
     padding-bottom: 80px; /* Компенсація bottom-nav */
 }
@@ -395,7 +414,6 @@ button:hover {
     display: none;
     height: calc(100% - 60px); /* Висота сторінки мінус rides-tab-header */
     margin-top: 60px; /* Компенсація висоти rides-tab-header */
-    overflow: hidden; /* Запобігаємо прокручуванню вкладок */
 }
 .rides-tab.active {
     display: block;

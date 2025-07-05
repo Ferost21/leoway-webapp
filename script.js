@@ -591,6 +591,8 @@ function switchRidesTab(tab) {
     }
 
     // Примусово оновити прокручування до верху
-    const scrollableContent = document.querySelector(`#${tab === 'bookings' ? 'my-rides-results' : 'my-driver-results'}`).parentElement;
-    scrollableContent.scrollTop = 0;
+    const scrollableContent = document.querySelector('#my-rides-page .scrollable-content');
+    if (scrollableContent) {
+        scrollableContent.scrollTop = 0;
+    }
 }
