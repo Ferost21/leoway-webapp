@@ -361,20 +361,14 @@ button:hover {
     padding: 20px; /* Повертаємо загальний відступ 20px з усіх боків */
     box-sizing: border-box;
 }
-#search-page {
-    /* Цей відступ компенсує верхнє та нижнє меню */
-    padding-top: 60px; /* Висота rides-tab-header */
-    padding-bottom: 60px; /* Висота bottom-nav */
-}
-
+#search-page,
 #create-page {
-    /* Цей відступ компенсує верхнє та нижнє меню */
-    padding-top: 60px; /* Висота rides-tab-header */
-    padding-bottom: 60px; /* Висота bottom-nav */
+    /* Тепер 120px для компенсації висоти rides-tab-header */
+    padding-top: 120px;
+    padding-bottom: 60px; /* Висота bottom-nav залишається 60px */
 }
 #my-rides-page {
-    /* Прибираємо будь-який padding з #my-rides-page, адже його вміст буде керувати відступами */
-    padding: 0;
+    padding: 0; /* Ця сторінка сама по собі не має внутрішніх відступів */
 }
 #my-rides-title {
     font-size: 18px;
@@ -398,11 +392,11 @@ button:hover {
 
 .rides-tab {
     display: none;
-    /* Додаємо відступи, щоб вміст не залазив під фіксовані елементи */
-    padding-top: 60px;    /* Висота rides-tab-header */
-    padding-bottom: 60px; /* Висота bottom-nav */
-    padding-left: 20px;   /* Зберігаємо бічні відступи */
-    padding-right: 20px;  /* Зберігаємо бічні відступи */
+    /* Тепер 120px для компенсації висоти rides-tab-header */
+    padding-top: 120px;
+    padding-bottom: 60px; /* Висота bottom-nav залишається 60px */
+    padding-left: 20px;
+    padding-right: 20px;
 }
 .rides-tab.active {
     display: block;
@@ -440,27 +434,33 @@ button:hover {
     box-shadow: 0 2px 5px rgba(0,0,0,0.1);
     z-index: 1001;
     width: 100%;
-    max-width: 600px; /* Така ж ширина, як у .bottom-nav */
-    margin: 0 auto; /* Центрування */
-    height: 60px;
+    max-width: 600px;
+    margin: 0 auto;
+    height: 120px; /* Висота залишається 120px */
     display: flex;
-    align-items: center;
-    justify-content: center;
+    align-items: flex-end; /* Вирівнюємо елементи по нижньому краю */
+    justify-content: space-around;
+    padding-bottom: 0; /* Змінено: прибираємо нижній відступ з шапки */
+    box-sizing: border-box;
 }
+
 .tab-button {
     flex: 1;
     max-width: 50%;
-    padding: 15px;
-    background: transparent; /* Без фону */
+    padding: 15px 10px;
+    margin: 10px 0px 0px;    /* Змінено: залишаємо вертикальний padding, але зменшуємо горизонтальний, якщо потрібно. Ви можете експериментувати з цими значеннями. */
+    background: transparent;
     border: none;
     cursor: pointer;
     font-size: 16px;
-    color: var(--text-color, #222); /* Залишаємо адаптивний колір тексту */
+    color: var(--text-color, #222);
     text-align: center;
     text-decoration: none;
-    transition: none; /* Без анімацій */
+    transition: none;
+    /* align-self: flex-end; -- Ця властивість все ще важлива, але її можна прибрати, якщо батьківський елемент вже має align-items: flex-end; */
 }
+
 .tab-button:hover, .tab-button.active {
-    background: transparent; /* Без фону при наведенні чи активності */
-    font-weight: bold; /* Жирний шрифт для активної вкладки */
+    background: transparent;
+    font-weight: bold;
 }
