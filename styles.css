@@ -383,13 +383,13 @@ button:hover {
 /* Сторінки пошуку та створення */
 #search-page .scrollable-content,
 #create-page .scrollable-content {
-    padding-top: 100px; /* 120px відступ + 20px базовий padding */
+    padding-top: 60px; /* 120px відступ + 20px базовий padding */
     padding-bottom: 80px; /* Компенсація bottom-nav */
 }
 
 /* Сторінка профілю */
 #profile-page .scrollable-content {
-    padding-top: 20px; /* Без додаткового відступу, якщо не потрібно */
+    padding-top: 100px; /* Без додаткового відступу, якщо не потрібно */
     padding-bottom: 80px; /* Компенсація bottom-nav */
 }
 #my-rides-page {
@@ -460,10 +460,11 @@ button:hover {
     width: 100%;
     max-width: 600px;
     margin: 0 auto;
-    height: 120px; /* Зменшено висоту для компактності */
+    height: 120px; /* Висота залишається 120px */
     display: flex;
-    align-items: center;
+    align-items: flex-end; /* Вирівнюємо елементи по нижньому краю */
     justify-content: space-around;
+    padding-bottom: 0; /* Змінено: прибираємо нижній відступ з шапки */
     box-sizing: border-box;
 }
 
