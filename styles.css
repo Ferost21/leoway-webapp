@@ -558,3 +558,17 @@ button:hover {
     margin: 0;
     color: var(--text-color, #222);
 }
+
+.cancel-button, .delete-button {
+    background: var(--cancel-button-bg-color, #e74c3c);
+    color: var(--button-text-color, white);
+    border: none;
+    padding: 10px;
+    font-size: 15px;
+    border-radius: 6px;
+    margin-top: 4px;
+    cursor: pointer;
+}
+.cancel-button:hover, .delete-button:hover {
+    background: var(--cancel-button-hover-bg-color, #c0392b);
+}

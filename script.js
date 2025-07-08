@@ -434,6 +434,29 @@ function getStatusText(status) {
     }
 }
 
+async function deleteRide(rideId) {
+    const tgId = webApp.initDataUnsafe.user?.id;
+    if (!tgId) return alert('Не вдалося отримати ваш Telegram ID!');
+    if (!confirm('Ви впевнені, що хочете видалити цю поїздку?')) return;
+    try {
+        const res = await fetch(`${API_BASE_URL}/api/delete-ride`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'ngrok-skip-browser-warning': 'true'
+            },
+            body: JSON.stringify({ rideId, tgId })
+        });
+        if (!res.ok) throw new Error('Помилка видалення поїздки');
+        const result = await res.json();
+        alert(`Поїздка ${rideId} видалена!`);
+        closeDriverRideModal();
+        loadMyRides();
+    } catch (err) {
+        alert('Помилка при видаленні поїздки: ' + err.message);
+    }
+}
+
 async function loadMyRides() {
     const tgId = webApp.initDataUnsafe.user?.id;
     if (!tgId) {
@@ -544,6 +567,9 @@ function showDriverRideDetails(rideId, departure, arrival, time, date, seatsAvai
                 ${description ? `<p>Опис: ${description}</p>` : ''}
                 <p>Ціна: ${price} ₴</p>
             </div>
+            <div class="ride-actions">
+                <button class="delete-button" onclick="deleteRide(${rideId})">Видалити поїздку</button>
+            </div>
         </div>`;
 
     modal.style.display = 'flex';
@@ -573,6 +599,9 @@ function closeDriverRideModal() {
         isDriverRideModalOpen = false;
         Telegram.WebApp.BackButton.hide();
         window.history.pushState({ page: currentPage }, document.title);
+        if (currentPage === 'my-rides') {
+            loadMyRides(); // Оновлюємо вкладку після закриття
+        }
     }, 300);
 }
 
