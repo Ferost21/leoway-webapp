@@ -557,7 +557,7 @@ function showDriverRideDetails(rideId, departure, arrival, time, date, seatsAvai
     const modalTitle = document.getElementById('driver-ride-modal-title');
     const modalResults = document.getElementById('driver-ride-modal-results');
 
-    modalTitle.textContent = `${departure} → ${arrival}`;
+    // modalTitle.textContent = `${departure} → ${arrival}`;
     modalResults.innerHTML = `
         <div class="ride-item">
             <div class="ride-route">
