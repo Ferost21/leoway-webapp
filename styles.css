@@ -131,7 +131,7 @@ button:hover {
     }
 }
 .modal {
-    display: flex;
+    display: none; /* Змінено з display: flex на display: none */
     justify-content: center;
     align-items: flex-start;
     position: fixed;
@@ -144,6 +144,7 @@ button:hover {
     transition: background 0.3s ease;
 }
 .modal.show {
+    display: flex; /* Відображаємо як flex при додаванні класу show */
     background: rgba(0, 0, 0, 0.5);
 }
 .modal.closing {
@@ -221,6 +222,12 @@ button:hover {
     flex-direction: column;
     gap: 8px;
     color: var(--text-color, #222);
+}
+.ride-item.clickable {
+    cursor: pointer;
+}
+.ride-item.clickable:hover {
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
 }
 .ride-top {
     display: flex;
@@ -513,4 +520,41 @@ button:hover {
 .tab-button:hover, .tab-button.active {
     background: transparent;
     font-weight: bold;
+}
+#modal-results, #driver-ride-modal-results {
+    padding: 20px;
+    margin-top: 90px;
+    flex: 1;
+    overflow-y: auto;
+}
+#modal-title, #driver-ride-modal-title {
+    font-size: 18px;
+    margin: 0;
+    color: var(--text-color, #222);
+}
+
+.cancel-button, .delete-button {
+    background: var(--cancel-button-bg-color, #e74c3c);
+    color: var(--button-text-color, white);
+    border: none;
+    padding: 10px;
+    font-size: 15px;
+    border-radius: 6px;
+    margin-top: 4px;
+    cursor: pointer;
+}
+.cancel-button:hover, .delete-button:hover {
+    background: var(--cancel-button-hover-bg-color, #c0392b);
+}
+
+#modal-results, #driver-ride-modal-results {
+    padding: 20px;
+    margin-top: 90px;
+    flex: 1;
+    overflow-y: auto;
+}
+#modal-title, #driver-ride-modal-title {
+    font-size: 18px;
+    margin: 0;
+    color: var(--text-color, #222);
 }
