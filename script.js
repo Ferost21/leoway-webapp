@@ -40,10 +40,6 @@ document.addEventListener('DOMContentLoaded', () => {
     updateTheme();
     webApp.onEvent('themeChanged', updateTheme);
 
-    // Явно приховуємо модальні вікна при завантаженні
-    document.getElementById('modal').style.display = 'none';
-    document.getElementById('driver-ride-modal').style.display = 'none';
-
     try {
         flatpickr("#date", {
             dateFormat: "d-m-Y",
@@ -97,20 +93,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
     window.addEventListener('popstate', (event) => {
         const modal = document.getElementById('modal');
-        const driverRideModal = document.getElementById('driver-ride-modal');
-        if (event.state && event.state.driverRideModalOpen && isDriverRideModalOpen) {
-            closeDriverRideModal();
-        } else if (event.state && event.state.modalOpen && isModalOpen) {
+        if (isModalOpen) {
             closeModal();
         } else {
-            navigate(event.state?.page || 'search');
+            navigate('search');
         }
     });
 
-    // Ініціалізуємо історію зі сторінкою search
     window.history.replaceState({ page: 'search' }, document.title);
 
-    // Ініціалізація користувача
+    // Initialize user only if not already initialized
     const user = webApp.initDataUnsafe.user;
     if (user && user.id) {
         const isInitialized = localStorage.getItem(`userInitialized_${user.id}`);
@@ -142,7 +134,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // Встановлюємо сторінку пошуку за замовчуванням
+    // Set default page to 'search' on load
     currentPage = 'search';
     const navItems = document.querySelectorAll('.nav-item');
     navItems.forEach(item => item.classList.remove('active'));
@@ -391,29 +383,6 @@ async function cancelRide(bookingId) {
     }
 }
 
-async function deleteRide(rideId) {
-    const tgId = webApp.initDataUnsafe.user?.id;
-    if (!tgId) return alert('Не вдалося отримати ваш Telegram ID!');
-    if (!confirm('Ви впевнені, що хочете видалити цю поїздку?')) return;
-    try {
-        const res = await fetch(`${API_BASE_URL}/api/delete-ride`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'ngrok-skip-browser-warning': 'true'
-            },
-            body: JSON.stringify({ rideId, tgId })
-        });
-        if (!res.ok) throw new Error('Помилка видалення поїздки');
-        const result = await res.json();
-        alert(`Поїздка ${rideId} видалена!`);
-        closeDriverRideModal();
-        loadMyRides();
-    } catch (err) {
-        alert('Помилка при видаленні поїздки: ' + err.message);
-    }
-}
-
 async function contactDriver(driverTelegramId, bookingId) {
     const userTgId = webApp.initDataUnsafe.user?.id;
     if (!userTgId) {
@@ -514,96 +483,28 @@ function renderRides(rides, isBooking) {
         const dateStr = dt.toLocaleDateString('uk-UA', { day: '2-digit', month: '2-digit' });
         const statusText = getStatusText(ride.status || '');
         const statusClass = ride.status ? `status-${ride.status}` : '';
-        if (isBooking) {
-            return `
-                <div class="ride-item">
-                    <div class="ride-top">
-                        <div class="ride-route">
-                            <p class="route">${ride.departure} → ${ride.arrival}</p>
-                            <p>${timeStr}, ${dateStr}</p>
-                            <p>Місць: ${ride.seats_booked}/${ride.seats_total}</p>
-                            ${ride.status ? `<p class="status ${statusClass}">Статус: ${statusText}</p>` : ''}
-                            ${ride.description ? `<p>Опис: ${ride.description}</p>` : ''}
+        return `
+            <div class="ride-item">
+                <div class="ride-top">
+                    <div class="ride-route">
+                        <p class="route">${ride.departure} → ${ride.arrival}</p>
+                        <p>${timeStr}, ${dateStr}</p>
+                        <p>Місць: ${isBooking ? ride.seats_booked : ride.seats_available}/${ride.seats_total}</p>
+                        ${ride.status ? `<p class="status ${statusClass}">Статус: ${statusText}</p>` : ''}
+                        ${ride.description ? `<p>Опис: ${ride.description}</p>` : ''}
+                        ${isBooking ? `
                             <p>Водій: ${ride.driver_name} ★ ${ride.driver_rating.toFixed(1)}</p>
-                            <p>Номер бронювання: ${ride.booking_id}</p>
-                        </div>
-                        <div class="price-tag">${ride.price} ₴</div>
+                            <p>Номер бронювання: ${ride.booking_id}</p>` : ''}
                     </div>
-                    ${ride.status !== 'cancelled' ? `
-                        <div class="ride-actions">
-                            <button class="cancel-button" onclick="cancelRide(${ride.booking_id})">Скасувати</button>
-                            ${ride.driver_telegram_id ? `<button class="contact-button" onclick="contactDriver('${ride.driver_telegram_id}', ${ride.booking_id})">Зв’язатися з водієм</button>` : ''}
-                        </div>` : ''}
-                </div>`;
-        } else {
-            return `
-                <div class="ride-item clickable" onclick="showDriverRideDetails(${ride.ride_id}, '${ride.departure}', '${ride.arrival}', '${timeStr}', '${dateStr}', ${ride.seats_available}, ${ride.seats_total}, ${ride.price}, '${ride.description || ''}')">
-                    <div class="ride-top">
-                        <div class="ride-route">
-                            <p class="route">${ride.departure} → ${ride.arrival}</p>
-                            <p>${timeStr}, ${dateStr}</p>
-                            <p>Місць: ${ride.seats_available}/${ride.seats_total}</p>
-                            ${ride.description ? `<p>Опис: ${ride.description}</p>` : ''}
-                            <p>Водій: ${ride.driver_name} ★ ${ride.driver_rating.toFixed(1)}</p>
-                        </div>
-                        <div class="price-tag">${ride.price} ₴</div>
-                    </div>
-                </div>`;
-        }
+                    <div class="price-tag">${ride.price} ₴</div>
+                </div>
+                ${isBooking && ride.status !== 'cancelled' ? `
+                    <div class="ride-actions">
+                        <button class="cancel-button" onclick="cancelRide(${ride.booking_id})">Скасувати</button>
+                        ${ride.driver_telegram_id ? `<button class="contact-button" onclick="contactDriver('${ride.driver_telegram_id}', ${ride.booking_id})">Зв’язатися з водієм</button>` : ''}
+                    </div>` : ''}
+            </div>`;
     }).join('');
-}
-
-function showDriverRideDetails(rideId, departure, arrival, time, date, seatsAvailable, seatsTotal, price, description) {
-    const modal = document.getElementById('driver-ride-modal');
-    const modalTitle = document.getElementById('driver-ride-modal-title');
-    const modalResults = document.getElementById('driver-ride-modal-results');
-
-    // Видалено встановлення заголовка
-    modalResults.innerHTML = `
-        <div class="ride-item">
-            <div class="ride-route">
-                <p class="route">${departure} → ${arrival}</p>
-                <p>${time}, ${date}</p>
-                <p>Місць: ${seatsAvailable}/${seatsTotal}</p>
-                ${description ? `<p>Опис: ${description}</p>` : ''}
-                <p>Ціна: ${price} ₴</p>
-            </div>
-            <div class="ride-actions">
-                <button class="delete-button" onclick="deleteRide(${rideId})">Видалити поїздку</button>
-            </div>
-        </div>`;
-
-    modal.style.display = 'flex';
-    requestAnimationFrame(() => {
-        modal.classList.add('show');
-    });
-    modal.classList.remove('closing');
-
-    Telegram.WebApp.BackButton.show();
-    Telegram.WebApp.BackButton.onClick(() => {
-        closeDriverRideModal();
-    });
-
-    isDriverRideModalOpen = true;
-    setTimeout(() => {
-        window.history.pushState({ driverRideModalOpen: true }, '');
-    }, 100);
-}
-
-function closeDriverRideModal() {
-    const modal = document.getElementById('driver-ride-modal');
-    modal.classList.add('closing');
-    modal.classList.remove('show');
-    setTimeout(() => {
-        modal.style.display = 'none';
-        modal.classList.remove('closing');
-        isDriverRideModalOpen = false;
-        Telegram.WebApp.BackButton.hide();
-        window.history.pushState({ page: currentPage }, document.title);
-        if (currentPage === 'my-rides') {
-            loadMyRides(); // Оновлюємо вкладку після закриття
-        }
-    }, 300);
 }
 
 function closeModal() {
@@ -622,8 +523,6 @@ function closeModal() {
 function navigate(page) {
     if (isModalOpen) {
         closeModal();
-    } else if (isDriverRideModalOpen) {
-        closeDriverRideModal();
     }
 
     const navItems = document.querySelectorAll('.nav-item');
