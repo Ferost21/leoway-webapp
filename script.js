@@ -559,17 +559,15 @@ function showDriverRideDetails(rideId, departure, arrival, time, date, seatsAvai
 
     // modalTitle.textContent = `${departure} → ${arrival}`;
     modalResults.innerHTML = `
-        <div class="ride-item">
-            <div class="ride-route">
-                <p class="route">${departure} → ${arrival}</p>
-                <p>${time}, ${date}</p>
-                <p>Місць: ${seatsAvailable}/${seatsTotal}</p>
-                ${description ? `<p>Опис: ${description}</p>` : ''}
-                <p>Ціна: ${price} ₴</p>
-            </div>
-            <div class="ride-actions">
-                <button class="delete-button" onclick="deleteRide(${rideId})">Видалити поїздку</button>
-            </div>
+        <div class="ride-details">
+            <p class="route">${departure} → ${arrival}</p>
+            <p>${time}, ${date}</p>
+            <p>Місць: ${seatsAvailable}/${seatsTotal}</p>
+            ${description ? `<p>Опис: ${description}</p>` : ''}
+            <p>Ціна: ${price} ₴</p>
+        </div>
+        <div class="ride-actions" style="position: absolute; bottom: 20px; width: calc(100% - 40px);">
+            <button class="delete-button" onclick="deleteRide(${rideId})">Видалити поїздку</button>
         </div>`;
 
     modal.style.display = 'flex';
