@@ -74,19 +74,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     Telegram.WebApp.BackButton.hide();
 
-    const BASE_URL = 'https://da9139faa00a.ngrok-free.app';
-
-    function fetchWithNgrok(endpoint, options = {}) {
-        const url = `${BASE_URL}${endpoint}`;
-        const defaultOptions = {
-            headers: {
-                'ngrok-skip-browser-warning': 'true',
-                ...options.headers
-            }
-        };
-        return fetch(url, { ...defaultOptions, ...options });
-    }
-
     function updateSwapButtonVisibility() {
         const departure = document.getElementById('departure').value.trim();
         const arrival = document.getElementById('arrival').value.trim();
@@ -116,10 +103,11 @@ document.addEventListener('DOMContentLoaded', () => {
     if (user && user.id) {
         const isInitialized = localStorage.getItem(`userInitialized_${user.id}`);
         if (!isInitialized) {
-            fetchWithNgrok('/api/init-user', {
+            fetch('https://f51fab9daa2b.ngrok-free.app/api/init-user', {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
+                    'ngrok-skip-browser-warning': 'true'
                 },
                 body: JSON.stringify({
                     tgId: user.id,
@@ -181,23 +169,27 @@ function loadProfile() {
     }
 }
 
-// Fetch rating function (updated)
+// Fetch rating function (unchanged)
 function fetchRating(tgId) {
-    return fetchWithNgrok(`/api/user-rating?tgId=${tgId}`)
-        .then(res => res.json())
-        .then(data => {
-            if (data.error) throw new Error(data.error);
-            return data.rating ? data.rating.toFixed(1) : null;
-        })
-        .catch(err => {
-            console.error('Error fetching rating:', err);
-            return null;
-        });
+    return fetch(`https://f51fab9daa2b.ngrok-free.app/api/user-rating?tgId=${tgId}`, {
+        headers: { 'ngrok-skip-browser-warning': 'true' }
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.error) throw new Error(data.error);
+        return data.rating ? data.rating.toFixed(1) : null;
+    })
+    .catch(err => {
+        console.error('Error fetching rating:', err);
+        return null;
+    });
 }
 
 async function fetchCities(query) {
     if (query.length < 2) return [];
-    const response = await fetchWithNgrok(`/api/cities?query=${encodeURIComponent(query)}`);
+    const response = await fetch(`https://f51fab9daa2b.ngrok-free.app/api/cities?query=${encodeURIComponent(query)}`, {
+        headers: { 'ngrok-skip-browser-warning': 'true' }
+    });
     if (!response.ok) return [];
     const data = await response.json();
     const uniqueCities = [];
@@ -265,10 +257,11 @@ async function submitSearch() {
     if (departure.length > 255 || arrival.length > 255) return alert('Назви місць мають бути до 255 символів!');
 
     try {
-        const res = await fetchWithNgrok('/api/search-rides', {
+        const res = await fetch('https://f51fab9daa2b.ngrok-free.app/api/search-rides', {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'ngrok-skip-browser-warning': 'true'
             },
             body: JSON.stringify({ departure, arrival, date, seats })
         });
@@ -340,10 +333,11 @@ async function bookRide(rideId, seats, driverTelegramId) {
         return alert('Ви не можете забронювати власну поїздку!');
     }
     try {
-        const res = await fetchWithNgrok('/api/book-ride', {
+        const res = await fetch('https://f51fab9daa2b.ngrok-free.app/api/book-ride', {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'ngrok-skip-browser-warning': 'true'
             },
             body: JSON.stringify({
                 rideId,
@@ -368,10 +362,11 @@ async function cancelRide(bookingId) {
     const tgId = webApp.initDataUnsafe.user?.id;
     if (!tgId) return alert('Не вдалося отримати ваш Telegram ID!');
     try {
-        const res = await fetchWithNgrok('/api/cancel-ride', {
+        const res = await fetch('https://f51fab9daa2b.ngrok-free.app/api/cancel-ride', {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'ngrok-skip-browser-warning': 'true'
             },
             body: JSON.stringify({ bookingId, tgId })
         });
@@ -399,13 +394,16 @@ async function contactDriver(driverTelegramId, bookingId) {
         return;
     }
     try {
-        await fetchWithNgrok('/api/log-contact-attempt', {
+        // Log the contact attempt to the backend
+        await fetch('https://f51fab9daa2b.ngrok-free.app/api/log-contact-attempt', {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'ngrok-skip-browser-warning': 'true'
             },
             body: JSON.stringify({ userTgId, bookingId, driverTelegramId })
         });
+        // Use Deeplink to the bot instead of direct user link
         webApp.openTelegramLink(`https://t.me/pdsdk_bot?start=contact_${driverTelegramId}_${bookingId}`);
     } catch (err) {
         alert(`Не вдалося відкрити чат з водієм: ${err.message}. Спробуйте ще раз або зв’яжіться з підтримкою.`);
@@ -435,29 +433,38 @@ async function loadMyRides() {
     }
 
     try {
-        const res = await fetchWithNgrok(`/api/my-rides?tgId=${tgId}`);
+        const res = await fetch(`https://f51fab9daa2b.ngrok-free.app/api/my-rides?tgId=${tgId}`, {
+            headers: { 'ngrok-skip-browser-warning': 'true' }
+        });
+
         if (!res.ok) throw new Error('Не вдалося отримати ваші поїздки');
+
         const rides = await res.json();
 
+        // Розділити поїздки за роллю
         const bookings = rides.filter(r => r.role === 'passenger');
         const driverRides = rides.filter(r => r.role === 'driver');
 
         const scrollableContent = document.querySelector('#my-rides-page .scrollable-content');
 
+        // Оновлюємо вкладку "Бронювання"
         document.getElementById('my-rides-results').innerHTML = bookings.length === 0
             ? '<div class="no-rides">У вас немає заброньованих поїздок.</div>'
             : renderRides(bookings, true);
 
+        // Оновлюємо вкладку "Мої поїздки"
         document.getElementById('my-driver-results').innerHTML = driverRides.length === 0
             ? '<div class="no-rides">У вас немає створених поїздок.</div>'
             : renderRides(driverRides, false);
 
+        // Додаємо/знімаємо клас no-rides-container залежно від вмісту активної вкладки
         const activeTab = document.querySelector('.rides-tab.active');
         if (activeTab.querySelector('.no-rides')) {
             scrollableContent.classList.add('no-rides-container');
         } else {
             scrollableContent.classList.remove('no-rides-container');
         }
+
     } catch (err) {
         document.getElementById('my-rides-results').innerHTML = '<div class="no-rides">Помилка при завантаженні поїздок: ' + err.message + '</div>';
         const scrollableContent = document.querySelector('#my-rides-page .scrollable-content');
@@ -542,8 +549,8 @@ function submitCreateRide() {
 
     const data = {
         tgId: user.id,
-        firstName: user.first_name || "Невідомий користувач",
-        photoUrl: user.photo_url || null,
+        firstName: user.first_name || "Невідомий користувач", // Fallback if first_name is missing
+        photoUrl: user.photo_url || null, // Optional photo URL
         departure: document.getElementById("create-departure").value.trim(),
         arrival: document.getElementById("create-arrival").value.trim(),
         date: document.getElementById("create-date").value,
@@ -558,10 +565,11 @@ function submitCreateRide() {
         return;
     }
 
-    fetchWithNgrok('/api/create-ride', {
+    fetch("https://f51fab9daa2b.ngrok-free.app/api/create-ride", {
         method: "POST",
         headers: {
-            "Content-Type": "application/json"
+            "Content-Type": "application/json",
+            "ngrok-skip-browser-warning": "true"
         },
         body: JSON.stringify(data)
     })
@@ -599,6 +607,7 @@ function switchRidesTab(tab) {
         driverContent.classList.add('active');
     }
 
+    // Додаємо/знімаємо клас no-rides-container залежно від вмісту активної вкладки
     const activeTab = document.querySelector('.rides-tab.active');
     if (activeTab.querySelector('.no-rides')) {
         scrollableContent.classList.add('no-rides-container');
@@ -606,6 +615,7 @@ function switchRidesTab(tab) {
         scrollableContent.classList.remove('no-rides-container');
     }
 
+    // Примусово оновити прокручування до верху
     if (scrollableContent) {
         scrollableContent.scrollTop = 0;
     }
