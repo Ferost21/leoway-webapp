@@ -86,6 +86,23 @@ button:hover {
     padding: 10px;
     cursor: pointer;
 }
+.flatpickr-calendar {
+    width: 307px; /* Або відповідна ширина, як у інших полів */
+    max-width: 100vw;
+    box-sizing: border-box;
+    left: auto !important;
+    right: auto !important;
+    transform: none;
+}
+.flatpickr-calendar.arrowLeft::before,
+.flatpickr-calendar.arrowRight::before {
+    display: none;
+}
+#create-date, #create-time {
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+}
 @media (max-width: 600px) {
     #date {
         background-color: var(--input-bg-color, white);

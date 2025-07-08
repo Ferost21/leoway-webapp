@@ -58,7 +58,8 @@ document.addEventListener('DOMContentLoaded', () => {
     flatpickr("#create-date", {
         dateFormat: "d-m-Y",
         minDate: "today",
-        locale: "uk"
+        locale: "uk",
+        position: "below"
     });
 
     flatpickr("#create-time", {
@@ -66,7 +67,8 @@ document.addEventListener('DOMContentLoaded', () => {
         noCalendar: true,
         dateFormat: "H:i",
         time_24hr: true,
-        locale: "uk"
+        locale: "uk",
+        position: "below"
     });
 
     setupSuggestions('departure', 'departure-suggestions');
