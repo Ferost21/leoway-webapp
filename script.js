@@ -4,6 +4,8 @@ webApp.ready();
 let isModalOpen = false;
 let currentPage = 'search';
 
+const API_BASE_URL = 'https://f51fab9daa2b.ngrok-free.app';
+
 // Функція для оновлення стилів на основі теми
 function updateTheme() {
     const themeParams = webApp.themeParams || {};
@@ -103,7 +105,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (user && user.id) {
         const isInitialized = localStorage.getItem(`userInitialized_${user.id}`);
         if (!isInitialized) {
-            fetch('https://f51fab9daa2b.ngrok-free.app/api/init-user', {
+            fetch(`${API_BASE_URL}/api/init-user`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -171,7 +173,7 @@ function loadProfile() {
 
 // Fetch rating function (unchanged)
 function fetchRating(tgId) {
-    return fetch(`https://f51fab9daa2b.ngrok-free.app/api/user-rating?tgId=${tgId}`, {
+    return fetch(`${API_BASE_URL}/api/user-rating?tgId=${tgId}`, {
         headers: { 'ngrok-skip-browser-warning': 'true' }
     })
     .then(res => res.json())
@@ -187,7 +189,7 @@ function fetchRating(tgId) {
 
 async function fetchCities(query) {
     if (query.length < 2) return [];
-    const response = await fetch(`https://f51fab9daa2b.ngrok-free.app/api/cities?query=${encodeURIComponent(query)}`, {
+    const response = await fetch(`${API_BASE_URL}/api/cities?query=${encodeURIComponent(query)}`, {
         headers: { 'ngrok-skip-browser-warning': 'true' }
     });
     if (!response.ok) return [];
@@ -257,7 +259,7 @@ async function submitSearch() {
     if (departure.length > 255 || arrival.length > 255) return alert('Назви місць мають бути до 255 символів!');
 
     try {
-        const res = await fetch('https://f51fab9daa2b.ngrok-free.app/api/search-rides', {
+        const res = await fetch(`${API_BASE_URL}/api/search-rides`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -333,7 +335,7 @@ async function bookRide(rideId, seats, driverTelegramId) {
         return alert('Ви не можете забронювати власну поїздку!');
     }
     try {
-        const res = await fetch('https://f51fab9daa2b.ngrok-free.app/api/book-ride', {
+        const res = await fetch(`${API_BASE_URL}/api/book-ride`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -362,7 +364,7 @@ async function cancelRide(bookingId) {
     const tgId = webApp.initDataUnsafe.user?.id;
     if (!tgId) return alert('Не вдалося отримати ваш Telegram ID!');
     try {
-        const res = await fetch('https://f51fab9daa2b.ngrok-free.app/api/cancel-ride', {
+        const res = await fetch(`${API_BASE_URL}/api/cancel-ride`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -395,7 +397,7 @@ async function contactDriver(driverTelegramId, bookingId) {
     }
     try {
         // Log the contact attempt to the backend
-        await fetch('https://f51fab9daa2b.ngrok-free.app/api/log-contact-attempt', {
+        await fetch(`${API_BASE_URL}/api/log-contact-attempt`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -433,7 +435,7 @@ async function loadMyRides() {
     }
 
     try {
-        const res = await fetch(`https://f51fab9daa2b.ngrok-free.app/api/my-rides?tgId=${tgId}`, {
+        const res = await fetch(`${API_BASE_URL}/api/my-rides?tgId=${tgId}`, {
             headers: { 'ngrok-skip-browser-warning': 'true' }
         });
 
@@ -565,7 +567,7 @@ function submitCreateRide() {
         return;
     }
 
-    fetch("https://f51fab9daa2b.ngrok-free.app/api/create-ride", {
+    fetch(`${API_BASE_URL}/api/create-ride`, {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
