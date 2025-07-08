@@ -543,7 +543,6 @@ function renderRides(rides, isBooking) {
                             <p>${timeStr}, ${dateStr}</p>
                             <p>Місць: ${ride.seats_available}/${ride.seats_total}</p>
                             ${ride.description ? `<p>Опис: ${ride.description}</p>` : ''}
-                            <p>Водій: ${ride.driver_name} ★ ${ride.driver_rating.toFixed(1)}</p>
                         </div>
                         <div class="price-tag">${ride.price} ₴</div>
                     </div>
