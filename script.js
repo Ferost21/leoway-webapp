@@ -5,7 +5,7 @@ let isModalOpen = false;
 let isDriverRideModalOpen = false;
 let currentPage = 'search';
 
-const API_BASE_URL = 'https://f51fab9daa2b.ngrok-free.app';
+const API_BASE_URL = 'https://a989a3640a73.ngrok-free.app';
 
 // Функція для оновлення стилів на основі теми
 function updateTheme() {
