@@ -597,18 +597,20 @@ async function showDriverRideDetails(rideId, departure, arrival, time, date, sea
 
         const passengersHtml = passengers.length === 0
             ? '<div class="no-passengers">Пасажирів не знайдено.</div>'
-            : passengers.map(passenger => `
-                <div class="passenger-item">
-                    <div class="passenger-info">
-                        <p><strong>${passenger.passenger_name}</strong></p>
-                        <p>Місць: ${passenger.seats_booked}</p>
-                        <p>Номер бронювання: ${passenger.booking_id}</p>
+            : passengers.map(passenger => {
+                const statusText = getStatusText(passenger.status);
+                const statusClass = passenger.status ? `status-${passenger.status}` : '';
+                return `
+                    <div class="passenger-item">
+                        <div class="passenger-info">
+                            <p><strong>${passenger.passenger_name}</strong></p>
+                            <p>Місць: ${passenger.seats_booked}</p>
+                            <p>Номер бронювання: ${passenger.booking_id}</p>
+                            <p class="status ${statusClass}">Статус: ${statusText}</p>
+                        </div>
                     </div>
-                    ${passenger.passenger_telegram_id ? `
-                        <button class="contact-button" onclick="contactPassenger('${passenger.passenger_telegram_id}', ${passenger.booking_id})">Зв’язатися з пасажиром</button>
-                    ` : ''}
-                </div>
-            `).join('');
+                `;
+            }).join('');
 
         modalResults.innerHTML = `
             <div class="ride-details">
