@@ -601,6 +601,34 @@ async function showDriverRideDetails(rideId, departure, arrival, time, date, sea
     const modalTitle = document.getElementById('driver-ride-modal-title');
     const modalResults = document.getElementById('driver-ride-modal-results');
 
+    // Парсинг дати з перевіркою на валідність
+    let formattedDate;
+    try {
+        // Очікуємо date у форматі DD.MM.YYYY, наприклад, "10.07.2025"
+        const dateParts = date.split('.');
+        if (dateParts.length !== 3) throw new Error('Невірний формат дати');
+        const parsedDate = new Date(`${dateParts[2]}-${dateParts[1]}-${dateParts[0]}T${time}`);
+        if (isNaN(parsedDate.getTime())) throw new Error('Недійсна дата');
+        
+        formattedDate = parsedDate.toLocaleDateString('uk-UA', { 
+            weekday: 'long', 
+            day: 'numeric', 
+            month: 'long' 
+        }).replace(/^\w/, c => c.toUpperCase()); // Капіталізація першого символу
+    } catch (err) {
+        // Якщо дата недійсна, використовуємо поточну дату (10 липня 2025)
+        console.warn('Помилка парсингу дати:', err.message, 'Використовуємо поточну дату');
+        const fallbackDate = new Date('2025-07-10T' + time);
+        formattedDate = fallbackDate.toLocaleDateString('uk-UA', { 
+            weekday: 'long', 
+            day: 'numeric', 
+            month: 'long' 
+        }).replace(/^\w/, c => c.toUpperCase());
+    }
+
+    // Обчислюємо кількість зайнятих місць
+    const occupiedSeats = seatsTotal - seatsAvailable;
+
     try {
         const tgId = webApp.initDataUnsafe.user?.id;
         if (!tgId) throw new Error('Не вдалося отримати ваш Telegram ID!');
@@ -650,14 +678,13 @@ async function showDriverRideDetails(rideId, departure, arrival, time, date, sea
 
         modalResults.innerHTML = `
             <div class="ride-details">
+                <p class="ride-date">${time}, ${formattedDate}</p>
                 <p class="route">${departure} → ${arrival}</p>
-                <p>${time}, ${date}</p>
-                <p>Місць: ${seatsAvailable}/${seatsTotal}</p>
                 ${description ? `<p>Опис: ${description}</p>` : ''}
                 <p>Ціна: ${price} ₴</p>
             </div>
             <div class="passengers-list">
-                <h3>Пасажири</h3>
+                <h3>Пасажири ${occupiedSeats}/${seatsTotal}</h3>
                 ${passengersHtml}
             </div>
             <div class="ride-actions" style="position: absolute; bottom: 20px; width: calc(100% - 40px);">
@@ -666,14 +693,13 @@ async function showDriverRideDetails(rideId, departure, arrival, time, date, sea
     } catch (err) {
         modalResults.innerHTML = `
             <div class="ride-details">
+                <p class="ride-date">${time}, ${formattedDate}</p>
                 <p class="route">${departure} → ${arrival}</p>
-                <p>${time}, ${date}</p>
-                <p>Місць: ${seatsAvailable}/${seatsTotal}</p>
                 ${description ? `<p>Опис: ${description}</p>` : ''}
                 <p>Ціна: ${price} ₴</p>
             </div>
             <div class="passengers-list">
-                <h3>Пасажири</h3>
+                <h3>Пасажири ${occupiedSeats}/${seatsTotal}</h3>
                 <div class="no-passengers">Помилка при завантаженні пасажирів: ${err.message}</div>
             </div>
             <div class="ride-actions" style="position: absolute; bottom: 20px; width: calc(100% - 40px);">
