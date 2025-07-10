@@ -421,6 +421,35 @@ async function contactDriver(driverTelegramId, bookingId) {
     }
 }
 
+async function contactPassenger(passengerTelegramId, bookingId) {
+    const userTgId = webApp.initDataUnsafe.user?.id;
+    if (!userTgId) {
+        alert('Не вдалося отримати ваш Telegram ID!');
+        return;
+    }
+    if (!passengerTelegramId || !/^\d+$/.test(passengerTelegramId)) {
+        alert('Не вдалося відкрити чат: пасажир не вказав дійсний Telegram ID');
+        return;
+    }
+    if (passengerTelegramId === String(userTgId)) {
+        alert('Ви не можете відкрити чат із собою!');
+        return;
+    }
+    try {
+        await fetch(`${API_BASE_URL}/api/log-contact-attempt`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'ngrok-skip-browser-warning': 'true'
+            },
+            body: JSON.stringify({ userTgId, bookingId, driverTelegramId: passengerTelegramId })
+        });
+        webApp.openTelegramLink(`https://t.me/pdsdk_bot?start=contact_${passengerTelegramId}_${bookingId}`);
+    } catch (err) {
+        alert(`Не вдалося відкрити чат з пасажиром: ${err.message}. Спробуйте ще раз або зв’яжіться з підтримкою.`);
+    }
+}
+
 function getStatusText(status) {
     switch (status) {
         case 'approved':
@@ -551,22 +580,68 @@ function renderRides(rides, isBooking) {
     }).join('');
 }
 
-function showDriverRideDetails(rideId, departure, arrival, time, date, seatsAvailable, seatsTotal, price, description) {
+async function showDriverRideDetails(rideId, departure, arrival, time, date, seatsAvailable, seatsTotal, price, description) {
     const modal = document.getElementById('driver-ride-modal');
     const modalTitle = document.getElementById('driver-ride-modal-title');
     const modalResults = document.getElementById('driver-ride-modal-results');
 
-    modalResults.innerHTML = `
-        <div class="ride-details">
-            <p class="route">${departure} → ${arrival}</p>
-            <p>${time}, ${date}</p>
-            <p>Місць: ${seatsAvailable}/${seatsTotal}</p>
-            ${description ? `<p>Опис: ${description}</p>` : ''}
-            <p>Ціна: ${price} ₴</p>
-        </div>
-        <div class="ride-actions" style="position: absolute; bottom: 20px; width: calc(100% - 40px);">
-            <button class="delete-button" onclick="deleteRide(${rideId})">Видалити поїздку</button>
-        </div>`;
+    try {
+        const tgId = webApp.initDataUnsafe.user?.id;
+        if (!tgId) throw new Error('Не вдалося отримати ваш Telegram ID!');
+
+        const res = await fetch(`${API_BASE_URL}/api/ride-passengers?rideId=${rideId}&tgId=${tgId}`, {
+            headers: { 'ngrok-skip-browser-warning': 'true' }
+        });
+        if (!res.ok) throw new Error('Не вдалося отримати список пасажирів');
+        const passengers = await res.json();
+
+        const passengersHtml = passengers.length === 0
+            ? '<div class="no-passengers">Пасажирів не знайдено.</div>'
+            : passengers.map(passenger => `
+                <div class="passenger-item">
+                    <div class="passenger-info">
+                        <p><strong>${passenger.passenger_name}</strong></p>
+                        <p>Місць: ${passenger.seats_booked}</p>
+                        <p>Номер бронювання: ${passenger.booking_id}</p>
+                    </div>
+                    ${passenger.passenger_telegram_id ? `
+                        <button class="contact-button" onclick="contactPassenger('${passenger.passenger_telegram_id}', ${passenger.booking_id})">Зв’язатися з пасажиром</button>
+                    ` : ''}
+                </div>
+            `).join('');
+
+        modalResults.innerHTML = `
+            <div class="ride-details">
+                <p class="route">${departure} → ${arrival}</p>
+                <p>${time}, ${date}</p>
+                <p>Місць: ${seatsAvailable}/${seatsTotal}</p>
+                ${description ? `<p>Опис: ${description}</p>` : ''}
+                <p>Ціна: ${price} ₴</p>
+            </div>
+            <div class="passengers-list">
+                <h3>Пасажири</h3>
+                ${passengersHtml}
+            </div>
+            <div class="ride-actions" style="position: absolute; bottom: 20px; width: calc(100% - 40px);">
+                <button class="delete-button" onclick="deleteRide(${rideId})">Видалити поїздку</button>
+            </div>`;
+    } catch (err) {
+        modalResults.innerHTML = `
+            <div class="ride-details">
+                <p class="route">${departure} → ${arrival}</p>
+                <p>${time}, ${date}</p>
+                <p>Місць: ${seatsAvailable}/${seatsTotal}</p>
+                ${description ? `<p>Опис: ${description}</p>` : ''}
+                <p>Ціна: ${price} ₴</p>
+            </div>
+            <div class="passengers-list">
+                <h3>Пасажири</h3>
+                <div class="no-passengers">Помилка при завантаженні пасажирів: ${err.message}</div>
+            </div>
+            <div class="ride-actions" style="position: absolute; bottom: 20px; width: calc(100% - 40px);">
+                <button class="delete-button" onclick="deleteRide(${rideId})">Видалити поїздку</button>
+            </div>`;
+    }
 
     modal.style.display = 'flex';
     requestAnimationFrame(() => {

@@ -572,3 +572,33 @@ button:hover {
 .cancel-button:hover, .delete-button:hover {
     background: var(--cancel-button-hover-bg-color, #c0392b);
 }
+
+.passengers-list {
+    margin-top: 20px;
+}
+.passengers-list h3 {
+    font-size: 18px;
+    margin: 10px 0;
+    color: var(--text-color, #222);
+}
+.passenger-item {
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    background: var(--ride-bg-color, white);
+    padding: 15px;
+    margin: 12px 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+}
+.passenger-info p {
+    margin: 4px 0;
+    color: var(--text-color, #222);
+}
+.no-passengers {
+    text-align: center;
+    font-size: 16px;
+    color: var(--text-color, #555);
+    margin-top: 20px;
+}
