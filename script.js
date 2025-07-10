@@ -421,32 +421,48 @@ async function contactDriver(driverTelegramId, bookingId) {
     }
 }
 
-async function contactPassenger(passengerTelegramId, bookingId) {
-    const userTgId = webApp.initDataUnsafe.user?.id;
-    if (!userTgId) {
-        alert('Не вдалося отримати ваш Telegram ID!');
-        return;
-    }
-    if (!passengerTelegramId || !/^\d+$/.test(passengerTelegramId)) {
-        alert('Не вдалося відкрити чат: пасажир не вказав дійсний Telegram ID');
-        return;
-    }
-    if (passengerTelegramId === String(userTgId)) {
-        alert('Ви не можете відкрити чат із собою!');
-        return;
-    }
+async function approveBooking(bookingId, rideId) {
+    const tgId = webApp.initDataUnsafe.user?.id;
+    if (!tgId) return alert('Не вдалося отримати ваш Telegram ID!');
     try {
-        await fetch(`${API_BASE_URL}/api/log-contact-attempt`, {
+        const res = await fetch(`${API_BASE_URL}/api/update-booking-status`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
                 'ngrok-skip-browser-warning': 'true'
             },
-            body: JSON.stringify({ userTgId, bookingId, driverTelegramId: passengerTelegramId })
+            body: JSON.stringify({ bookingId, tgId, status: 'approve' })
         });
-        webApp.openTelegramLink(`https://t.me/pdsdk_bot?start=contact_${passengerTelegramId}_${bookingId}`);
+        if (!res.ok) throw new Error('Помилка підтвердження бронювання');
+        const result = await res.json();
+        alert(`Бронювання ${bookingId} підтверджено!`);
+        // Оновлюємо список пасажирів
+        showDriverRideDetails(rideId, document.querySelector('.ride-details .route').textContent.split(' → ')[0], document.querySelector('.ride-details .route').textContent.split(' → ')[1], document.querySelector('.ride-details p:nth-child(2)').textContent.split(', ')[0], document.querySelector('.ride-details p:nth-child(2)').textContent.split(', ')[1], parseInt(document.querySelector('.ride-details p:nth-child(3)').textContent.split('/')[0].replace('Місць: ', '')), parseInt(document.querySelector('.ride-details p:nth-child(3)').textContent.split('/')[1]), parseFloat(document.querySelector('.ride-details p:nth-child(5)').textContent.replace('Ціна: ', '').replace(' ₴', '')), document.querySelector('.ride-details p:nth-child(4)')?.textContent?.replace('Опис: ', '') || '');
     } catch (err) {
-        alert(`Не вдалося відкрити чат з пасажиром: ${err.message}. Спробуйте ще раз або зв’яжіться з підтримкою.`);
+        alert('Помилка при підтвердженні бронювання: ' + err.message);
+    }
+}
+
+async function cancelBooking(bookingId, rideId) {
+    const tgId = webApp.initDataUnsafe.user?.id;
+    if (!tgId) return alert('Не вдалося отримати ваш Telegram ID!');
+    if (!confirm('Ви впевнені, що хочете скасувати це бронювання?')) return;
+    try {
+        const res = await fetch(`${API_BASE_URL}/api/update-booking-status`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'ngrok-skip-browser-warning': 'true'
+            },
+            body: JSON.stringify({ bookingId, tgId, status: 'cancel' })
+        });
+        if (!res.ok) throw new Error('Помилка скасування бронювання');
+        const result = await res.json();
+        alert(`Бронювання ${bookingId} скасовано!`);
+        // Оновлюємо список пасажирів
+        showDriverRideDetails(rideId, document.querySelector('.ride-details .route').textContent.split(' → ')[0], document.querySelector('.ride-details .route').textContent.split(' → ')[1], document.querySelector('.ride-details p:nth-child(2)').textContent.split(', ')[0], document.querySelector('.ride-details p:nth-child(2)').textContent.split(', ')[1], parseInt(document.querySelector('.ride-details p:nth-child(3)').textContent.split('/')[0].replace('Місць: ', '')), parseInt(document.querySelector('.ride-details p:nth-child(3)').textContent.split('/')[1]), parseFloat(document.querySelector('.ride-details p:nth-child(5)').textContent.replace('Ціна: ', '').replace(' ₴', '')), document.querySelector('.ride-details p:nth-child(4)')?.textContent?.replace('Опис: ', '') || '');
+    } catch (err) {
+        alert('Помилка при скасуванні бронювання: ' + err.message);
     }
 }
 
@@ -608,6 +624,12 @@ async function showDriverRideDetails(rideId, departure, arrival, time, date, sea
                             <p>Номер бронювання: ${passenger.booking_id}</p>
                             <p class="status ${statusClass}">Статус: ${statusText}</p>
                         </div>
+                        ${passenger.status === 'pending' ? `
+                            <div class="passenger-actions">
+                                <button class="approve-button" onclick="approveBooking(${passenger.booking_id}, ${rideId})">Підтвердити</button>
+                                <button class="cancel-booking-button" onclick="cancelBooking(${passenger.booking_id}, ${rideId})">Скасувати</button>
+                            </div>
+                        ` : ''}
                     </div>
                 `;
             }).join('');
