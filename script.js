@@ -5,7 +5,7 @@ let isModalOpen = false;
 let isDriverRideModalOpen = false;
 let currentPage = 'search';
 
-const API_BASE_URL = 'https://a989a3640a73.ngrok-free.app';
+const API_BASE_URL = 'https://49c939404297.ngrok-free.app';
 
 // Функція для оновлення стилів на основі теми
 function updateTheme() {
@@ -556,7 +556,6 @@ function showDriverRideDetails(rideId, departure, arrival, time, date, seatsAvai
     const modalTitle = document.getElementById('driver-ride-modal-title');
     const modalResults = document.getElementById('driver-ride-modal-results');
 
-    // modalTitle.textContent = `${departure} → ${arrival}`;
     modalResults.innerHTML = `
         <div class="ride-details">
             <p class="route">${departure} → ${arrival}</p>
