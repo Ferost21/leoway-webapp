@@ -592,24 +592,20 @@ async function showDriverRideDetails(rideId, departure, arrival, time, date, sea
     const modalTitle = document.getElementById('driver-ride-modal-title');
     const modalResults = document.getElementById('driver-ride-modal-results');
 
-    // Парсинг дати з перевіркою на валідність
     let formattedDate;
     try {
-        // Очікуємо date у форматі DD.MM.YYYY, наприклад, "10.07.2025"
-        const dateParts = date.split('.');
-        if (dateParts.length !== 3) throw new Error('Невірний формат дати');
-        const parsedDate = new Date(`${dateParts[2]}-${dateParts[1]}-${dateParts[0]}T${time}`);
+        const [day, month] = date.split('.');
+        const parsedDate = new Date(`2025-${month}-${day}T${time}`); // Використовуємо 2025 як рік
         if (isNaN(parsedDate.getTime())) throw new Error('Недійсна дата');
-        
         formattedDate = parsedDate.toLocaleDateString('uk-UA', { 
             weekday: 'long', 
             day: 'numeric', 
             month: 'long' 
-        }).replace(/^\w/, c => c.toUpperCase()); // Капіталізація першого символу
+        }).replace(/^\w/, c => c.toUpperCase());
     } catch (err) {
-        // Якщо дата недійсна, використовуємо поточну дату (10 липня 2025)
         console.warn('Помилка парсингу дати:', err.message, 'Використовуємо поточну дату');
-        const fallbackDate = new Date('2025-07-10T' + time);
+        const fallbackDate = new Date();
+        fallbackDate.setHours(time.split(':')[0], time.split(':')[1], 0, 0);
         formattedDate = fallbackDate.toLocaleDateString('uk-UA', { 
             weekday: 'long', 
             day: 'numeric', 
@@ -617,7 +613,6 @@ async function showDriverRideDetails(rideId, departure, arrival, time, date, sea
         }).replace(/^\w/, c => c.toUpperCase());
     }
 
-    // Обчислюємо кількість зайнятих місць
     const occupiedSeats = seatsTotal - seatsAvailable;
 
     try {
@@ -635,7 +630,6 @@ async function showDriverRideDetails(rideId, departure, arrival, time, date, sea
             : passengers.map(passenger => {
                 const statusText = getStatusText(passenger.status);
                 const statusClass = passenger.status ? `status-${passenger.status}` : '';
-                // Визначаємо текст для імені пасажира залежно від кількості місць
                 let passengerNameText;
                 if (passenger.seats_booked === 1) {
                     passengerNameText = `<p><strong>${passenger.passenger_name}</strong></p>`;
@@ -651,11 +645,15 @@ async function showDriverRideDetails(rideId, departure, arrival, time, date, sea
                     }
                     passengerNameText = `<p><strong>${passenger.passenger_name} + ${otherPassengers} ${seatWord}</strong></p>`;
                 }
+                const photoUrl = passenger.photo_url || 'https://t.me/i/userpic/320/default.svg'; // Заміна на дефолтне фото Telegram
                 return `
                     <div class="passenger-item">
                         <div class="passenger-info">
-                            ${passengerNameText}
-                            <p class="status ${statusClass}">Статус: ${statusText}</p>
+                            <img src="${photoUrl}" alt="Profile Photo" class="passenger-photo">
+                            <div class="passenger-text">
+                                ${passengerNameText}
+                                <p class="status ${statusClass}">Статус: ${statusText}</p>
+                            </div>
                         </div>
                         ${passenger.status === 'pending' ? `
                             <div class="passenger-actions">

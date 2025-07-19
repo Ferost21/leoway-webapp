@@ -641,3 +641,20 @@ button:hover {
 #my-rides-page .scrollable-content {
     margin-top: 30px; /* Відступ для фіксованого заголовка */
 }
+
+.passenger-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.passenger-photo {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.passenger-text {
+    flex: 1;
+}
