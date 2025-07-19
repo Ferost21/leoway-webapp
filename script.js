@@ -519,31 +519,22 @@ async function loadMyRides() {
         if (!res.ok) throw new Error('Не вдалося отримати ваші поїздки');
 
         const rides = await res.json();
-
-        // Розділити поїздки за роллю
-        const bookings = rides.filter(r => r.role === 'passenger');
-        const driverRides = rides.filter(r => r.role === 'driver');
-
         const scrollableContent = document.querySelector('#my-rides-page .scrollable-content');
 
-        // Оновлюємо вкладку "Бронювання"
-        document.getElementById('my-rides-results').innerHTML = bookings.length === 0
-            ? '<div class="no-rides">У вас немає заброньованих поїздок.</div>'
-            : renderRides(bookings, true);
+        // Оновлюємо список всіх поїздок
+        document.getElementById('my-rides-results').innerHTML = rides.length === 0
+            ? '<div class="no-rides">У вас немає поїздок.</div>'
+            : renderRides(rides);
 
-        // Оновлюємо вкладку "Мої поїздки"
-        document.getElementById('my-driver-results').innerHTML = driverRides.length === 0
-            ? '<div class="no-rides">У вас немає створених поїздок.</div>'
-            : renderRides(driverRides, false);
-
-        // Додаємо/знімаємо клас no-rides-container залежно від вмісту активної вкладки
-        const activeTab = document.querySelector('.rides-tab.active');
-        if (activeTab.querySelector('.no-rides')) {
+        // Додаємо/знімаємо клас no-rides-container залежно від вмісту
+        if (rides.length === 0) {
             scrollableContent.classList.add('no-rides-container');
         } else {
             scrollableContent.classList.remove('no-rides-container');
         }
 
+        // Примусово прокручуємо до верху
+        scrollableContent.scrollTop = 0;
     } catch (err) {
         document.getElementById('my-rides-results').innerHTML = '<div class="no-rides">Помилка при завантаженні поїздок: ' + err.message + '</div>';
         const scrollableContent = document.querySelector('#my-rides-page .scrollable-content');
@@ -825,37 +816,4 @@ function submitCreateRide() {
         alert("Помилка при з'єднанні з сервером.");
         console.error(err);
     });
-}
-
-function switchRidesTab(tab) {
-    const bookingsTab = document.getElementById('tab-bookings');
-    const driverTab = document.getElementById('tab-driver');
-    const bookingsContent = document.getElementById('my-rides-results');
-    const driverContent = document.getElementById('my-driver-results');
-    const scrollableContent = document.querySelector('#my-rides-page .scrollable-content');
-
-    if (tab === 'bookings') {
-        bookingsTab.classList.add('active');
-        driverTab.classList.remove('active');
-        bookingsContent.classList.add('active');
-        driverContent.classList.remove('active');
-    } else {
-        bookingsTab.classList.remove('active');
-        driverTab.classList.add('active');
-        bookingsContent.classList.remove('active');
-        driverContent.classList.add('active');
-    }
-
-    // Додаємо/знімаємо клас no-rides-container залежно від вмісту активної вкладки
-    const activeTab = document.querySelector('.rides-tab.active');
-    if (activeTab.querySelector('.no-rides')) {
-        scrollableContent.classList.add('no-rides-container');
-    } else {
-        scrollableContent.classList.remove('no-rides-container');
-    }
-
-    // Примусово оновити прокручування до верху
-    if (scrollableContent) {
-        scrollableContent.scrollTop = 0;
-    }
 }
