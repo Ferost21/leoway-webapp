@@ -636,8 +636,8 @@ button:hover {
     max-width: 600px;
     margin: 0 auto;
     box-sizing: border-box;
-    z-index: 1003;
+    z-index: 1002;
 }
 #my-rides-page .scrollable-content {
-    margin-top: 90px; /* Відступ для фіксованого заголовка */
+    margin-top: 20px; /* Відступ для фіксованого заголовка */
 }
