@@ -20,8 +20,8 @@
     display: flex;
     justify-content: center; /* Центруємо горизонтально */
     align-items: center; /* Центруємо вертикально */
-    height: calc(100% - 180px); /* Висота мінус rides-tab-header (60px) і top offset (120px) */
-    margin-top: 180px; /* Компенсація rides-tab-header + top offset */
+    height: calc(100% - 60px); /* Висота мінус top offset */
+    margin-top: 60px; /* Компенсація top offset */
 }
 
 body {
@@ -511,8 +511,8 @@ button:hover {
 
 .rides-tab {
     display: none;
-    height: calc(100% - 120px);
-    margin-top: 100px;
+    height: calc(100% - 60px);
+    margin-top: 60px;
 }
 
 .rides-tab.active {
@@ -542,41 +542,6 @@ button:hover {
 #profile-rating {
     font-size: 18px;
     color: var(--text-color, #666);
-}
-
-.rides-tab-header {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    background: var(--nav-bg-color, #fff);
-    border-bottom: 1px solid var(--border-color, #ccc);
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-    z-index: 1001;
-    width: 100%;
-    max-width: 600px;
-    margin: 0 auto;
-    height: 120px;
-    display: flex;
-    align-items: flex-end;
-    justify-content: space-around;
-    padding-bottom: 0;
-    box-sizing: border-box;
-}
-
-.tab-button {
-    flex: 1;
-    max-width: 50%;
-    padding: 15px 10px;
-    margin: 10px 0px 0px;
-    background: transparent;
-    border: none;
-    cursor: pointer;
-    font-size: 16px;
-    color: var(--text-color, #222);
-    text-align: center;
-    text-decoration: none;
-    transition: none;
 }
 
 .tab-button:hover, .tab-button.active {
