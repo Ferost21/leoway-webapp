@@ -639,5 +639,5 @@ button:hover {
     z-index: 1002;
 }
 #my-rides-page .scrollable-content {
-    margin-top: 20px; /* Відступ для фіксованого заголовка */
+    margin-top: 30px; /* Відступ для фіксованого заголовка */
 }
