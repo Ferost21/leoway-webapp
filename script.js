@@ -98,7 +98,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
     window.addEventListener('popstate', (event) => {
         if (event.state && event.state.passengerModalOpen && isPassengerModalOpen) {
-            closePassengerModal();
+            closePassengerModal(
+                event.state.rideId,
+                event.state.departure,
+                event.state.arrival,
+                event.state.time,
+                event.state.date,
+                event.state.seatsAvailable,
+                event.state.seatsTotal,
+                event.state.price,
+                event.state.description
+            );
         } else if (event.state && event.state.driverRideModalOpen && isDriverRideModalOpen) {
             closeDriverRideModal();
         } else if (event.state && event.state.modalOpen && isModalOpen) {
@@ -439,7 +449,7 @@ async function approveBooking(bookingId, rideId) {
         const result = await res.json();
         alert(`Бронювання ${bookingId} підтверджено!`);
         // Оновлюємо список пасажирів
-        showDriverRideDetails(rideId, document.querySelector('.ride-details .route').textContent.split(' → ')[0], document.querySelector('.ride-details .route').textContent.split(' → ')[1], document.querySelector('.ride-details p:nth-child(2)').textContent.split(', ')[0], document.querySelector('.ride-details p:nth-child(2)').textContent.split(', ')[1], parseInt(document.querySelector('.ride-details p:nth-child(3)').textContent.split('/')[0].replace('Місць: ', '')), parseInt(document.querySelector('.ride-details p:nth-child(3)').textContent.split('/')[1]), parseFloat(document.querySelector('.ride-details p:nth-child(5)').textContent.replace('Ціна: ', '').replace(' ₴', '')), document.querySelector('.ride-details p:nth-child(4)')?.textContent?.replace('Опис: ', '') || '');
+        showDriverRideDetails(rideId, document.querySelector('.ride-details .route').textContent.split(' → ')[0], document.querySelector('.ride-details .route').textContent.split(' → ')[1], document.querySelector('.ride-details .ride-date').textContent.split(', ')[0], document.querySelector('.ride-details .ride-date').textContent.split(', ')[1], parseInt(document.querySelector('.ride-details p:nth-child(3)').textContent.split('/')[0].replace('Місць: ', '')), parseInt(document.querySelector('.ride-details p:nth-child(3)').textContent.split('/')[1]), parseFloat(document.querySelector('.ride-details p:nth-child(5)').textContent.replace('Ціна: ', '').replace(' ₴', '')), document.querySelector('.ride-details p:nth-child(4)')?.textContent?.replace('Опис: ', '') || '');
     } catch (err) {
         alert('Помилка при підтвердженні бронювання: ' + err.message);
     }
@@ -462,7 +472,7 @@ async function cancelBooking(bookingId, rideId) {
         const result = await res.json();
         alert(`Бронювання ${bookingId} скасовано!`);
         // Оновлюємо список пасажирів
-        showDriverRideDetails(rideId, document.querySelector('.ride-details .route').textContent.split(' → ')[0], document.querySelector('.ride-details .route').textContent.split(' → ')[1], document.querySelector('.ride-details p:nth-child(2)').textContent.split(', ')[0], document.querySelector('.ride-details p:nth-child(2)').textContent.split(', ')[1], parseInt(document.querySelector('.ride-details p:nth-child(3)').textContent.split('/')[0].replace('Місць: ', '')), parseInt(document.querySelector('.ride-details p:nth-child(3)').textContent.split('/')[1]), parseFloat(document.querySelector('.ride-details p:nth-child(5)').textContent.replace('Ціна: ', '').replace(' ₴', '')), document.querySelector('.ride-details p:nth-child(4)')?.textContent?.replace('Опис: ', '') || '');
+        showDriverRideDetails(rideId, document.querySelector('.ride-details .route').textContent.split(' → ')[0], document.querySelector('.ride-details .route').textContent.split(' → ')[1], document.querySelector('.ride-details .ride-date').textContent.split(', ')[0], document.querySelector('.ride-details .ride-date').textContent.split(', ')[1], parseInt(document.querySelector('.ride-details p:nth-child(3)').textContent.split('/')[0].replace('Місць: ', '')), parseInt(document.querySelector('.ride-details p:nth-child(3)').textContent.split('/')[1]), parseFloat(document.querySelector('.ride-details p:nth-child(5)').textContent.replace('Ціна: ', '').replace(' ₴', '')), document.querySelector('.ride-details p:nth-child(4)')?.textContent?.replace('Опис: ', '') || '');
     } catch (err) {
         alert('Помилка при скасуванні бронювання: ' + err.message);
     }
@@ -497,6 +507,7 @@ async function deleteRide(rideId) {
         if (!res.ok) throw new Error('Помилка видалення поїздки');
         const result = await res.json();
         alert(`Поїздка ${rideId} видалена!`);
+        closePassengerModal(); // Закриваємо passenger-modal, якщо відкрите
         closeDriverRideModal();
         loadMyRides();
     } catch (err) {
@@ -662,6 +673,7 @@ async function showDriverRideDetails(rideId, departure, arrival, time, date, sea
             <div class="ride-details">
                 <p class="ride-date">${time}, ${formattedDate}</p>
                 <p class="route">${departure} → ${arrival}</p>
+                <p>Місць: ${seatsAvailable}/${seatsTotal}</p>
                 ${description ? `<p>Опис: ${description}</p>` : ''}
                 <p>Ціна: ${price} ₴</p>
             </div>
@@ -677,6 +689,7 @@ async function showDriverRideDetails(rideId, departure, arrival, time, date, sea
             <div class="ride-details">
                 <p class="ride-date">${time}, ${formattedDate}</p>
                 <p class="route">${departure} → ${arrival}</p>
+                <p>Місць: ${seatsAvailable}/${seatsTotal}</p>
                 ${description ? `<p>Опис: ${description}</p>` : ''}
                 <p>Ціна: ${price} ₴</p>
             </div>
@@ -687,6 +700,18 @@ async function showDriverRideDetails(rideId, departure, arrival, time, date, sea
             <div class="ride-actions" style="position: absolute; bottom: 20px; width: calc(100% - 40px);">
                 <button class="delete-button" onclick="deleteRide(${rideId})">Видалити поїздку</button>
             </div>`;
+    }
+
+    // Закриваємо passenger-modal, якщо воно відкрите
+    if (isPassengerModalOpen) {
+        const passengerModal = document.getElementById('passenger-modal');
+        passengerModal.classList.add('closing');
+        passengerModal.classList.remove('show');
+        setTimeout(() => {
+            passengerModal.style.display = 'none';
+            passengerModal.classList.remove('closing');
+            isPassengerModalOpen = false;
+        }, 300);
     }
 
     modal.style.display = 'flex';
@@ -702,7 +727,7 @@ async function showDriverRideDetails(rideId, departure, arrival, time, date, sea
 
     isDriverRideModalOpen = true;
     setTimeout(() => {
-        window.history.pushState({ driverRideModalOpen: true }, '');
+        window.history.pushState({ driverRideModalOpen: true, rideId, departure, arrival, time, date, seatsAvailable, seatsTotal, price, description }, '', `#my-rides/${rideId}`);
     }, 100);
 }
 
@@ -732,7 +757,11 @@ function showPassengerDetails(passengerName, bookingId, rideId, departure, arriv
 
     isPassengerModalOpen = true;
     setTimeout(() => {
-        window.history.pushState({ passengerModalOpen: true, rideId, departure, arrival, time, date, seatsAvailable, seatsTotal, price, description }, '');
+        window.history.pushState(
+            { passengerModalOpen: true, rideId, bookingId, departure, arrival, time, date, seatsAvailable, seatsTotal, price, description },
+            '',
+            `#my-rides/${rideId}/${bookingId}`
+        );
     }, 100);
 }
 
@@ -745,20 +774,18 @@ function closePassengerModal(rideId, departure, arrival, time, date, seatsAvaila
         modal.classList.remove('closing');
         isPassengerModalOpen = false;
 
-        // Повертаємося до driver-ride-modal
-        Telegram.WebApp.BackButton.show();
-        Telegram.WebApp.BackButton.onClick(() => {
-            closeDriverRideModal();
-        });
-
-        // Відновлюємо driver-ride-modal, якщо воно було відкрите
+        // Переконуємося, що driver-ride-modal відкрите
         if (isDriverRideModalOpen) {
             const driverModal = document.getElementById('driver-ride-modal');
-            driverModal.style.display = 'flex';
-            driverModal.classList.add('show');
-            driverModal.classList.remove('closing');
-            // Оновлюємо історію
-            window.history.pushState({ driverRideModalOpen: true }, '');
+            if (driverModal.style.display !== 'flex' || !driverModal.classList.contains('show')) {
+                showDriverRideDetails(rideId, departure, arrival, time, date, seatsAvailable, seatsTotal, price, description);
+            } else {
+                Telegram.WebApp.BackButton.show();
+                Telegram.WebApp.BackButton.onClick(() => {
+                    closeDriverRideModal();
+                });
+                window.history.pushState({ driverRideModalOpen: true, rideId, departure, arrival, time, date, seatsAvailable, seatsTotal, price, description }, '', `#my-rides/${rideId}`);
+            }
         }
     }, 300);
 }
@@ -772,7 +799,7 @@ function closeDriverRideModal() {
         modal.classList.remove('closing');
         isDriverRideModalOpen = false;
         Telegram.WebApp.BackButton.hide();
-        window.history.pushState({ page: currentPage }, document.title);
+        window.history.pushState({ page: currentPage }, '', '#my-rides');
         if (currentPage === 'my-rides') {
             loadMyRides();
         }
@@ -825,7 +852,7 @@ function navigate(page) {
     document.getElementById(`${page}-page`).classList.add('active');
 
     currentPage = page;
-    window.history.pushState({ page }, document.title);
+    window.history.pushState({ page }, '', `#${page}`);
 
     if (page === 'my-rides') {
         loadMyRides();
