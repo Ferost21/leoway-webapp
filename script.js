@@ -427,7 +427,7 @@ async function approveBooking(bookingId, rideId) {
     const tgId = webApp.initDataUnsafe.user?.id;
     if (!tgId) return alert('Не вдалося отримати ваш Telegram ID!');
     try {
-        const res = await fetch(`${API_BASE_URL}/api/update-bicking-status`, {
+        const res = await fetch(`${API_BASE_URL}/api/update-booking-status`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -641,7 +641,7 @@ async function showDriverRideDetails(rideId, departure, arrival, time, date, sea
                 }
                 const photoUrl = passenger.photo_url || 'https://t.me/i/userpic/320/default.svg';
                 return `
-                    <div class="passenger-item" onclick="showPassengerDetails('${passenger.passenger_name}', ${passenger.booking_id}, ${rideId})">
+                    <div class="passenger-item" onclick="showPassengerDetails('${passenger.passenger_name}', ${passenger.booking_id}, ${rideId}, '${departure}', '${arrival}', '${time}', '${date}', ${seatsAvailable}, ${seatsTotal}, ${price}, '${description || ''}')">
                         <div class="passenger-info">
                             <img src="${photoUrl}" alt="Profile Photo" class="passenger-photo">
                             <div class="passenger-text">
@@ -706,15 +706,10 @@ async function showDriverRideDetails(rideId, departure, arrival, time, date, sea
     }, 100);
 }
 
-function showPassengerDetails(passengerName, bookingId, rideId) {
-    const passengerModal = document.getElementById('passenger-modal');
+function showPassengerDetails(passengerName, bookingId, rideId, departure, arrival, time, date, seatsAvailable, seatsTotal, price, description) {
+    const modal = document.getElementById('passenger-modal');
     const modalTitle = document.getElementById('passenger-modal-title');
     const modalResults = document.getElementById('passenger-modal-results');
-    const driverRideModal = document.getElementById('driver-ride-modal');
-
-    // Keep the driver ride modal visible
-    driverRideModal.style.display = 'flex';
-    driverRideModal.classList.add('show');
 
     modalTitle.textContent = 'Інформація про пасажира';
     modalResults.innerHTML = `
@@ -723,45 +718,48 @@ function showPassengerDetails(passengerName, bookingId, rideId) {
         </div>
     `;
 
-    passengerModal.style.display = 'flex';
+    // Показуємо модальне вікно пасажира, не закриваючи driver-ride-modal
+    modal.style.display = 'flex';
     requestAnimationFrame(() => {
-        passengerModal.classList.add('show');
+        modal.classList.add('show');
     });
-    passengerModal.classList.remove('closing');
+    modal.classList.remove('closing');
 
     Telegram.WebApp.BackButton.show();
     Telegram.WebApp.BackButton.onClick(() => {
-        closePassengerModal(rideId);
+        closePassengerModal(rideId, departure, arrival, time, date, seatsAvailable, seatsTotal, price, description);
     });
 
     isPassengerModalOpen = true;
     setTimeout(() => {
-        window.history.pushState({ passengerModalOpen: true, rideId }, '');
+        window.history.pushState({ passengerModalOpen: true, rideId, departure, arrival, time, date, seatsAvailable, seatsTotal, price, description }, '');
     }, 100);
 }
 
-function closePassengerModal(rideId) {
-    const passengerModal = document.getElementById('passenger-modal');
-    const driverRideModal = document.getElementById('driver-ride-modal');
-    
-    passengerModal.classList.add('closing');
-    passengerModal.classList.remove('show');
+function closePassengerModal(rideId, departure, arrival, time, date, seatsAvailable, seatsTotal, price, description) {
+    const modal = document.getElementById('passenger-modal');
+    modal.classList.add('closing');
+    modal.classList.remove('show');
     setTimeout(() => {
-        passengerModal.style.display = 'none';
-        passengerModal.classList.remove('closing');
+        modal.style.display = 'none';
+        modal.classList.remove('closing');
         isPassengerModalOpen = false;
 
-        // Ensure driver ride modal remains open
-        driverRideModal.style.display = 'flex';
-        driverRideModal.classList.add('show');
-        driverRideModal.classList.remove('closing');
-
+        // Повертаємося до driver-ride-modal
         Telegram.WebApp.BackButton.show();
         Telegram.WebApp.BackButton.onClick(() => {
             closeDriverRideModal();
         });
 
-        window.history.pushState({ driverRideModalOpen: true }, '');
+        // Відновлюємо driver-ride-modal, якщо воно було відкрите
+        if (isDriverRideModalOpen) {
+            const driverModal = document.getElementById('driver-ride-modal');
+            driverModal.style.display = 'flex';
+            driverModal.classList.add('show');
+            driverModal.classList.remove('closing');
+            // Оновлюємо історію
+            window.history.pushState({ driverRideModalOpen: true }, '');
+        }
     }, 300);
 }
 
@@ -796,7 +794,22 @@ function closeModal() {
 
 function navigate(page) {
     if (isPassengerModalOpen) {
-        closePassengerModal();
+        // Закриваємо passenger-modal, повертаючись до driver-ride-modal
+        const state = window.history.state || {};
+        if (state.passengerModalOpen && state.rideId) {
+            closePassengerModal(
+                state.rideId,
+                state.departure,
+                state.arrival,
+                state.time,
+                state.date,
+                state.seatsAvailable,
+                state.seatsTotal,
+                state.price,
+                state.description
+            );
+            return;
+        }
     } else if (isDriverRideModalOpen) {
         closeDriverRideModal();
     } else if (isModalOpen) {
