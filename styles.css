@@ -221,7 +221,7 @@ button:hover {
     z-index: 1003;
 }
 
-#modal-results, #driver-ride-modal-results, #passenger-modal-results {
+#modal-results, #driver-ride-modal-results {
     padding: 20px;
     margin-top: 90px;
     flex: 1;
@@ -566,8 +566,8 @@ button:hover {
     padding: 15px;
     margin: 12px 0;
     display: flex;
-    flex-direction: column;
-    cursor: pointer;
+    flex-direction: column; /* Текст зверху, кнопки знизу */
+    /* gap: 10px; */
 }
 
 .passenger-info p {
