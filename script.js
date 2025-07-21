@@ -427,7 +427,7 @@ async function approveBooking(bookingId, rideId) {
     const tgId = webApp.initDataUnsafe.user?.id;
     if (!tgId) return alert('Не вдалося отримати ваш Telegram ID!');
     try {
-        const res = await fetch(`${API_BASE_URL}/api/update-booking-status`, {
+        const res = await fetch(`${API_BASE_URL}/api/update-bicking-status`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -707,9 +707,14 @@ async function showDriverRideDetails(rideId, departure, arrival, time, date, sea
 }
 
 function showPassengerDetails(passengerName, bookingId, rideId) {
-    const modal = document.getElementById('passenger-modal');
+    const passengerModal = document.getElementById('passenger-modal');
     const modalTitle = document.getElementById('passenger-modal-title');
     const modalResults = document.getElementById('passenger-modal-results');
+    const driverRideModal = document.getElementById('driver-ride-modal');
+
+    // Keep the driver ride modal visible
+    driverRideModal.style.display = 'flex';
+    driverRideModal.classList.add('show');
 
     modalTitle.textContent = 'Інформація про пасажира';
     modalResults.innerHTML = `
@@ -718,38 +723,45 @@ function showPassengerDetails(passengerName, bookingId, rideId) {
         </div>
     `;
 
-    modal.style.display = 'flex';
+    passengerModal.style.display = 'flex';
     requestAnimationFrame(() => {
-        modal.classList.add('show');
+        passengerModal.classList.add('show');
     });
-    modal.classList.remove('closing');
+    passengerModal.classList.remove('closing');
 
     Telegram.WebApp.BackButton.show();
     Telegram.WebApp.BackButton.onClick(() => {
-        closePassengerModal();
+        closePassengerModal(rideId);
     });
 
     isPassengerModalOpen = true;
     setTimeout(() => {
-        window.history.pushState({ passengerModalOpen: true }, '');
+        window.history.pushState({ passengerModalOpen: true, rideId }, '');
     }, 100);
 }
 
-function closePassengerModal() {
-    const modal = document.getElementById('passenger-modal');
-    modal.classList.add('closing');
-    modal.classList.remove('show');
+function closePassengerModal(rideId) {
+    const passengerModal = document.getElementById('passenger-modal');
+    const driverRideModal = document.getElementById('driver-ride-modal');
+    
+    passengerModal.classList.add('closing');
+    passengerModal.classList.remove('show');
     setTimeout(() => {
-        modal.style.display = 'none';
-        modal.classList.remove('closing');
+        passengerModal.style.display = 'none';
+        passengerModal.classList.remove('closing');
         isPassengerModalOpen = false;
-        Telegram.WebApp.BackButton.hide();
-        window.history.pushState({ driverRideModalOpen: true }, '');
-        // Повертаємося до модального вікна деталей поїздки
+
+        // Ensure driver ride modal remains open
+        driverRideModal.style.display = 'flex';
+        driverRideModal.classList.add('show');
+        driverRideModal.classList.remove('closing');
+
         Telegram.WebApp.BackButton.show();
         Telegram.WebApp.BackButton.onClick(() => {
             closeDriverRideModal();
         });
+
+        window.history.pushState({ driverRideModalOpen: true }, '');
     }, 300);
 }
 
@@ -764,7 +776,7 @@ function closeDriverRideModal() {
         Telegram.WebApp.BackButton.hide();
         window.history.pushState({ page: currentPage }, document.title);
         if (currentPage === 'my-rides') {
-            loadMyRides(); // Оновлюємо вкладку після закриття
+            loadMyRides();
         }
     }, 300);
 }
@@ -819,8 +831,8 @@ function submitCreateRide() {
 
     const data = {
         tgId: user.id,
-        firstName: user.first_name || "Невідомий користувач", // Fallback if first_name is missing
-        photoUrl: user.photo_url || null, // Optional photo URL
+        firstName: user.first_name || "Невідомий користувач",
+        photoUrl: user.photo_url || null,
         departure: document.getElementById("create-departure").value.trim(),
         arrival: document.getElementById("create-arrival").value.trim(),
         date: document.getElementById("create-date").value,
