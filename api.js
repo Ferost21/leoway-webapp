@@ -1,3 +1,5 @@
+import { renderRides } from './rides.js';
+
 const API_BASE_URL = 'https://49c939404297.ngrok-free.app';
 const webApp = window.Telegram.WebApp;
 
@@ -280,9 +282,19 @@ async function loadMyRides() {
         const rides = await res.json();
         const scrollableContent = document.querySelector('#my-rides-page .scrollable-content');
 
+        // Розділяємо поїздки на бронювання та поїздки водія
+        const bookings = rides.filter(ride => ride.role === 'passenger');
+        const driverRides = rides.filter(ride => ride.role === 'driver');
+
+        // Рендеримо бронювання (isBooking = true)
+        const bookingsHtml = bookings.length > 0 ? renderRides(bookings, true) : '';
+        // Рендеримо поїздки водія (isBooking = false)
+        const driverRidesHtml = driverRides.length > 0 ? renderRides(driverRides, false) : '';
+
+        // Комбінуємо HTML або показуємо повідомлення, якщо немає поїздок
         document.getElementById('my-rides-results').innerHTML = rides.length === 0
             ? '<div class="no-rides">У вас немає поїздок.</div>'
-            : renderRides(rides);
+            : `${bookingsHtml}${driverRidesHtml}`;
 
         if (rides.length === 0) {
             scrollableContent.classList.add('no-rides-container');
