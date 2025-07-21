@@ -1,6 +1,8 @@
 import { approveBooking, cancelBooking, deleteRide } from './api.js';
 import { closeDriverRideModal, isDriverRideModalOpen, currentPage } from './ui.js';
 
+const webApp = window.Telegram.WebApp;
+
 function getStatusText(status) {
     switch (status) {
         case 'approved':
