@@ -1,4 +1,6 @@
-function updateTheme() {
+const webApp = window.Telegram.WebApp;
+
+export function updateTheme() {
     const themeParams = webApp.themeParams || {};
     const isDark = webApp.colorScheme === 'dark';
 

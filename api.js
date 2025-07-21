@@ -1,3 +1,6 @@
+const API_BASE_URL = 'https://49c939404297.ngrok-free.app';
+const webApp = window.Telegram.WebApp;
+
 async function fetchCities(query) {
     if (query.length < 2) return [];
     const response = await fetch(`${API_BASE_URL}/api/cities?query=${encodeURIComponent(query)}`, {
@@ -14,6 +17,21 @@ async function fetchCities(query) {
         }
     });
     return uniqueCities.map(name => ({ name }));
+}
+
+function fetchRating(tgId) {
+    return fetch(`${API_BASE_URL}/api/user-rating?tgId=${tgId}`, {
+        headers: { 'ngrok-skip-browser-warning': 'true' }
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.error) throw new Error(data.error);
+        return data.rating ? data.rating.toFixed(1) : null;
+    })
+    .catch(err => {
+        console.error('Error fetching rating:', err);
+        return null;
+    });
 }
 
 async function submitSearch() {
@@ -243,50 +261,41 @@ async function deleteRide(rideId) {
     }
 }
 
-async function submitCreateRide() {
-    const user = webApp.initDataUnsafe.user;
-    if (!user || !user.id) {
-        alert("Не вдалося отримати ваш Telegram ID!");
+async function loadMyRides() {
+    const tgId = webApp.initDataUnsafe.user?.id;
+    if (!tgId) {
+        document.getElementById('my-rides-results').innerHTML = '<div class="no-rides">Не вдалося отримати ваш Telegram ID!</div>';
+        const scrollableContent = document.querySelector('#my-rides-page .scrollable-content');
+        scrollableContent.classList.add('no-rides-container');
         return;
     }
 
-    const data = {
-        tgId: user.id,
-        firstName: user.first_name || "Невідомий користувач",
-        photoUrl: user.photo_url || null,
-        departure: document.getElementById("create-departure").value.trim(),
-        arrival: document.getElementById("create-arrival").value.trim(),
-        date: document.getElementById("create-date").value,
-        time: document.getElementById("create-time").value,
-        description: document.getElementById("create-description").value.trim(),
-        seats: parseInt(document.getElementById("create-seats").value),
-        price: parseFloat(document.getElementById("create-price").value)
-    };
+    try {
+        const res = await fetch(`${API_BASE_URL}/api/my-rides?tgId=${tgId}`, {
+            headers: { 'ngrok-skip-browser-warning': 'true' }
+        });
 
-    if (!data.departure || !data.arrival || !data.date || !data.time || !data.seats || !data.price) {
-        alert("Будь ласка, заповніть усі обов'язкові поля.");
-        return;
-    }
+        if (!res.ok) throw new Error('Не вдалося отримати ваші поїздки');
 
-    fetch(`${API_BASE_URL}/api/create-ride`, {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-            "ngrok-skip-browser-warning": "true"
-        },
-        body: JSON.stringify(data)
-    })
-    .then(res => res.json())
-    .then(response => {
-        if (response.error) {
-            alert("Помилка: " + response.error);
+        const rides = await res.json();
+        const scrollableContent = document.querySelector('#my-rides-page .scrollable-content');
+
+        document.getElementById('my-rides-results').innerHTML = rides.length === 0
+            ? '<div class="no-rides">У вас немає поїздок.</div>'
+            : renderRides(rides);
+
+        if (rides.length === 0) {
+            scrollableContent.classList.add('no-rides-container');
         } else {
-            alert("Поїздка створена успішно!");
-            navigate("search");
+            scrollableContent.classList.remove('no-rides-container');
         }
-    })
-    .catch(err => {
-        alert("Помилка при з'єднанні з сервером.");
-        console.error(err);
-    });
+
+        scrollableContent.scrollTop = 0;
+    } catch (err) {
+        document.getElementById('my-rides-results').innerHTML = '<div class="no-rides">Помилка при завантаженні поїздок: ' + err.message + '</div>';
+        const scrollableContent = document.querySelector('#my-rides-page .scrollable-content');
+        scrollableContent.classList.add('no-rides-container');
+    }
 }
+
+export { fetchCities, fetchRating, submitSearch, bookRide, cancelRide, contactDriver, approveBooking, cancelBooking, deleteRide, loadMyRides };

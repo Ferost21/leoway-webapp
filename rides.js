@@ -1,37 +1,16 @@
-async function loadMyRides() {
-    const tgId = webApp.initDataUnsafe.user?.id;
-    if (!tgId) {
-        document.getElementById('my-rides-results').innerHTML = '<div class="no-rides">Не вдалося отримати ваш Telegram ID!</div>';
-        const scrollableContent = document.querySelector('#my-rides-page .scrollable-content');
-        scrollableContent.classList.add('no-rides-container');
-        return;
-    }
+import { approveBooking, cancelBooking, deleteRide } from './api.js';
+import { closeDriverRideModal, isDriverRideModalOpen, currentPage } from './ui.js';
 
-    try {
-        const res = await fetch(`${API_BASE_URL}/api/my-rides?tgId=${tgId}`, {
-            headers: { 'ngrok-skip-browser-warning': 'true' }
-        });
-
-        if (!res.ok) throw new Error('Не вдалося отримати ваші поїздки');
-
-        const rides = await res.json();
-        const scrollableContent = document.querySelector('#my-rides-page .scrollable-content');
-
-        document.getElementById('my-rides-results').innerHTML = rides.length === 0
-            ? '<div class="no-rides">У вас немає поїздок.</div>'
-            : renderRides(rides);
-
-        if (rides.length === 0) {
-            scrollableContent.classList.add('no-rides-container');
-        } else {
-            scrollableContent.classList.remove('no-rides-container');
-        }
-
-        scrollableContent.scrollTop = 0;
-    } catch (err) {
-        document.getElementById('my-rides-results').innerHTML = '<div class="no-rides">Помилка при завантаженні поїздок: ' + err.message + '</div>';
-        const scrollableContent = document.querySelector('#my-rides-page .scrollable-content');
-        scrollableContent.classList.add('no-rides-container');
+function getStatusText(status) {
+    switch (status) {
+        case 'approved':
+            return 'Підтверджено';
+        case 'pending':
+            return 'Очікує';
+        case 'cancelled':
+            return 'Скасовано';
+        default:
+            return 'Невідомо';
     }
 }
 
@@ -78,19 +57,6 @@ function renderRides(rides, isBooking) {
                 </div>`;
         }
     }).join('');
-}
-
-function getStatusText(status) {
-    switch (status) {
-        case 'approved':
-            return 'Підтверджено';
-        case 'pending':
-            return 'Очікує';
-        case 'cancelled':
-            return 'Скасовано';
-        default:
-            return 'Невідомо';
-    }
 }
 
 async function showDriverRideDetails(rideId, departure, arrival, time, date, seatsAvailable, seatsTotal, price, description) {
@@ -218,3 +184,5 @@ async function showDriverRideDetails(rideId, departure, arrival, time, date, sea
         window.history.pushState({ driverRideModalOpen: true }, '');
     }, 100);
 }
+
+export { renderRides, showDriverRideDetails, getStatusText };

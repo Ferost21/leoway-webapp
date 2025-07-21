@@ -1,3 +1,9 @@
+import { fetchRating } from './api.js';
+
+let isModalOpen = false;
+let isDriverRideModalOpen = false;
+let currentPage = 'search';
+
 function setupSuggestions(inputId, suggestionsId) {
     const input = document.getElementById(inputId);
     const suggestions = document.getElementById(suggestionsId);
@@ -38,3 +44,78 @@ function swapLocations() {
     document.getElementById('departure').value = arrival;
     document.getElementById('arrival').value = departure;
 }
+
+function closeModal() {
+    const modal = document.getElementById('modal');
+    modal.classList.add('closing');
+    modal.classList.remove('show');
+    setTimeout(() => {
+        modal.style.display = 'none';
+        modal.classList.remove('closing');
+        isModalOpen = false;
+        Telegram.WebApp.BackButton.hide();
+        window.history.pushState({ page: currentPage }, document.title);
+    }, 300);
+}
+
+function closeDriverRideModal() {
+    const modal = document.getElementById('driver-ride-modal');
+    modal.classList.add('closing');
+    modal.classList.remove('show');
+    setTimeout(() => {
+        modal.style.display = 'none';
+        modal.classList.remove('closing');
+        isDriverRideModalOpen = false;
+        Telegram.WebApp.BackButton.hide();
+        window.history.pushState({ page: currentPage }, document.title);
+        if (currentPage === 'my-rides') {
+            loadMyRides();
+        }
+    }, 300);
+}
+
+function navigate(page) {
+    if (isModalOpen) {
+        closeModal();
+    } else if (isDriverRideModalOpen) {
+        closeDriverRideModal();
+    }
+
+    const navItems = document.querySelectorAll('.nav-item');
+    navItems.forEach(item => item.classList.remove('active'));
+    document.querySelector(`.nav-item[onclick="navigate('${page}')"]`).classList.add('active');
+
+    const pages = document.querySelectorAll('.page');
+    pages.forEach(p => p.classList.remove('active'));
+    document.getElementById(`${page}-page`).classList.add('active');
+
+    currentPage = page;
+    window.history.pushState({ page }, document.title);
+
+    if (page === 'my-rides') {
+        loadMyRides();
+    }
+}
+
+function loadProfile() {
+    const user = webApp.initDataUnsafe.user;
+    if (user && user.id) {
+        const profilePhoto = document.getElementById('profile-photo');
+        const profileName = document.getElementById('profile-name');
+        const profileRating = document.getElementById('profile-rating');
+
+        profileName.textContent = user.first_name || 'Невідомий користувач';
+
+        fetchRating(user.id).then(rating => {
+            profileRating.textContent = `Рейтинг: ★${rating || 'N/A'}`;
+        });
+
+        if (user.photo_url) {
+            profilePhoto.src = user.photo_url;
+        } else {
+            profilePhoto.src = 'https://via.placeholder.com/100';
+        }
+    }
+}
+
+export { setupSuggestions, formatShortDate, swapLocations, closeModal, closeDriverRideModal, navigate, loadProfile, isModalOpen, isDriverRideModalOpen, currentPage };

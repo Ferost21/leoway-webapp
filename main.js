@@ -1,17 +1,17 @@
+import { updateTheme } from './theme.js';
+import { fetchRating, loadMyRides, submitSearch, bookRide, cancelRide, contactDriver, approveBooking, cancelBooking, deleteRide } from './api.js';
+import { setupSuggestions, swapLocations, navigate, loadProfile, closeModal, closeDriverRideModal } from './ui.js';
+import { showDriverRideDetails } from './rides.js';
+
 const webApp = window.Telegram.WebApp;
 webApp.ready();
-
-let isModalOpen = false;
-let isDriverRideModalOpen = false;
-let currentPage = 'search';
-
-const API_BASE_URL = 'https://49c939404297.ngrok-free.app';
 
 document.addEventListener('DOMContentLoaded', () => {
     webApp.ready();
     updateTheme();
     webApp.onEvent('themeChanged', updateTheme);
 
+    // Явно приховуємо модальні вікна при завантаженні
     document.getElementById('modal').style.display = 'none';
     document.getElementById('driver-ride-modal').style.display = 'none';
 
@@ -64,6 +64,20 @@ document.addEventListener('DOMContentLoaded', () => {
 
     updateSwapButtonVisibility();
 
+    window.addEventListener('popstate', (event) => {
+        if (event.state && event.state.driverRideModalOpen && isDriverRideModalOpen) {
+            closeDriverRideModal();
+        } else if (event.state && event.state.modalOpen && isModalOpen) {
+            closeModal();
+        } else {
+            navigate(event.state?.page || 'search');
+        }
+    });
+
+    // Ініціалізуємо історію зі сторінкою search
+    window.history.replaceState({ page: 'search' }, document.title);
+
+    // Ініціалізація користувача
     const user = webApp.initDataUnsafe.user;
     if (user && user.id) {
         const isInitialized = localStorage.getItem(`userInitialized_${user.id}`);
@@ -95,18 +109,73 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    currentPage = 'search';
-    const navItems = document.querySelectorAll('.nav-item');
-    navItems.forEach(item => item.classList.remove('active'));
-    document.querySelector(`.nav-item[onclick="navigate('search')"]`).classList.add('active');
-
-    const pages = document.querySelectorAll('.page');
-    pages.forEach(p => p.classList.remove('active'));
-    document.getElementById('search-page').classList.add('active');
+    // Встановлюємо сторінку пошуку за замовчуванням
+    navigate('search');
 
     loadProfile();
 
     if (currentPage === 'my-rides') {
         loadMyRides();
     }
+
+    // Додаємо функції до window для викликів із HTML
+    window.navigate = navigate;
+    window.submitSearch = submitSearch;
+    window.swapLocations = swapLocations;
+    window.submitCreateRide = submitCreateRide;
+    window.bookRide = bookRide;
+    window.cancelRide = cancelRide;
+    window.contactDriver = contactDriver;
+    window.approveBooking = approveBooking;
+    window.cancelBooking = cancelBooking;
+    window.deleteRide = deleteRide;
+    window.showDriverRideDetails = showDriverRideDetails;
 });
+
+function submitCreateRide() {
+    const user = webApp.initDataUnsafe.user;
+    if (!user || !user.id) {
+        alert("Не вдалося отримати ваш Telegram ID!");
+        return;
+    }
+
+    const data = {
+        tgId: user.id,
+        firstName: user.first_name || "Невідомий користувач",
+        photoUrl: user.photo_url || null,
+        departure: document.getElementById("create-departure").value.trim(),
+        arrival: document.getElementById("create-arrival").value.trim(),
+        date: document.getElementById("create-date").value,
+        time: document.getElementById("create-time").value,
+        description: document.getElementById("create-description").value.trim(),
+        seats: parseInt(document.getElementById("create-seats").value),
+        price: parseFloat(document.getElementById("create-price").value)
+    };
+
+    if (!data.departure || !data.arrival || !data.date || !data.time || !data.seats || !data.price) {
+        alert("Будь ласка, заповніть усі обов'язкові поля.");
+        return;
+    }
+
+    fetch(`${API_BASE_URL}/api/create-ride`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "ngrok-skip-browser-warning": "true"
+        },
+        body: JSON.stringify(data)
+    })
+    .then(res => res.json())
+    .then(response => {
+        if (response.error) {
+            alert("Помилка: " + response.error);
+        } else {
+            alert("Поїздка створена успішно!");
+            navigate("search");
+        }
+    })
+    .catch(err => {
+        alert("Помилка при з'єднанні з сервером.");
+        console.error(err);
+    });
+}
