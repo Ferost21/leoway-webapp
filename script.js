@@ -3,6 +3,7 @@ webApp.ready();
 
 let isModalOpen = false;
 let isDriverRideModalOpen = false;
+let isPassengerModalOpen = false;
 let currentPage = 'search';
 
 const API_BASE_URL = 'https://49c939404297.ngrok-free.app';
@@ -44,6 +45,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Явно приховуємо модальні вікна при завантаженні
     document.getElementById('modal').style.display = 'none';
     document.getElementById('driver-ride-modal').style.display = 'none';
+    document.getElementById('passenger-modal').style.display = 'none';
 
     try {
         flatpickr("#date", {
@@ -95,9 +97,9 @@ document.addEventListener('DOMContentLoaded', () => {
     updateSwapButtonVisibility();
 
     window.addEventListener('popstate', (event) => {
-        const modal = document.getElementById('modal');
-        const driverRideModal = document.getElementById('driver-ride-modal');
-        if (event.state && event.state.driverRideModalOpen && isDriverRideModalOpen) {
+        if (event.state && event.state.passengerModalOpen && isPassengerModalOpen) {
+            closePassengerModal();
+        } else if (event.state && event.state.driverRideModalOpen && isDriverRideModalOpen) {
             closeDriverRideModal();
         } else if (event.state && event.state.modalOpen && isModalOpen) {
             closeModal();
@@ -595,7 +597,7 @@ async function showDriverRideDetails(rideId, departure, arrival, time, date, sea
     let formattedDate;
     try {
         const [day, month] = date.split('.');
-        const parsedDate = new Date(`2025-${month}-${day}T${time}`); // Використовуємо 2025 як рік
+        const parsedDate = new Date(`2025-${month}-${day}T${time}`);
         if (isNaN(parsedDate.getTime())) throw new Error('Недійсна дата');
         formattedDate = parsedDate.toLocaleDateString('uk-UA', { 
             weekday: 'long', 
@@ -637,9 +639,9 @@ async function showDriverRideDetails(rideId, departure, arrival, time, date, sea
                     const otherPassengers = passenger.seats_booked - 1;
                     passengerNameText = `<p><strong>${passenger.passenger_name} (+${otherPassengers})</strong></p>`;
                 }
-                const photoUrl = passenger.photo_url || 'https://t.me/i/userpic/320/default.svg'; // Заміна на дефолтне фото Telegram
+                const photoUrl = passenger.photo_url || 'https://t.me/i/userpic/320/default.svg';
                 return `
-                    <div class="passenger-item">
+                    <div class="passenger-item" onclick="showPassengerDetails('${passenger.passenger_name}', ${passenger.booking_id}, ${rideId})">
                         <div class="passenger-info">
                             <img src="${photoUrl}" alt="Profile Photo" class="passenger-photo">
                             <div class="passenger-text">
@@ -649,12 +651,11 @@ async function showDriverRideDetails(rideId, departure, arrival, time, date, sea
                         </div>
                         ${passenger.status === 'pending' ? `
                             <div class="passenger-actions">
-                                <button class="approve-button" onclick="approveBooking(${passenger.booking_id}, ${rideId})">Підтвердити</button>
-                                <button class="cancel-booking-button" onclick="cancelBooking(${passenger.booking_id}, ${rideId})">Скасувати</button>
+                                <button class="approve-button" onclick="approveBooking(${passenger.booking_id}, ${rideId});event.stopPropagation();">Підтвердити</button>
+                                <button class="cancel-booking-button" onclick="cancelBooking(${passenger.booking_id}, ${rideId});event.stopPropagation();">Скасувати</button>
                             </div>
                         ` : ''}
-                    </div>
-                `;
+                    </div>`;
             }).join('');
 
         modalResults.innerHTML = `
@@ -705,6 +706,53 @@ async function showDriverRideDetails(rideId, departure, arrival, time, date, sea
     }, 100);
 }
 
+function showPassengerDetails(passengerName, bookingId, rideId) {
+    const modal = document.getElementById('passenger-modal');
+    const modalTitle = document.getElementById('passenger-modal-title');
+    const modalResults = document.getElementById('passenger-modal-results');
+
+    modalTitle.textContent = 'Інформація про пасажира';
+    modalResults.innerHTML = `
+        <div class="passenger-details">
+            <p><strong>Ім'я:</strong> ${passengerName}</p>
+        </div>
+    `;
+
+    modal.style.display = 'flex';
+    requestAnimationFrame(() => {
+        modal.classList.add('show');
+    });
+    modal.classList.remove('closing');
+
+    Telegram.WebApp.BackButton.show();
+    Telegram.WebApp.BackButton.onClick(() => {
+        closePassengerModal();
+    });
+
+    isPassengerModalOpen = true;
+    setTimeout(() => {
+        window.history.pushState({ passengerModalOpen: true }, '');
+    }, 100);
+}
+
+function closePassengerModal() {
+    const modal = document.getElementById('passenger-modal');
+    modal.classList.add('closing');
+    modal.classList.remove('show');
+    setTimeout(() => {
+        modal.style.display = 'none';
+        modal.classList.remove('closing');
+        isPassengerModalOpen = false;
+        Telegram.WebApp.BackButton.hide();
+        window.history.pushState({ driverRideModalOpen: true }, '');
+        // Повертаємося до модального вікна деталей поїздки
+        Telegram.WebApp.BackButton.show();
+        Telegram.WebApp.BackButton.onClick(() => {
+            closeDriverRideModal();
+        });
+    }, 300);
+}
+
 function closeDriverRideModal() {
     const modal = document.getElementById('driver-ride-modal');
     modal.classList.add('closing');
@@ -735,10 +783,12 @@ function closeModal() {
 }
 
 function navigate(page) {
-    if (isModalOpen) {
-        closeModal();
+    if (isPassengerModalOpen) {
+        closePassengerModal();
     } else if (isDriverRideModalOpen) {
         closeDriverRideModal();
+    } else if (isModalOpen) {
+        closeModal();
     }
 
     const navItems = document.querySelectorAll('.nav-item');
