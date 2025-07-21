@@ -5,6 +5,7 @@ let isModalOpen = false;
 let isDriverRideModalOpen = false;
 let isPassengerModalOpen = false;
 let currentPage = 'search';
+let lastDriverRideDetails = null; // Store the last driver ride details for back navigation
 
 const API_BASE_URL = 'https://49c939404297.ngrok-free.app';
 
@@ -439,7 +440,7 @@ async function approveBooking(bookingId, rideId) {
         const result = await res.json();
         alert(`Бронювання ${bookingId} підтверджено!`);
         // Оновлюємо список пасажирів
-        showDriverRideDetails(rideId, document.querySelector('.ride-details .route').textContent.split(' → ')[0], document.querySelector('.ride-details .route').textContent.split(' → ')[1], document.querySelector('.ride-details p:nth-child(2)').textContent.split(', ')[0], document.querySelector('.ride-details p:nth-child(2)').textContent.split(', ')[1], parseInt(document.querySelector('.ride-details p:nth-child(3)').textContent.split('/')[0].replace('Місць: ', '')), parseInt(document.querySelector('.ride-details p:nth-child(3)').textContent.split('/')[1]), parseFloat(document.querySelector('.ride-details p:nth-child(5)').textContent.replace('Ціна: ', '').replace(' ₴', '')), document.querySelector('.ride-details p:nth-child(4)')?.textContent?.replace('Опис: ', '') || '');
+        showDriverRideDetails(...lastDriverRideDetails);
     } catch (err) {
         alert('Помилка при підтвердженні бронювання: ' + err.message);
     }
@@ -462,7 +463,7 @@ async function cancelBooking(bookingId, rideId) {
         const result = await res.json();
         alert(`Бронювання ${bookingId} скасовано!`);
         // Оновлюємо список пасажирів
-        showDriverRideDetails(rideId, document.querySelector('.ride-details .route').textContent.split(' → ')[0], document.querySelector('.ride-details .route').textContent.split(' → ')[1], document.querySelector('.ride-details p:nth-child(2)').textContent.split(', ')[0], document.querySelector('.ride-details p:nth-child(2)').textContent.split(', ')[1], parseInt(document.querySelector('.ride-details p:nth-child(3)').textContent.split('/')[0].replace('Місць: ', '')), parseInt(document.querySelector('.ride-details p:nth-child(3)').textContent.split('/')[1]), parseFloat(document.querySelector('.ride-details p:nth-child(5)').textContent.replace('Ціна: ', '').replace(' ₴', '')), document.querySelector('.ride-details p:nth-child(4)')?.textContent?.replace('Опис: ', '') || '');
+        showDriverRideDetails(...lastDriverRideDetails);
     } catch (err) {
         alert('Помилка при скасуванні бронювання: ' + err.message);
     }
@@ -590,6 +591,9 @@ function renderRides(rides, isBooking) {
 }
 
 async function showDriverRideDetails(rideId, departure, arrival, time, date, seatsAvailable, seatsTotal, price, description) {
+    // Store the current ride details for back navigation
+    lastDriverRideDetails = [rideId, departure, arrival, time, date, seatsAvailable, seatsTotal, price, description];
+
     const modal = document.getElementById('driver-ride-modal');
     const modalTitle = document.getElementById('driver-ride-modal-title');
     const modalResults = document.getElementById('driver-ride-modal-results');
@@ -743,13 +747,11 @@ function closePassengerModal() {
         modal.style.display = 'none';
         modal.classList.remove('closing');
         isPassengerModalOpen = false;
-        Telegram.WebApp.BackButton.hide();
-        window.history.pushState({ driverRideModalOpen: true }, '');
+
         // Повертаємося до модального вікна деталей поїздки
-        Telegram.WebApp.BackButton.show();
-        Telegram.WebApp.BackButton.onClick(() => {
-            closeDriverRideModal();
-        });
+        if (lastDriverRideDetails) {
+            showDriverRideDetails(...lastDriverRideDetails);
+        }
     }, 300);
 }
 
@@ -764,7 +766,7 @@ function closeDriverRideModal() {
         Telegram.WebApp.BackButton.hide();
         window.history.pushState({ page: currentPage }, document.title);
         if (currentPage === 'my-rides') {
-            loadMyRides(); // Оновлюємо вкладку після закриття
+            loadMyRides();
         }
     }, 300);
 }
@@ -819,8 +821,8 @@ function submitCreateRide() {
 
     const data = {
         tgId: user.id,
-        firstName: user.first_name || "Невідомий користувач", // Fallback if first_name is missing
-        photoUrl: user.photo_url || null, // Optional photo URL
+        firstName: user.first_name || "Невідомий користувач",
+        photoUrl: user.photo_url || null,
         departure: document.getElementById("create-departure").value.trim(),
         arrival: document.getElementById("create-arrival").value.trim(),
         date: document.getElementById("create-date").value,
