@@ -1,4 +1,6 @@
-import { fetchRating } from './api.js';
+import { fetchCities, fetchRating, loadMyRides } from './api.js';
+
+const webApp = window.Telegram.WebApp;
 
 let isModalOpen = false;
 let isDriverRideModalOpen = false;
