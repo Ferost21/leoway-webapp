@@ -1,6 +1,6 @@
 import { updateTheme } from './theme.js';
 import { fetchRating, loadMyRides, submitSearch, bookRide, cancelRide, contactDriver, approveBooking, cancelBooking, deleteRide } from './api.js';
-import { setupSuggestions, swapLocations, navigate, loadProfile, closeModal, closeDriverRideModal } from './ui.js';
+import { setupSuggestions, swapLocations, navigate, loadProfile, closeModal, closeDriverRideModal, isModalOpen, isDriverRideModalOpen, currentPage } from './ui.js';
 import { showDriverRideDetails } from './rides.js';
 
 const webApp = window.Telegram.WebApp;
