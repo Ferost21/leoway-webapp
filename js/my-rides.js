@@ -128,15 +128,8 @@ async function showDriverRideDetails(rideId, departure, arrival, time, date, sea
                     passengerNameText = `<p><strong>${passenger.passenger_name}</strong></p>`;
                 } else {
                     const otherPassengers = passenger.seats_booked - 1;
-                    let seatWord;
-                    if (otherPassengers === 1) {
-                        seatWord = 'інший пасажир';
-                    } else if (otherPassengers >= 2 && otherPassengers <= 4) {
-                        seatWord = 'інші пасажири';
-                    } else {
-                        seatWord = 'інших пасажирів';
-                    }
-                    passengerNameText = `<p><strong>${passenger.passenger_name} + ${otherPassengers} ${seatWord}</strong></p>`;
+                    // Змінюємо цю частину, щоб завжди виводити "+ число"
+                    passengerNameText = `<p><strong>${passenger.passenger_name} (+${otherPassengers})</strong></p>`;
                 }
                 const photoUrl = passenger.photo_url || 'https://t.me/i/userpic/320/default.svg';
                 return `
