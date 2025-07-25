@@ -1,3 +1,5 @@
+// rides.js
+import { API_BASE_URL, approveBooking, cancelBooking, deleteRide } from './api.js';
 import { approveBooking, cancelBooking, deleteRide } from './api.js';
 import { closeDriverRideModal, isDriverRideModalOpen, currentPage } from './ui.js';
 
