@@ -1,10 +1,39 @@
-import { updateTheme } from './theme.js';
-import { fetchRating, loadMyRides, submitSearch, bookRide, cancelRide, contactDriver, approveBooking, cancelBooking, deleteRide } from './api.js';
-import { setupSuggestions, swapLocations, navigate, loadProfile, closeModal, closeDriverRideModal, isModalOpen, isDriverRideModalOpen, currentPage } from './ui.js';
-import { showDriverRideDetails } from './rides.js';
-
 const webApp = window.Telegram.WebApp;
 webApp.ready();
+
+let isModalOpen = false;
+let isDriverRideModalOpen = false;
+let currentPage = 'search';
+
+const API_BASE_URL = 'https://7458c7693ee4.ngrok-free.app';
+
+function updateTheme() {
+    const themeParams = webApp.themeParams || {};
+    const isDark = webApp.colorScheme === 'dark';
+
+    const root = document.documentElement;
+    root.style.setProperty('--bg-color', themeParams.bg_color || (isDark ? '#1f2a2d' : '#f5f5f5'));
+    root.style.setProperty('--text-color', themeParams.text_color || (isDark ? '#e0e0e0' : '#222'));
+    root.style.setProperty('--border-color', themeParams.border_color || (isDark ? '#555' : '#ccc'));
+    root.style.setProperty('--input-bg-color', themeParams.section_bg_color || (isDark ? '#2c3839' : 'white'));
+    root.style.setProperty('--button-bg-color', themeParams.button_color || (isDark ? '#2ecc71' : '#27ae60'));
+    root.style.setProperty('--button-text-color', themeParams.button_text_color || 'white');
+    root.style.setProperty('--button-hover-bg-color', themeParams.button_color || (isDark ? '#27ae60' : '#219653'));
+    root.style.setProperty('--hover-bg-color', themeParams.section_bg_color || (isDark ? '#2c3839' : '#f0f0f0'));
+    root.style.setProperty('--modal-bg-color', themeParams.section_bg_color || (isDark ? '#2c3839' : '#eee'));
+    root.style.setProperty('--ride-bg-color', themeParams.section_bg_color || (isDark ? '#2c3839' : 'white'));
+    root.style.setProperty('--nav-bg-color', themeParams.section_bg_color || (isDark ? '#2c3839' : '#fff'));
+    root.style.setProperty('--cancel-button-bg-color', themeParams.destructive_text_color || (isDark ? '#e74c3c' : '#e74c3c'));
+    root.style.setProperty('--cancel-button-hover-bg-color', themeParams.destructive_text_color || (isDark ? '#c0392b' : '#c0392b'));
+    root.style.setProperty('--status-approved-color', isDark ? '#2ecc71' : '#27ae60');
+    root.style.setProperty('--status-pending-color', isDark ? '#f1c40f' : '#f39c12');
+    root.style.setProperty('--status-cancelled-color', isDark ? '#e74c3c' : '#e74c3c');
+    root.style.setProperty('--contact-button-bg-color', themeParams.link_color || (isDark ? '#3498db' : '#2980b9'));
+    root.style.setProperty('--contact-button-hover-bg-color', themeParams.link_color || (isDark ? '#2980b9' : '#2471a3'));
+
+    webApp.setHeaderColor(themeParams.bg_color || (isDark ? '#1f2a2d' : '#ffffff'), 'bg_color');
+    webApp.setBackgroundColor(themeParams.bg_color || (isDark ? '#1f2a2d' : '#f5f5f5'));
+}
 
 document.addEventListener('DOMContentLoaded', () => {
     webApp.ready();
@@ -65,6 +94,8 @@ document.addEventListener('DOMContentLoaded', () => {
     updateSwapButtonVisibility();
 
     window.addEventListener('popstate', (event) => {
+        const modal = document.getElementById('modal');
+        const driverRideModal = document.getElementById('driver-ride-modal');
         if (event.state && event.state.driverRideModalOpen && isDriverRideModalOpen) {
             closeDriverRideModal();
         } else if (event.state && event.state.modalOpen && isModalOpen) {
@@ -110,72 +141,18 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Встановлюємо сторінку пошуку за замовчуванням
-    navigate('search');
+    currentPage = 'search';
+    const navItems = document.querySelectorAll('.nav-item');
+    navItems.forEach(item => item.classList.remove('active'));
+    document.querySelector(`.nav-item[onclick="navigate('search')"]`).classList.add('active');
+
+    const pages = document.querySelectorAll('.page');
+    pages.forEach(p => p.classList.remove('active'));
+    document.getElementById('search-page').classList.add('active');
 
     loadProfile();
 
     if (currentPage === 'my-rides') {
         loadMyRides();
     }
-
-    // Додаємо функції до window для викликів із HTML
-    window.navigate = navigate;
-    window.submitSearch = submitSearch;
-    window.swapLocations = swapLocations;
-    window.submitCreateRide = submitCreateRide;
-    window.bookRide = bookRide;
-    window.cancelRide = cancelRide;
-    window.contactDriver = contactDriver;
-    window.approveBooking = approveBooking;
-    window.cancelBooking = cancelBooking;
-    window.deleteRide = deleteRide;
-    window.showDriverRideDetails = showDriverRideDetails;
 });
-
-function submitCreateRide() {
-    const user = webApp.initDataUnsafe.user;
-    if (!user || !user.id) {
-        alert("Не вдалося отримати ваш Telegram ID!");
-        return;
-    }
-
-    const data = {
-        tgId: user.id,
-        firstName: user.first_name || "Невідомий користувач",
-        photoUrl: user.photo_url || null,
-        departure: document.getElementById("create-departure").value.trim(),
-        arrival: document.getElementById("create-arrival").value.trim(),
-        date: document.getElementById("create-date").value,
-        time: document.getElementById("create-time").value,
-        description: document.getElementById("create-description").value.trim(),
-        seats: parseInt(document.getElementById("create-seats").value),
-        price: parseFloat(document.getElementById("create-price").value)
-    };
-
-    if (!data.departure || !data.arrival || !data.date || !data.time || !data.seats || !data.price) {
-        alert("Будь ласка, заповніть усі обов'язкові поля.");
-        return;
-    }
-
-    fetch(`${API_BASE_URL}/api/create-ride`, {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-            "ngrok-skip-browser-warning": "true"
-        },
-        body: JSON.stringify(data)
-    })
-    .then(res => res.json())
-    .then(response => {
-        if (response.error) {
-            alert("Помилка: " + response.error);
-        } else {
-            alert("Поїздка створена успішно!");
-            navigate("search");
-        }
-    })
-    .catch(err => {
-        alert("Помилка при з'єднанні з сервером.");
-        console.error(err);
-    });
-}

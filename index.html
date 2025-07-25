@@ -9,11 +9,15 @@
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/uk.js"></script>
     <link rel="stylesheet" href="styles.css">
-    <script src="theme.js" type="module"></script>
-    <script src="api.js" type="module"></script>
-    <script src="ui.js" type="module"></script>
-    <script src="rides.js" type="module"></script>
-    <script src="main.js" type="module"></script>
+    <script src="js/main.js"></script>
+    <script src="js/search.js"></script>
+    <script src="js/my-rides.js"></script>
+    <script src="js/create-ride.js"></script>
+    <script src="js/profile.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/modals.js"></script>
+    <script src="js/navigation.js"></script>
+    <script src="js/api.js"></script>
 </head>
 <body>
     <!-- Нижнє меню навігації -->
@@ -114,16 +118,6 @@
                 <div id="driver-ride-modal-results" class="scrollable-content"></div>
             </div>
         </div>
-
-        <div id="passenger-modal" class="modal">
-            <div class="modal-content">
-                <div class="modal-title-box">
-                    <h2 id="passenger-modal-title">Інформація про пасажира</h2>
-                </div>
-                <div id="passenger-modal-results" class="scrollable-content"></div>
-            </div>
-        </div>
-        
     </div>
 </body>
 </html>
