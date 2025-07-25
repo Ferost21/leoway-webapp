@@ -1,3 +1,5 @@
+// api.js
+export const API_BASE_URL = 'https://49c939404297.ngrok-free.app';
 import { renderRides } from './rides.js';
 
 const API_BASE_URL = 'https://49c939404297.ngrok-free.app';
