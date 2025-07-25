@@ -1,1 +1,660 @@
+/* Основний контейнер сторінки */
+.page-container {
+    position: relative;
+    height: calc(100vh - 60px); /* Висота body мінус bottom-nav */
+    overflow: hidden; /* Запобігаємо прокручуванню за межами контенту */
+}
 
+/* Прокручуваний контент */
+.scrollable-content {
+    height: 100%;
+    overflow-y: auto; /* Лише цей блок прокручується */
+    overscroll-behavior: contain; /* Запобігає overscroll-ефекту за межами блоку */
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+/* Вимикаємо прокручування і центруємо .no-rides */
+.scrollable-content.no-rides-container {
+    overflow-y: hidden; /* Вимикаємо прокручування */
+    display: flex;
+    justify-content: center; /* Центруємо горизонтально */
+    align-items: center; /* Центруємо вертикально */
+    height: calc(100% - 60px); /* Висота мінус top offset */
+    margin-top: 60px; /* Компенсація top offset */
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background: var(--bg-color, #f5f5f5);
+    max-width: 600px;
+    margin: 0 auto;
+    height: 100vh;
+    box-sizing: border-box;
+    color: var(--text-color, #222);
+    overflow: hidden; /* Вимикаємо прокручування body */
+    display: flex;
+    flex-direction: column;
+}
+
+input, button {
+    width: 100%;
+    padding: 10px;
+    margin: 10px 0;
+    font-size: 16px;
+    box-sizing: border-box;
+    border-radius: 5px;
+    border: 1px solid var(--border-color, #ccc);
+    background-color: var(--input-bg-color, white);
+    color: var(--text-color, #222);
+}
+
+input {
+    background-color: var(--input-bg-color, white);
+}
+
+button {
+    background: var(--button-bg-color, #27ae60);
+    color: var(--button-text-color, white);
+    border: none;
+    cursor: pointer;
+}
+
+button:hover {
+    background: var(--button-hover-bg-color, #219653);
+}
+
+.suggestions {
+    border: 1px solid var(--border-color, #ccc);
+    border-radius: 5px;
+    max-height: 150px;
+    overflow-y: auto;
+    background: var(--input-bg-color, white);
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    z-index: 10;
+    color: var(--text-color, #222);
+}
+
+.suggestion-item {
+    padding: 10px;
+    cursor: pointer;
+}
+
+.suggestion-item:hover {
+    background: var(--hover-bg-color, #f0f0f0);
+}
+
+#date {
+    appearance: none;
+    background-color: var(--input-bg-color, white);
+    color: var(--text-color, #333);
+    padding: 10px;
+    cursor: pointer;
+}
+
+.flatpickr-calendar {
+    width: 307px; /* Або відповідна ширина, як у інших полів */
+    max-width: 100vw;
+    box-sizing: border-box;
+    left: auto !important;
+    right: auto !important;
+    transform: none;
+}
+
+.flatpickr-calendar.arrowLeft::before,
+.flatpickr-calendar.arrowRight::before {
+    display: none;
+}
+
+#create-date, #create-time {
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+}
+
+@media (max-width: 600px) {
+    #date {
+        background-color: var(--input-bg-color, white);
+        color: var(--text-color, #333);
+        padding: 12px;
+        font-size: 16px;
+    }
+    #date.flatpickr-input {
+        color: var(--text-color, #333);
+    }
+    .flatpickr-calendar {
+        z-index: 1003 !important;
+        position: fixed !important;
+        top: 50% !important;
+        left: 50% !important;
+        transform: translate(-50%, -50%) !important;
+        width: 90% !important;
+        max-height: 80vh !important;
+        overflow-y: auto !important;
+        background: var(--input-bg-color, white) !important;
+        border-radius: 5px !important;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1) !important;
+    }
+    .flatpickr-day {
+        display: block !important;
+    }
+}
+
+.modal {
+    display: none;
+    justify-content: center;
+    align-items: flex-start;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0);
+    z-index: 1002;
+    transition: background 0.3s ease;
+}
+
+.modal.show {
+    display: flex;
+    background: rgba(0, 0, 0, 0.5);
+}
+
+.modal.closing {
+    background: rgba(0, 0, 0, 0);
+}
+
+.modal-content {
+    background: var(--modal-bg-color, #eee);
+    width: 100%;
+    max-width: 600px;
+    height: 100%;
+    overflow: hidden;
+    box-sizing: border-box;
+    padding: 0;
+    border-radius: 0;
+    position: relative;
+    transform: translateX(100%);
+    animation: slideIn 0.3s forwards;
+    display: flex;
+    flex-direction: column;
+}
+
+.modal-content .scrollable-content {
+    margin-top: 90px;
+    padding-bottom: 20px;
+    flex: 1;
+}
+
+.modal.closing .modal-content {
+    animation: slideOut 0.3s forwards;
+}
+
+@keyframes slideIn {
+    from { transform: translateX(100%); }
+    to { transform: translateX(0); }
+}
+
+@keyframes slideOut {
+    from { transform: translateX(0); }
+    to { transform: translateX(100%); }
+}
+
+.modal-title-box {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    background: var(--modal-bg-color, #fff);
+    border-bottom-left-radius: 12px;
+    border-bottom-right-radius: 12px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    padding: 30px 18px 12px;
+    width: 100%;
+    max-width: 600px;
+    margin: 0 auto;
+    box-sizing: border-box;
+    z-index: 1003;
+}
+
+#modal-results, #driver-ride-modal-results {
+    padding: 20px;
+    margin-top: 90px;
+    flex: 1;
+    overflow-y: auto;
+}
+
+#modal-title, #driver-ride-modal-title {
+    font-size: 18px;
+    margin: 0;
+    color: var(--text-color, #222);
+}
+
+.ride-item {
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    background: var(--ride-bg-color, white);
+    border: none;
+    padding: 15px 20px;
+    margin: 12px 0;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    color: var(--text-color, #222);
+}
+
+.ride-item.clickable {
+    cursor: pointer;
+}
+
+.ride-item.clickable:hover {
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+}
+
+.ride-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+.ride-route p {
+    margin: 4px 0;
+    color: var(--text-color, #222);
+}
+
+.route {
+    font-weight: bold;
+    font-size: 16px;
+}
+
+.ride-item:hover {
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+}
+
+.ride-item > .ride-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.ride-actions {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.price-tag {
+    font-weight: bold;
+    font-size: 18px;
+    margin-top: 4px;
+    margin-right: 4px;
+    color: var(--text-color, #222);
+}
+
+.book-button {
+    background: var(--button-bg-color, #27ae60);
+    color: var(--button-text-color, white);
+    border: none;
+    padding: 10px;
+    font-size: 15px;
+    border-radius: 6px;
+    margin-top: 4px;
+    cursor: pointer;
+}
+
+.book-button:hover {
+    background: var(--button-hover-bg-color, #219653);
+}
+
+.cancel-button, .delete-button {
+    background: var(--cancel-button-bg-color, #e74c3c);
+    color: var(--button-text-color, white);
+    border: none;
+    padding: 10px;
+    font-size: 15px;
+    border-radius: 6px;
+    margin-top: 4px;
+    cursor: pointer;
+}
+
+.cancel-button:hover, .delete-button:hover {
+    background: var(--cancel-button-hover-bg-color, #c0392b);
+}
+
+.contact-button {
+    background: var(--contact-button-bg-color, #2980b9);
+    color: var(--button-text-color, white);
+    border: none;
+    padding: 10px;
+    font-size: 15px;
+    border-radius: 6px;
+    margin-top: 4px;
+    cursor: pointer;
+}
+
+.contact-button:hover {
+    background: var(--contact-button-hover-bg-color, #2471a3);
+}
+
+.input-wrapper {
+    position: relative;
+}
+
+.input-wrapper input {
+    padding-right: 40px;
+}
+
+.swap-button {
+    position: absolute;
+    top: 33%;
+    right: 5px;
+    transform: translateY(-50%);
+    width: 30px;
+    height: 30px;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    z-index: 2;
+}
+
+.swap-button.visible {
+    opacity: 1;
+}
+
+.swap-button:hover {
+    background: var(--hover-bg-color, rgba(39, 174, 96, 0.1));
+}
+
+.swap-button:active {
+    background: var(--hover-bg-color, rgba(33, 150, 83, 0.2));
+}
+
+.swap-button::after {
+    content: "⇅";
+    font-size: 20px;
+    color: var(--text-color, #666);
+    line-height: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+}
+
+.swap-button:hover::after {
+    color: var(--button-bg-color, #27ae60);
+}
+
+.swap-button:active::after {
+    color: var(--button-hover-bg-color, #219653);
+}
+
+.no-rides, .no-passengers {
+    text-align: center;
+    font-size: 18px;
+    color: var(--text-color, #666);
+    margin: 0;
+}
+
+.bottom-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: var(--nav-bg-color, #fff);
+    border-top: 1px solid var(--border-color, #ccc);
+    box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1);
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    height: 60px;
+    z-index: 1000;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.nav-item {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    font-size: 12px;
+    color: var(--text-color, #666);
+    cursor: pointer;
+    transition: background 0.2s ease;
+}
+
+.nav-item.active {
+    color: var(--button-bg-color, #27ae60);
+}
+
+.nav-item:hover {
+    background: var(--hover-bg-color, #f0f0f0);
+}
+
+.nav-item svg {
+    width: 24px;
+    height: 24px;
+    margin-bottom: 4px;
+    fill: var(--text-color, #666);
+}
+
+.nav-item.active svg {
+    fill: var(--button-bg-color, #27ae60);
+}
+
+.page {
+    display: none;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.page.active {
+    display: block;
+}
+
+#search-page .scrollable-content,
+#create-page .scrollable-content {
+    padding-top: 60px;
+    padding-bottom: 80px;
+}
+
+#profile-page .scrollable-content {
+    padding-top: 100px;
+    padding-bottom: 80px;
+}
+
+#my-rides-page {
+    padding: 0;
+}
+
+#my-rides-title {
+    font-size: 18px;
+    margin: 0 0 20px;
+    text-align: center;
+    color: var(--text-color, #222);
+}
+
+.status {
+    margin: 4px 0;
+    font-weight: bold;
+}
+
+.status-approved {
+    color: var(--status-approved-color, #27ae60);
+}
+
+.status-pending {
+    color: var(--status-pending-color, #f39c12);
+}
+
+.status-cancelled {
+    color: var(--status-cancelled-color, #e74c3c);
+}
+
+.rides-tab {
+    display: none;
+    height: calc(100% - 60px);
+    margin-top: 60px;
+}
+
+.rides-tab.active {
+    display: block;
+}
+
+.profile-header {
+    text-align: center;
+    padding: 20px;
+    background: var(--modal-bg-color, #eee);
+}
+
+.profile-photo {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-bottom: 10px;
+}
+
+#profile-name {
+    font-size: 24px;
+    color: var(--text-color, #222);
+    margin: 10px 0;
+}
+
+#profile-rating {
+    font-size: 18px;
+    color: var(--text-color, #666);
+}
+
+.tab-button:hover, .tab-button.active {
+    background: transparent;
+    font-weight: bold;
+}
+
+.passengers-list {
+    margin-top: 20px;
+}
+
+.passengers-list h3 {
+    font-size: 18px;
+    margin: 10px 0;
+    color: var(--text-color, #222);
+}
+
+.passenger-item {
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    background: var(--ride-bg-color, white);
+    padding: 15px;
+    margin: 12px 0;
+    display: flex;
+    flex-direction: column; /* Текст зверху, кнопки знизу */
+    /* gap: 10px; */
+}
+
+.passenger-info p {
+    margin: 4px 0;
+    color: var(--text-color, #222);
+}
+
+.passenger-actions {
+    display: flex;
+    flex-direction: row; /* Горизонтальне розташування кнопок */
+    gap: 10px;
+    /* margin-top: 10px; Відступ від тексту зверху */
+    justify-content: flex-end; /* Кнопки вирівняні праворуч */
+}
+
+.approve-button, .cancel-booking-button {
+    flex: 1; /* Кнопки займають рівну ширину */
+    padding: 8px; /* Зменшено відступи для компактності */
+    font-size: 14px; /* Зменшено розмір шрифту */
+    border-radius: 6px;
+    border: none;
+    cursor: pointer;
+    text-align: center;
+}
+
+.approve-button {
+    background: var(--status-approved-color, #27ae60);
+    color: var(--button-text-color, white);
+}
+
+.approve-button:hover {
+    background: var(--button-hover-bg-color, #219653);
+}
+
+.cancel-booking-button {
+    background: var(--cancel-button-bg-color, #e74c3c);
+    color: var(--button-text-color, white);
+}
+
+.cancel-booking-button:hover {
+    background: var(--cancel-button-hover-bg-color, #c0392b);
+}
+
+@media (max-width: 600px) {
+    .passenger-actions {
+        flex-direction: row; /* Залишаємо горизонтальне розташування на мобільних */
+        gap: 8px; /* Зменшуємо відступ між кнопками для малих екранів */
+    }
+    .approve-button, .cancel-booking-button {
+        font-size: 13px; /* Ще менший шрифт для мобільних */
+        padding: 6px; /* Зменшуємо відступи */
+    }
+}
+.my-rides-title-box {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    background: var(--modal-bg-color, #fff);
+    border-bottom-left-radius: 12px;
+    border-bottom-right-radius: 12px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    padding: 46px 18px 0px;
+    width: 100%;
+    max-width: 600px;
+    margin: 0 auto;
+    box-sizing: border-box;
+    z-index: 1002;
+}
+#my-rides-page .scrollable-content {
+    margin-top: 30px; /* Відступ для фіксованого заголовка */
+}
+
+.passenger-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.passenger-photo {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.passenger-text {
+    flex: 1;
+}
