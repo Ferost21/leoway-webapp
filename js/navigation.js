@@ -10,24 +10,20 @@ function navigate(page) {
     document.querySelector(`.nav-item[onclick="navigate('${page}')"]`).classList.add('active');
 
     const pages = document.querySelectorAll('.page');
+    const currentActivePage = document.querySelector('.page.active');
     const newPage = document.getElementById(`${page}-page`);
-    const current = document.querySelector('.page.showing');
 
-    if (current && current !== newPage) {
-        current.classList.remove('showing');
+    // If there's an active page, fade it out
+    if (currentActivePage) {
+        currentActivePage.classList.add('fade-out');
         setTimeout(() => {
-            pages.forEach(p => p.style.display = 'none'); // ховаємо всі
-            newPage.style.display = 'block';
-            requestAnimationFrame(() => {
-                newPage.classList.add('showing');
-            });
-        }, 300); // час анімації
-    } else if (!current) {
-        pages.forEach(p => p.style.display = 'none');
-        newPage.style.display = 'block';
-        requestAnimationFrame(() => {
-            newPage.classList.add('showing');
-        });
+            pages.forEach(p => p.classList.remove('active', 'fade-out', 'fade-in'));
+            newPage.classList.add('active', 'fade-in');
+        }, 300); // Match the CSS transition duration
+    } else {
+        // If no active page, directly fade in the new page
+        pages.forEach(p => p.classList.remove('active', 'fade-in'));
+        newPage.classList.add('active', 'fade-in');
     }
 
     currentPage = page;

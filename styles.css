@@ -464,10 +464,31 @@ button:hover {
     left: 0;
     width: 100%;
     height: 100%;
+    opacity: 0;
+    transition: opacity 0.3s ease;
 }
 
 .page.active {
     display: block;
+    opacity: 1;
+}
+
+.page.fade-in {
+    animation: fadeIn 0.3s ease forwards;
+}
+
+.page.fade-out {
+    animation: fadeOut 0.3s ease forwards;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes fadeOut {
+    from { opacity: 1; }
+    to { opacity: 0; }
 }
 
 #search-page .scrollable-content,
@@ -657,16 +678,4 @@ button:hover {
 
 .passenger-text {
     flex: 1;
-}
-
-.page {
-    opacity: 0;
-    transition: opacity 0.3s ease;
-    pointer-events: none;
-}
-
-.page.showing {
-    display: block;
-    opacity: 1;
-    pointer-events: auto;
 }
