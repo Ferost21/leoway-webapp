@@ -42,6 +42,7 @@ function renderRides(rides, isBooking) {
         const dateStr = dt.toLocaleDateString('uk-UA', { day: '2-digit', month: '2-digit' });
         const statusText = getStatusText(ride.status || '');
         const statusClass = ride.status ? `status-${ride.status}` : '';
+        const occupiedSeats = ride.seats_total - ride.seats_available; // Calculate occupied seats
         if (isBooking) {
             return `
                 <div class="ride-item">
@@ -49,7 +50,7 @@ function renderRides(rides, isBooking) {
                         <div class="ride-route">
                             <p class="route">${ride.departure} → ${ride.arrival}</p>
                             <p>${timeStr}, ${dateStr}</p>
-                            <p>Місць: ${ride.seats_booked}/${ride.seats_total}</p>
+                            <p>Зайнято місць: ${occupiedSeats}/${ride.seats_total}</p>
                             ${ride.status ? `<p class="status ${statusClass}">Статус: ${statusText}</p>` : ''}
                             ${ride.description ? `<p>Опис: ${ride.description}</p>` : ''}
                             <p>Водій: ${ride.driver_name} ★ ${ride.driver_rating.toFixed(1)}</p>
@@ -70,7 +71,7 @@ function renderRides(rides, isBooking) {
                         <div class="ride-route">
                             <p class="route">${ride.departure} → ${ride.arrival}</p>
                             <p>${timeStr}, ${dateStr}</p>
-                            <p>Місць: ${ride.seats_available}/${ride.seats_total}</p>
+                            <p>Зайнято місць: ${occupiedSeats}/${ride.seats_total}</p>
                             ${ride.description ? `<p>Опис: ${ride.description}</p>` : ''}
                         </div>
                         <div class="price-tag">${ride.price} ₴</div>
