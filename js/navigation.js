@@ -10,33 +10,23 @@ function navigate(page) {
     document.querySelector(`.nav-item[onclick="navigate('${page}')"]`).classList.add('active');
 
     const pages = document.querySelectorAll('.page');
-    const currentActive = document.querySelector('.page.active');
-    const nextPage = document.getElementById(`${page}-page`);
+    const current = document.querySelector('.page.fade-in');
+    const next = document.getElementById(`${page}-page`);
 
-    if (currentActive !== nextPage) {
-        if (currentActive) {
-            currentActive.classList.remove('active');
-        }
+    if (current === next) return;
 
-        // Затримка, щоб спрацював fade-out
-        setTimeout(() => {
-            pages.forEach(p => {
-                if (p !== nextPage) {
-                    p.style.display = 'none';
-                }
-            });
+    if (current) {
+        current.classList.remove('fade-in');
+        current.style.zIndex = 0;
+    }
 
-            nextPage.style.display = 'block';
-            requestAnimationFrame(() => {
-                nextPage.classList.add('active');
-            });
+    next.classList.add('fade-in');
+    next.style.zIndex = 1;
 
-            currentPage = page;
-            window.history.pushState({ page }, document.title);
+    currentPage = page;
+    window.history.pushState({ page }, document.title);
 
-            if (page === 'my-rides') {
-                loadMyRides();
-            }
-        }, 50); // Мінімальна затримка для плавного переходу
+    if (page === 'my-rides') {
+        loadMyRides();
     }
 }
