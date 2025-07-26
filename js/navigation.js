@@ -10,18 +10,25 @@ function navigate(page) {
     document.querySelector(`.nav-item[onclick="navigate('${page}')"]`).classList.add('active');
 
     const pages = document.querySelectorAll('.page');
-    const current = document.querySelector('.page.fade-in');
-    const next = document.getElementById(`${page}-page`);
+    const newPage = document.getElementById(`${page}-page`);
+    const current = document.querySelector('.page.showing');
 
-    if (current === next) return;
-
-    if (current) {
-        current.classList.remove('fade-in');
-        current.style.zIndex = 0;
+    if (current && current !== newPage) {
+        current.classList.remove('showing');
+        setTimeout(() => {
+            pages.forEach(p => p.style.display = 'none'); // ховаємо всі
+            newPage.style.display = 'block';
+            requestAnimationFrame(() => {
+                newPage.classList.add('showing');
+            });
+        }, 300); // час анімації
+    } else if (!current) {
+        pages.forEach(p => p.style.display = 'none');
+        newPage.style.display = 'block';
+        requestAnimationFrame(() => {
+            newPage.classList.add('showing');
+        });
     }
-
-    next.classList.add('fade-in');
-    next.style.zIndex = 1;
 
     currentPage = page;
     window.history.pushState({ page }, document.title);
