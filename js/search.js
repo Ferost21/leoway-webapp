@@ -72,8 +72,8 @@ async function submitSearch() {
         });
         if (!res.ok) throw new Error('Не вдалося отримати поїздки');
         const rides = await res.json();
-        const modalResults = document.getElementById('modal-results');
-        modalResults.innerHTML = rides.length === 0
+        const searchResults = document.getElementById('search-results');
+        searchResults.innerHTML = rides.length === 0
             ? '<div class="no-rides">Поїздок не знайдено.</div>'
             : rides.map(ride => {
                 const dt = new Date(ride.departure_time);
@@ -94,38 +94,24 @@ async function submitSearch() {
                         <button class="book-button" onclick="bookRide(${ride.id}, ${seats}, '${ride.driver_telegram_id}')">Забронювати</button>
                     </div>`;
             }).join('');
-        document.getElementById('modal-title').textContent = `${departure} → ${arrival}`;
 
-        const modalTitleBox = document.querySelector('.modal-title-box');
-        const oldSubtitle = modalTitleBox.querySelector('p');
+        document.getElementById('search-results-title').textContent = `${departure} → ${arrival}`;
+
+        const titleBox = document.querySelector('#search-results-page .my-rides-title-box');
+        const oldSubtitle = titleBox.querySelector('p');
         if (oldSubtitle) oldSubtitle.remove();
 
         const subtitle = document.createElement('p');
         subtitle.style.margin = '4px 0 0';
         subtitle.style.fontSize = '14px';
         subtitle.style.color = 'var(--text-color, #555)';
-
         const seatsNumber = parseInt(seats);
         const seatWord = seatsNumber === 1 ? 'пасажир' : (seatsNumber >= 2 && seatsNumber <= 4 ? 'пасажири' : 'пасажирів');
-
         subtitle.textContent = `${formatShortDate(date)}, ${seatsNumber} ${seatWord}`;
-        modalTitleBox.appendChild(subtitle);
-        const modal = document.getElementById('modal');
-        modal.style.display = 'flex';
-        requestAnimationFrame(() => {
-            modal.classList.add('show');
-        });
-        modal.classList.remove('closing');
+        titleBox.appendChild(subtitle);
 
-        Telegram.WebApp.BackButton.show();
-        Telegram.WebApp.BackButton.onClick(() => {
-            closeModal();
-        });
-
-        isModalOpen = true;
-        setTimeout(() => {
-            window.history.pushState({ modalOpen: true }, '');
-        }, 100);
+        // Переходимо на сторінку результатів
+        navigate('search-results');
     } catch (err) {
         alert('Помилка при пошуку поїздок: ' + err.message);
     }

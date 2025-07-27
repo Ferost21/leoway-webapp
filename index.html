@@ -15,10 +15,8 @@
     <script src="js/create-ride.js"></script>
     <script src="js/profile.js"></script>
     <script src="js/utils.js"></script>
-    <script src="js/modals.js"></script>
     <script src="js/navigation.js"></script>
     <script src="js/api.js"></script>
-    <script src="script.js" defer></script>
 </head>
 <body>
     <!-- Нижнє меню навігації -->
@@ -105,18 +103,25 @@
         </div>
 
         <!-- Модальне вікно -->
-        <div id="modal" class="modal" style="display: none;">
-            <div class="modal-content">
-                <div class="modal-title-box">
-                    <h2 id="modal-title"></h2>
+        <div class="page" id="search-results-page" style="display: none;">
+            <div class="page-container">
+                <div class="my-rides-title-box">
+                    <h2 id="search-results-title">Результати пошуку</h2>
+                    <!-- Сюди додаємо підзаголовок із датою та кількістю пасажирів -->
                 </div>
-                <div class="scrollable-content" id="modal-results"></div>
+                <div class="scrollable-content">
+                    <div id="search-results"></div>
+                </div>
             </div>
         </div>
 
-        <div id="driver-ride-modal" class="modal">
-            <div class="modal-content">
-                <div id="driver-ride-modal-results" class="scrollable-content"></div>
+        <div class="page" id="driver-ride-details-page" style="display: none;">
+            <div class="page-container">
+                <!-- <div class="my-rides-title-box">
+                </div> -->
+                <div class="scrollable-content">
+                    <div id="driver-ride-details-results"></div>
+                </div>
             </div>
         </div>
     </div>

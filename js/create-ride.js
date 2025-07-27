@@ -37,7 +37,7 @@ function submitCreateRide() {
             alert("Помилка: " + response.error);
         } else {
             alert("Поїздка створена успішно!");
-            navigate("search");
+            navigate("search"); // Повернення на головну сторінку
         }
     })
     .catch(err => {

@@ -38,11 +38,6 @@ function updateTheme() {
 document.addEventListener('DOMContentLoaded', () => {
     webApp.ready();
     updateTheme();
-    webApp.onEvent('themeChanged', updateTheme);
-
-    // Явно приховуємо модальні вікна при завантаженні
-    document.getElementById('modal').style.display = 'none';
-    document.getElementById('driver-ride-modal').style.display = 'none';
 
     try {
         flatpickr("#date", {
@@ -78,8 +73,6 @@ document.addEventListener('DOMContentLoaded', () => {
     setupSuggestions('create-departure', 'create-departure-suggestions');
     setupSuggestions('create-arrival', 'create-arrival-suggestions');
 
-    Telegram.WebApp.BackButton.hide();
-
     function updateSwapButtonVisibility() {
         const departure = document.getElementById('departure').value.trim();
         const arrival = document.getElementById('arrival').value.trim();
@@ -92,21 +85,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     updateSwapButtonVisibility();
-
-    window.addEventListener('popstate', (event) => {
-        const modal = document.getElementById('modal');
-        const driverRideModal = document.getElementById('driver-ride-modal');
-        if (event.state && event.state.driverRideModalOpen && isDriverRideModalOpen) {
-            closeDriverRideModal();
-        } else if (event.state && event.state.modalOpen && isModalOpen) {
-            closeModal();
-        } else {
-            navigate(event.state?.page || 'search');
-        }
-    });
-
-    // Ініціалізуємо історію зі сторінкою search
-    window.history.replaceState({ page: 'search' }, document.title);
 
     // Ініціалізація користувача
     const user = webApp.initDataUnsafe.user;
@@ -140,19 +118,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // Встановлюємо сторінку пошуку за замовчуванням
-    currentPage = 'search';
-    const navItems = document.querySelectorAll('.nav-item');
-    navItems.forEach(item => item.classList.remove('active'));
-    document.querySelector(`.nav-item[onclick="navigate('search')"]`).classList.add('active');
-
-    const pages = document.querySelectorAll('.page');
-    pages.forEach(p => p.classList.remove('active'));
-    document.getElementById('search-page').classList.add('active');
-
+    // Ініціалізація сторінки через navigate
+    navigate('search');
     loadProfile();
-
-    if (currentPage === 'my-rides') {
-        loadMyRides();
-    }
 });

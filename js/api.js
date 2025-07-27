@@ -95,7 +95,18 @@ async function approveBooking(bookingId, rideId) {
         if (!res.ok) throw new Error('Помилка підтвердження бронювання');
         const result = await res.json();
         alert(`Бронювання ${bookingId} підтверджено!`);
-        showDriverRideDetails(rideId, document.querySelector('.ride-details .route').textContent.split(' → ')[0], document.querySelector('.ride-details .route').textContent.split(' → ')[1], document.querySelector('.ride-details p:nth-child(2)').textContent.split(', ')[0], document.querySelector('.ride-details p:nth-child(2)').textContent.split(', ')[1], parseInt(document.querySelector('.ride-details p:nth-child(3)').textContent.split('/')[0].replace('Місць: ', '')), parseInt(document.querySelector('.ride-details p:nth-child(3)').textContent.split('/')[1]), parseFloat(document.querySelector('.ride-details p:nth-child(5)').textContent.replace('Ціна: ', '').replace(' ₴', '')), document.querySelector('.ride-details p:nth-child(4)')?.textContent?.replace('Опис: ', '') || '');
+        const details = document.querySelector('#driver-ride-details-results .ride-details');
+        showDriverRideDetails(
+            rideId,
+            details.querySelector('.route').textContent.split(' → ')[0],
+            details.querySelector('.route').textContent.split(' → ')[1],
+            details.querySelector('.ride-date').textContent.split(', ')[0],
+            details.querySelector('.ride-date').textContent.split(', ')[1],
+            parseInt(details.querySelector('p:nth-child(3)').textContent.split('/')[0].replace('Місць: ', '')),
+            parseInt(details.querySelector('p:nth-child(3)').textContent.split('/')[1]),
+            parseFloat(details.querySelector('p:nth-child(5)').textContent.replace('Ціна: ', '').replace(' ₴', '')),
+            details.querySelector('p:nth-child(4)')?.textContent?.replace('Опис: ', '') || ''
+        );
     } catch (err) {
         alert('Помилка при підтвердженні бронювання: ' + err.message);
     }
@@ -117,7 +128,18 @@ async function cancelBooking(bookingId, rideId) {
         if (!res.ok) throw new Error('Помилка скасування бронювання');
         const result = await res.json();
         alert(`Бронювання ${bookingId} скасовано!`);
-        showDriverRideDetails(rideId, document.querySelector('.ride-details .route').textContent.split(' → ')[0], document.querySelector('.ride-details .route').textContent.split(' → ')[1], document.querySelector('.ride-details p:nth-child(2)').textContent.split(', ')[0], document.querySelector('.ride-details p:nth-child(2)').textContent.split(', ')[1], parseInt(document.querySelector('.ride-details p:nth-child(3)').textContent.split('/')[0].replace('Місць: ', '')), parseInt(document.querySelector('.ride-details p:nth-child(3)').textContent.split('/')[1]), parseFloat(document.querySelector('.ride-details p:nth-child(5)').textContent.replace('Ціна: ', '').replace(' ₴', '')), document.querySelector('.ride-details p:nth-child(4)')?.textContent?.replace('Опис: ', '') || '');
+        const details = document.querySelector('#driver-ride-details-results .ride-details');
+        showDriverRideDetails(
+            rideId,
+            details.querySelector('.route').textContent.split(' → ')[0],
+            details.querySelector('.route').textContent.split(' → ')[1],
+            details.querySelector('.ride-date').textContent.split(', ')[0],
+            details.querySelector('.ride-date').textContent.split(', ')[1],
+            parseInt(details.querySelector('p:nth-child(3)').textContent.split('/')[0].replace('Місць: ', '')),
+            parseInt(details.querySelector('p:nth-child(3)').textContent.split('/')[1]),
+            parseFloat(details.querySelector('p:nth-child(5)').textContent.replace('Ціна: ', '').replace(' ₴', '')),
+            details.querySelector('p:nth-child(4)')?.textContent?.replace('Опис: ', '') || ''
+        );
     } catch (err) {
         alert('Помилка при скасуванні бронювання: ' + err.message);
     }
@@ -139,8 +161,7 @@ async function deleteRide(rideId) {
         if (!res.ok) throw new Error('Помилка видалення поїздки');
         const result = await res.json();
         alert(`Поїздка ${rideId} видалена!`);
-        closeDriverRideModal();
-        loadMyRides();
+        navigate('my-rides');
     } catch (err) {
         alert('Помилка при видаленні поїздки: ' + err.message);
     }

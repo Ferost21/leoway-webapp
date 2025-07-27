@@ -4,6 +4,7 @@ async function loadMyRides() {
         document.getElementById('my-rides-results').innerHTML = '<div class="no-rides">Не вдалося отримати ваш Telegram ID!</div>';
         const scrollableContent = document.querySelector('#my-rides-page .scrollable-content');
         scrollableContent.classList.add('no-rides-container');
+        console.error('Не вдалося отримати Telegram ID');
         return;
     }
 
@@ -28,7 +29,34 @@ async function loadMyRides() {
         }
 
         scrollableContent.scrollTop = 0;
+
+        // Перевіряємо хеш для автоматичного відкриття деталей
+        const hash = location.hash.replace('#', '');
+        const [page, rideId] = hash.split('/');
+        if (page === 'my-rides' && rideId && !document.getElementById('driver-ride-details-page').classList.contains('active')) {
+            const ride = rides.find(r => r.ride_id === parseInt(rideId));
+            if (ride) {
+                const dt = new Date(ride.departure_time);
+                const timeStr = dt.toLocaleTimeString('uk-UA', { hour: '2-digit', minute: '2-digit' });
+                const dateStr = dt.toLocaleDateString('uk-UA', { day: '2-digit', month: '2-digit' });
+                showDriverRideDetails(
+                    ride.ride_id,
+                    ride.departure,
+                    ride.arrival,
+                    timeStr,
+                    dateStr,
+                    ride.seats_available,
+                    ride.seats_total,
+                    ride.price,
+                    ride.description || ''
+                );
+            } else {
+                console.error(`Поїздка з rideId: ${rideId} не знайдена`);
+                navigate('my-rides');
+            }
+        }
     } catch (err) {
+        console.error('Помилка при завантаженні поїздок:', err.message);
         document.getElementById('my-rides-results').innerHTML = '<div class="no-rides">Помилка при завантаженні поїздок: ' + err.message + '</div>';
         const scrollableContent = document.querySelector('#my-rides-page .scrollable-content');
         scrollableContent.classList.add('no-rides-container');
@@ -42,7 +70,7 @@ function renderRides(rides, isBooking) {
         const dateStr = dt.toLocaleDateString('uk-UA', { day: '2-digit', month: '2-digit' });
         const statusText = getStatusText(ride.status || '');
         const statusClass = ride.status ? `status-${ride.status}` : '';
-        const occupiedSeats = ride.seats_total - ride.seats_available; // Calculate occupied seats
+        const occupiedSeats = ride.seats_total - ride.seats_available;
         if (isBooking) {
             return `
                 <div class="ride-item">
@@ -66,7 +94,7 @@ function renderRides(rides, isBooking) {
                 </div>`;
         } else {
             return `
-                <div class="ride-item clickable" onclick="showDriverRideDetails(${ride.ride_id}, '${ride.departure}', '${ride.arrival}', '${timeStr}', '${dateStr}', ${ride.seats_available}, ${ride.seats_total}, ${ride.price}, '${ride.description || ''}')">
+                <div class="ride-item clickable" data-ride-id="${ride.ride_id}" onclick="showDriverRideDetails(${ride.ride_id}, '${ride.departure}', '${ride.arrival}', '${timeStr}', '${dateStr}', ${ride.seats_available}, ${ride.seats_total}, ${ride.price}, '${ride.description || ''}')">
                     <div class="ride-top">
                         <div class="ride-route">
                             <p class="route">${ride.departure} → ${ride.arrival}</p>
@@ -81,10 +109,17 @@ function renderRides(rides, isBooking) {
     }).join('');
 }
 
+function getStatusText(status) {
+    switch (status) {
+        case 'approved': return 'Підтверджено';
+        case 'pending': return 'Очікує';
+        case 'cancelled': return 'Скасовано';
+        default: return '';
+    }
+}
+
 async function showDriverRideDetails(rideId, departure, arrival, time, date, seatsAvailable, seatsTotal, price, description) {
-    const modal = document.getElementById('driver-ride-modal');
-    const modalTitle = document.getElementById('driver-ride-modal-title');
-    const modalResults = document.getElementById('driver-ride-modal-results');
+    const resultsContainer = document.getElementById('driver-ride-details-results');
 
     let formattedDate;
     try {
@@ -97,7 +132,7 @@ async function showDriverRideDetails(rideId, departure, arrival, time, date, sea
             month: 'long' 
         }).replace(/^\w/, c => c.toUpperCase());
     } catch (err) {
-        console.warn('Помилка парсингу дати:', err.message, 'Використовуємо поточну дату');
+        console.error('Помилка парсингу дати:', err.message);
         const fallbackDate = new Date();
         fallbackDate.setHours(time.split(':')[0], time.split(':')[1], 0, 0);
         formattedDate = fallbackDate.toLocaleDateString('uk-UA', { 
@@ -111,8 +146,7 @@ async function showDriverRideDetails(rideId, departure, arrival, time, date, sea
 
     try {
         const tgId = webApp.initDataUnsafe.user?.id;
-        if (!tgId) throw new Error('Не вдалося отримати ваш Telegram ID!');
-
+        if (!tgId) throw new Error('Не вдалося отримати Telegram ID');
         const res = await fetch(`${API_BASE_URL}/api/ride-passengers?rideId=${rideId}&tgId=${tgId}`, {
             headers: { 'ngrok-skip-browser-warning': 'true' }
         });
@@ -129,7 +163,6 @@ async function showDriverRideDetails(rideId, departure, arrival, time, date, sea
                     passengerNameText = `<p><strong>${passenger.passenger_name}</strong></p>`;
                 } else {
                     const otherPassengers = passenger.seats_booked - 1;
-                    // Змінюємо цю частину, щоб завжди виводити "+ число"
                     passengerNameText = `<p><strong>${passenger.passenger_name} (+${otherPassengers})</strong></p>`;
                 }
                 const photoUrl = passenger.photo_url || 'https://t.me/i/userpic/320/default.svg';
@@ -152,7 +185,7 @@ async function showDriverRideDetails(rideId, departure, arrival, time, date, sea
                 `;
             }).join('');
 
-        modalResults.innerHTML = `
+        resultsContainer.innerHTML = `
             <div class="ride-details">
                 <p class="ride-date">${time}, ${formattedDate}</p>
                 <p class="route">${departure} → ${arrival}</p>
@@ -167,7 +200,8 @@ async function showDriverRideDetails(rideId, departure, arrival, time, date, sea
                 <button class="delete-button" onclick="deleteRide(${rideId})">Видалити поїздку</button>
             </div>`;
     } catch (err) {
-        modalResults.innerHTML = `
+        console.error('Помилка при завантаженні пасажирів:', err.message);
+        resultsContainer.innerHTML = `
             <div class="ride-details">
                 <p class="ride-date">${time}, ${formattedDate}</p>
                 <p class="route">${departure} → ${arrival}</p>
@@ -183,19 +217,5 @@ async function showDriverRideDetails(rideId, departure, arrival, time, date, sea
             </div>`;
     }
 
-    modal.style.display = 'flex';
-    requestAnimationFrame(() => {
-        modal.classList.add('show');
-    });
-    modal.classList.remove('closing');
-
-    Telegram.WebApp.BackButton.show();
-    Telegram.WebApp.BackButton.onClick(() => {
-        closeDriverRideModal();
-    });
-
-    isDriverRideModalOpen = true;
-    setTimeout(() => {
-        window.history.pushState({ driverRideModalOpen: true }, '');
-    }, 100);
+    navigate('driver-ride-details', { rideId });
 }
