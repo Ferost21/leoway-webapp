@@ -1,4 +1,4 @@
-const pages = ['search', 'create', 'my-rides', 'profile', 'search-results', 'driver-ride-details'];
+const pages = ['search', 'create', 'my-rides', 'profile', 'search-results', 'driver-ride-details', 'passenger-info'];
 let isNavigating = false;
 
 function navigate(page, params = {}) {
@@ -9,7 +9,7 @@ function navigate(page, params = {}) {
     isNavigating = true;
 
     if (!pages.includes(page)) {
-        console.error(`Сторінка ${page} не знайдена`);
+        console.error(`Page ${page} not found`);
         navigate('search');
         isNavigating = false;
         return;
@@ -19,7 +19,7 @@ function navigate(page, params = {}) {
     const newPage = document.getElementById(`${page}-page`);
 
     if (!newPage) {
-        console.error(`Елемент сторінки #${page}-page не знайдено`);
+        console.error(`Page element #${page}-page not found`);
         navigate('search');
         isNavigating = false;
         return;
@@ -58,10 +58,12 @@ function navigate(page, params = {}) {
         hash = `#my-rides/${params.rideId}`;
     } else if (page === 'search-results' && params.departure && params.arrival && params.date && params.seats) {
         hash = `#search-results/${encodeURIComponent(params.departure)}/${encodeURIComponent(params.arrival)}/${params.date}/${params.seats}`;
+    } else if (page === 'passenger-info' && params.rideId && params.bookingId) {
+        hash = `#my-rides/${params.rideId}/${params.bookingId}`;
     }
     history.pushState({ page, ...params }, '', hash);
 
-    if (['search-results', 'driver-ride-details'].includes(page)) {
+    if (['search-results', 'driver-ride-details', 'passenger-info'].includes(page)) {
         Telegram.WebApp.BackButton.show();
     } else {
         Telegram.WebApp.BackButton.hide();
@@ -88,11 +90,15 @@ window.addEventListener('load', () => {
         return;
     }
 
-    const [page, ...params] = hash.split('/');
+    const [page, rideId, bookingId] = hash.split('/');
     if (pages.includes(page)) {
-        navigate(page, { params });
-    } else if (page === 'my-rides' && params[0]) {
-        navigate('driver-ride-details', { rideId: params[0] });
+        navigate(page, { rideId, bookingId });
+    } else if (page === 'my-rides' && rideId) {
+        if (bookingId) {
+            navigate('passenger-info', { rideId, bookingId });
+        } else {
+            navigate('driver-ride-details', { rideId });
+        }
     } else {
         navigate('search');
     }
@@ -105,24 +111,20 @@ window.addEventListener('popstate', () => {
         return;
     }
 
-    const [page, ...params] = hash.split('/');
+    const [page, rideId, bookingId] = hash.split('/');
     if (pages.includes(page)) {
-        navigate(page, { params });
-    } else if (page === 'my-rides' && params[0]) {
-        navigate('driver-ride-details', { rideId: params[0] });
+        navigate(page, { rideId, bookingId });
+    } else if (page === 'my-rides' && rideId) {
+        if (bookingId) {
+            navigate('passenger-info', { rideId, bookingId });
+        } else {
+            navigate('driver-ride-details', { rideId });
+        }
     } else {
         navigate('search');
     }
 });
 
 Telegram.WebApp.BackButton.onClick(() => {
-    const currentHash = location.hash.replace('#', '');
-    const [currentPage] = currentHash.split('/');
-    if (currentPage === 'search-results') {
-        navigate('search');
-    } else if (currentPage === 'my-rides' && currentHash.includes('/')) {
-        navigate('my-rides');
-    } else {
-        navigate('search');
-    }
+    history.back();
 });

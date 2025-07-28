@@ -1,0 +1,34 @@
+/* Global reset and base styles */
+:root {
+    --bg-color: #f5f5f5;
+    --text-color: #222;
+    --border-color: #ccc;
+    --input-bg-color: white;
+    --button-bg-color: #27ae60;
+    --button-text-color: white;
+    --button-hover-bg-color: #219653;
+    --hover-bg-color: #f0f0f0;
+    --modal-bg-color: #eee;
+    --ride-bg-color: white;
+    --nav-bg-color: white;
+    --cancel-button-bg-color: #e74c3c;
+    --cancel-button-hover-bg-color: #c0392b;
+    --status-approved-color: #27ae60;
+    --status-pending-color: #f39c12;
+    --status-cancelled-color: #e74c3c;
+    --contact-button-bg-color: #2980b9;
+    --contact-button-hover-bg-color: #2471a3;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background: var(--bg-color);
+    max-width: 600px;
+    margin: 0 auto;
+    height: 100vh;
+    box-sizing: border-box;
+    color: var(--text-color);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}

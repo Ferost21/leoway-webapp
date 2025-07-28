@@ -116,6 +116,7 @@ async function cancelBooking(bookingId, rideId) {
     const tgId = webApp.initDataUnsafe.user?.id;
     if (!tgId) return alert('Не вдалося отримати ваш Telegram ID!');
     if (!confirm('Ви впевнені, що хочете скасувати це бронювання?')) return;
+
     try {
         const res = await fetch(`${API_BASE_URL}/api/update-booking-status`, {
             method: 'POST',
@@ -123,9 +124,12 @@ async function cancelBooking(bookingId, rideId) {
                 'Content-Type': 'application/json',
                 'ngrok-skip-browser-warning': 'true'
             },
-            body: JSON.stringify({ bookingId, tgId, status: 'cancel' })
+            body: JSON.stringify({ bookingId, tgId, status: 'cancel', rideId })
         });
-        if (!res.ok) throw new Error('Помилка скасування бронювання');
+        if (!res.ok) {
+            const errorText = await res.text();
+            throw new Error(`Помилка скасування бронювання: ${errorText || 'Сервер повернув помилку'}`);
+        }
         const result = await res.json();
         alert(`Бронювання ${bookingId} скасовано!`);
         const details = document.querySelector('#driver-ride-details-results .ride-details');
@@ -141,7 +145,7 @@ async function cancelBooking(bookingId, rideId) {
             details.querySelector('p:nth-child(4)')?.textContent?.replace('Опис: ', '') || ''
         );
     } catch (err) {
-        alert('Помилка при скасуванні бронювання: ' + err.message);
+        alert(err.message);
     }
 }
 

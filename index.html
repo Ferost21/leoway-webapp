@@ -8,7 +8,12 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/uk.js"></script>
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="css/base.css">
+    <link rel="stylesheet" href="css/navigation.css">
+    <link rel="stylesheet" href="css/page.css">
+    <link rel="stylesheet" href="css/form.css">
+    <link rel="stylesheet" href="css/ride.css">
+    <link rel="stylesheet" href="css/profile.css">
     <script src="js/main.js"></script>
     <script src="js/search.js"></script>
     <script src="js/my-rides.js"></script>
@@ -121,6 +126,22 @@
                 </div> -->
                 <div class="scrollable-content">
                     <div id="driver-ride-details-results"></div>
+                </div>
+            </div>
+        </div>
+
+        <div id="passenger-info-page" class="page">
+            <div class="scrollable-content">
+                <div class="profile-header">
+                    <img id="passenger-photo" class="passenger-photo" src="https://placehold.co/100x100" alt="Passenger Photo">
+                    <h2 id="passenger-name">Невідомий пасажир</h2>
+                    <p id="passenger-rating">Рейтинг: ★N/A</p>
+                    <p id="passenger-status">Статус: N/A</p>
+                    <p id="passenger-booking-id">Бронювання №0</p>
+                    <div class="passenger-actions">
+                        <button id="approve-booking-btn" class="approve-button">Підтвердити</button>
+                        <button id="cancel-booking-btn" class="cancel-booking-button">Скасувати</button>
+                    </div>
                 </div>
             </div>
         </div>

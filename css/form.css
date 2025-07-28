@@ -1,0 +1,139 @@
+input, button, textarea {
+    width: 100%;
+    padding: 10px;
+    margin: 10px 0;
+    font-size: 16px;
+    box-sizing: border-box;
+    border-radius: 5px;
+    border: 1px solid var(--border-color);
+    background: var(--input-bg-color);
+    color: var(--text-color);
+}
+
+button {
+    background: var(--button-bg-color);
+    color: var(--button-text-color);
+    border: none;
+    cursor: pointer;
+}
+
+button:hover {
+    background: var(--button-hover-bg-color);
+}
+
+.suggestions {
+    border: 1px solid var(--border-color);
+    border-radius: 5px;
+    max-height: 150px;
+    overflow-y: auto;
+    background: var(--input-bg-color);
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    z-index: 10;
+    color: var(--text-color);
+}
+
+.suggestion-item {
+    padding: 10px;
+    cursor: pointer;
+}
+
+.suggestion-item:hover {
+    background: var(--hover-bg-color);
+}
+
+#date, #create-date, #create-time {
+    appearance: none;
+    cursor: pointer;
+}
+
+.flatpickr-calendar {
+    width: 307px;
+    max-width: 100vw;
+    box-sizing: border-box;
+    left: auto !important;
+    right: auto !important;
+    transform: none;
+}
+
+.flatpickr-calendar.arrowLeft::before,
+.flatpickr-calendar.arrowRight::before {
+    display: none;
+}
+
+.input-wrapper {
+    position: relative;
+}
+
+.input-wrapper input {
+    padding-right: 40px;
+}
+
+.swap-button {
+    position: absolute;
+    top: 33%;
+    right: 5px;
+    transform: translateY(-50%);
+    width: 30px;
+    height: 30px;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.swap-button.visible {
+    opacity: 1;
+}
+
+.swap-button:hover {
+    background: rgba(39, 174, 96, 0.1);
+}
+
+.swap-button:active {
+    background: rgba(33, 150, 83, 0.2);
+}
+
+.swap-button::after {
+    content: "⇅";
+    font-size: 20px;
+    color: var(--text-color);
+}
+
+.swap-button:hover::after {
+    color: var(--button-bg-color);
+}
+
+.swap-button:active::after {
+    color: var(--button-hover-bg-color);
+}
+
+@media (max-width: 600px) {
+    #date, #create-date, #create-time {
+        padding: 12px;
+        font-size: 16px;
+    }
+    .flatpickr-calendar {
+        z-index: 1003 !important;
+        position: fixed !important;
+        top: 50% !important;
+        left: 50% !important;
+        transform: translate(-50%, -50%) !important;
+        width: 90% !important;
+        max-height: 80vh !important;
+        overflow-y: auto !important;
+        background: var(--input-bg-color) !important;
+        border-radius: 5px !important;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1) !important;
+    }
+    .flatpickr-day {
+        display: block !important;
+    }
+}
