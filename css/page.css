@@ -64,7 +64,8 @@
     box-sizing: border-box;
 }
 
-.scrollable-content.no-rides-container {
+.scrollable-content.no-rides-container,
+.scrollable-content.no-messages-container {
     overflow-y: hidden;
     display: flex;
     justify-content: center;
@@ -90,9 +91,163 @@
     padding-bottom: 20px;
 }
 
-#my-rides-page .scrollable-content {
-    margin-top: 55px; /* Increased from 30px to 90px to align with title box height */
+#my-rides-page .scrollable-content,
+#inbox-page .scrollable-content {
+    margin-top: 55px;
     padding-bottom: 20px;
+}
+
+#passenger-info-page .scrollable-content {
+    margin-top: 55px;
+    padding-bottom: 120px;
+}
+
+#chat-page {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh;
+    background: var(--modal-bg-color);
+    z-index: 1005;
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box;
+}
+
+.chat-header {
+    position: sticky;
+    top: 0;
+    background: var(--modal-bg-color);
+    padding: 10px 20px;
+    border-bottom: 1px solid var(--border-color);
+    z-index: 102;
+    display: flex;
+    align-items: center;
+    min-height: 60px; /* Фіксована висота для точного розрахунку */
+}
+
+.chat-header-content {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+}
+
+#chat-contact-photo {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+}
+
+.chat-contact-info {
+    display: flex;
+    flex-direction: column;
+}
+
+#chat-contact-name {
+    font-size: 16px;
+    font-weight: bold;
+    color: var(--text-color);
+}
+
+#chat-booking-id {
+    margin: 2px 0 0 0;
+    font-size: 12px;
+    color: var(--text-secondary-color);
+}
+
+.chat-messages {
+    flex-grow: 1;
+    overflow-y: auto;
+    padding: 10px 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    min-height: 0;
+    box-sizing: border-box;
+    /* Враховуємо висоту chat-header (60px) і chat-input (60px) */
+    max-height: calc(100vh - 163px);
+    overscroll-behavior: contain;
+}
+
+.message {
+    max-width: 80%;
+    padding: 10px;
+    border-radius: 8px;
+    word-wrap: break-word;
+}
+
+.message.sent {
+    background-color: var(--button-bg-color);
+    color: var(--button-text-color);
+    margin-left: auto;
+}
+
+.message.received {
+    background-color: var(--modal-bg-color);
+    color: var(--text-color);
+    margin-right: auto;
+    border: 1px solid var(--border-color);
+}
+
+.message p {
+    margin: 0;
+    font-size: 14px;
+}
+
+.message-time {
+    font-size: 12px;
+    color: var(--text-secondary-color);
+    text-align: right;
+    display: block;
+    margin-top: 5px;
+}
+
+.chat-input {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: var(--modal-bg-color);
+    padding: 10px 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    border-top: 1px solid var(--border-color);
+    z-index: 103;
+    box-sizing: border-box;
+    min-height: 60px; /* Фіксована висота для точного розрахунку */
+}
+
+.chat-input input {
+    flex-grow: 1;
+    padding: 10px;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    font-size: 14px;
+}
+
+.chat-input button {
+    background: var(--button-bg-color);
+    border: none;
+    border-radius: 8px;
+    padding: 10px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+}
+
+.chat-input button:hover {
+    background: var(--button-hover-bg-color);
+}
+
+.chat-input button svg {
+    width: 24px;
+    height: 24px;
 }
 
 .my-rides-title-box {
@@ -115,8 +270,122 @@
 
 #search-results-title,
 #driver-ride-details-title,
-#my-rides-title {
+#my-rides-title,
+#inbox-title,
+#passenger-info-title {
     font-size: 18px;
     margin: 0;
     color: var(--text-color);
+}
+
+.no-messages {
+    text-align: center;
+    color: var(--text-color);
+    font-size: 16px;
+    margin-top: 20px;
+}
+
+.passenger-container {
+    text-align: center;
+    padding: 20px;
+}
+
+.passenger-container img {
+    border-radius: 50%;
+    width: 100px;
+    height: 100px;
+    margin-bottom: 10px;
+}
+
+.passenger-container h2 {
+    margin: 10px 0;
+    font-size: 20px;
+    color: var(--text-color);
+}
+
+.passenger-container p {
+    margin: 5px 0;
+    font-size: 16px;
+    color: var(--text-color);
+}
+
+.passenger-actions {
+    margin-top: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+}
+
+.passenger-actions button {
+    width: 200px;
+    padding: 10px;
+    font-size: 16px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.passenger-actions #approve-booking-btn {
+    background-color: var(--button-bg-color);
+    color: var(--button-text-color);
+}
+
+.passenger-actions #approve-booking-btn:hover {
+    background-color: var(--button-hover-bg-color);
+}
+
+.passenger-actions #cancel-booking-btn {
+    background-color: var(--cancel-button-bg-color);
+    color: var(--button-text-color);
+}
+
+.passenger-actions #cancel-booking-btn:hover {
+    background-color: var(--cancel-button-hover-bg-color);
+}
+
+.passenger-actions #contact-passenger-btn {
+    background-color: var(--contact-button-bg-color);
+    color: var(--button-text-color);
+}
+
+.passenger-actions #contact-passenger-btn:hover {
+    background-color: var(--contact-button-hover-bg-color);
+}
+
+.conversation-list {
+    display: block;
+}
+
+.conversation-item {
+    padding: 10px;
+    border-bottom: 1px solid var(--border-color);
+    cursor: pointer;
+}
+
+.conversation-item:hover {
+    background-color: var(--hover-bg-color);
+}
+
+.conversation-info h3 {
+    margin: 0;
+    font-size: 16px;
+    color: var(--text-color);
+}
+
+.conversation-info p {
+    margin: 5px 0;
+    font-size: 14px;
+    color: var(--text-secondary-color);
+}
+
+.last-message {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.last-message-time {
+    font-size: 12px;
+    color: var(--text-secondary-color);
 }

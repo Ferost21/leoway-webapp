@@ -19,7 +19,10 @@ async function bookRide(rideId, seats, driverTelegramId) {
                 seats
             })
         });
-        if (!res.ok) throw new Error('Помилка бронювання');
+        if (!res.ok) {
+            const errorData = await res.json();
+            throw new Error(errorData.detail || 'Помилка бронювання');
+        }
         const result = await res.json();
         alert(`Бронювання створено! Номер: ${result.bookingId}`);
         if (currentPage === 'my-rides') {
@@ -42,7 +45,10 @@ async function cancelRide(bookingId) {
             },
             body: JSON.stringify({ bookingId, tgId })
         });
-        if (!res.ok) throw new Error('Помилка скасування бронювання');
+        if (!res.ok) {
+            const errorData = await res.json();
+            throw new Error(errorData.detail || 'Помилка скасування бронювання');
+        }
         const result = await res.json();
         alert(`Бронювання ${bookingId} скасовано!`);
         loadMyRides();
@@ -51,7 +57,7 @@ async function cancelRide(bookingId) {
     }
 }
 
-async function contactDriver(driverTelegramId, bookingId) {
+async function contactDriver(driverTelegramId, bookingId, rideId) {
     const userTgId = webApp.initDataUnsafe.user?.id;
     if (!userTgId) {
         alert('Не вдалося отримати ваш Telegram ID!');
@@ -66,17 +72,80 @@ async function contactDriver(driverTelegramId, bookingId) {
         return;
     }
     try {
-        await fetch(`${API_BASE_URL}/api/log-contact-attempt`, {
+        const res = await fetch(`${API_BASE_URL}/api/start-chat`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
                 'ngrok-skip-browser-warning': 'true'
             },
-            body: JSON.stringify({ userTgId, bookingId, driverTelegramId })
+            body: JSON.stringify({ userTgId, bookingId, contactTgId: driverTelegramId, rideId })
         });
-        webApp.openTelegramLink(`https://t.me/pdsdk_bot?start=contact_${driverTelegramId}_${bookingId}`);
+        if (!res.ok) {
+            const errorData = await res.json();
+            throw new Error(errorData.detail || 'Помилка при створенні чату');
+        }
+        const result = await res.json();
+        // Отримуємо ім’я водія з API, якщо можливо
+        const driverRes = await fetch(`${API_BASE_URL}/api/ride-passengers?rideId=${rideId}&tgId=${userTgId}`, {
+            headers: { 'ngrok-skip-browser-warning': 'true' }
+        });
+        let contactName = 'Водій';
+        if (driverRes.ok) {
+            const passengers = await driverRes.json();
+            const driver = passengers.find(p => p.passenger_telegram_id === driverTelegramId);
+            contactName = driver?.passenger_name || 'Водій';
+        } else {
+            console.warn(`Failed to fetch driver info: ${driverRes.status} ${driverRes.statusText}`);
+        }
+        navigate('chat', { chatId: result.chatId, contactName, bookingId, rideId });
     } catch (err) {
         alert(`Не вдалося відкрити чат з водієм: ${err.message}. Спробуйте ще раз або зв’яжіться з підтримкою.`);
+    }
+}
+
+async function contactPassenger(passengerTelegramId, bookingId, rideId) {
+    const userTgId = webApp.initDataUnsafe.user?.id;
+    if (!userTgId) {
+        alert('Не вдалося отримати ваш Telegram ID!');
+        return;
+    }
+    if (!passengerTelegramId || !/^\d+$/.test(passengerTelegramId)) {
+        alert('Не вдалося відкрити чат: пасажир не вказав дійсний Telegram ID');
+        return;
+    }
+    if (passengerTelegramId === String(userTgId)) {
+        alert('Ви не можете відкрити чат із собою!');
+        return;
+    }
+    try {
+        const res = await fetch(`${API_BASE_URL}/api/start-chat`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'ngrok-skip-browser-warning': 'true'
+            },
+            body: JSON.stringify({ userTgId, bookingId, contactTgId: passengerTelegramId, rideId })
+        });
+        if (!res.ok) {
+            const errorData = await res.json();
+            throw new Error(errorData.detail || 'Помилка при створенні чату');
+        }
+        const result = await res.json();
+        // Отримуємо ім’я пасажира з API
+        const passengerRes = await fetch(`${API_BASE_URL}/api/ride-passengers?rideId=${rideId}&tgId=${userTgId}`, {
+            headers: { 'ngrok-skip-browser-warning': 'true' }
+        });
+        let contactName = 'Пасажир';
+        if (passengerRes.ok) {
+            const passengers = await passengerRes.json();
+            const passenger = passengers.find(p => p.passenger_telegram_id === passengerTelegramId);
+            contactName = passenger?.passenger_name || 'Пасажир';
+        } else {
+            console.warn(`Failed to fetch passenger info: ${passengerRes.status} ${passengerRes.statusText}`);
+        }
+        navigate('chat', { chatId: result.chatId, contactName, bookingId, rideId });
+    } catch (err) {
+        alert(`Не вдалося відкрити чат з пасажиром: ${err.message}. Спробуйте ще раз або зв’яжіться з підтримкою.`);
     }
 }
 
@@ -90,9 +159,12 @@ async function approveBooking(bookingId, rideId) {
                 'Content-Type': 'application/json',
                 'ngrok-skip-browser-warning': 'true'
             },
-            body: JSON.stringify({ bookingId, tgId, status: 'approve' })
+            body: JSON.stringify({ bookingId, tgId, status: 'approved' })
         });
-        if (!res.ok) throw new Error('Помилка підтвердження бронювання');
+        if (!res.ok) {
+            const errorData = await res.json();
+            throw new Error(errorData.detail || 'Помилка підтвердження бронювання');
+        }
         const result = await res.json();
         alert(`Бронювання ${bookingId} підтверджено!`);
         const details = document.querySelector('#driver-ride-details-results .ride-details');
@@ -124,11 +196,11 @@ async function cancelBooking(bookingId, rideId) {
                 'Content-Type': 'application/json',
                 'ngrok-skip-browser-warning': 'true'
             },
-            body: JSON.stringify({ bookingId, tgId, status: 'cancel', rideId })
+            body: JSON.stringify({ bookingId, tgId, status: 'cancelled', rideId })
         });
         if (!res.ok) {
-            const errorText = await res.text();
-            throw new Error(`Помилка скасування бронювання: ${errorText || 'Сервер повернув помилку'}`);
+            const errorData = await res.json();
+            throw new Error(errorData.detail || `Помилка скасування бронювання: ${errorData.message || 'Сервер повернув помилку'}`);
         }
         const result = await res.json();
         alert(`Бронювання ${bookingId} скасовано!`);
@@ -162,7 +234,10 @@ async function deleteRide(rideId) {
             },
             body: JSON.stringify({ rideId, tgId })
         });
-        if (!res.ok) throw new Error('Помилка видалення поїздки');
+        if (!res.ok) {
+            const errorData = await res.json();
+            throw new Error(errorData.detail || 'Помилка видалення поїздки');
+        }
         const result = await res.json();
         alert(`Поїздка ${rideId} видалена!`);
         navigate('my-rides');

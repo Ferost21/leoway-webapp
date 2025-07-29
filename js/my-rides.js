@@ -76,7 +76,6 @@ function renderRides(rides, isBooking) {
         const statusClass = ride.status ? `status-${ride.status}` : '';
         const occupiedSeats = ride.seats_total - ride.seats_available;
         if (ride.role === 'passenger' && ride.status === 'cancelled') {
-            // Special rendering for cancelled passenger bookings
             return `
                 <div class="ride-item clickable" data-ride-id="${ride.ride_id}" onclick="showDriverRideDetails(${ride.ride_id}, '${ride.departure}', '${ride.arrival}', '${timeStr}', '${dateStr}', ${ride.seats_available}, ${ride.seats_total}, ${ride.price}, '${ride.description || ''}', '${ride.role}', '${ride.status}', '${ride.cancel_reason || 'Невідома причина'}', ${ride.booking_id})">
                     <div class="ride-top">
@@ -89,7 +88,6 @@ function renderRides(rides, isBooking) {
                     </div>
                 </div>`;
         } else if (ride.role === 'passenger' && ride.status === 'pending') {
-            // Special rendering for pending passenger bookings
             return `
                 <div class="ride-item clickable" data-ride-id="${ride.ride_id}" onclick="showDriverRideDetails(${ride.ride_id}, '${ride.departure}', '${ride.arrival}', '${timeStr}', '${dateStr}', ${ride.seats_available}, ${ride.seats_total}, ${ride.price}, '${ride.description || ''}', '${ride.role}', '${ride.status}', '${ride.cancel_reason || ''}', ${ride.booking_id})">
                     <div class="ride-top">
@@ -104,7 +102,6 @@ function renderRides(rides, isBooking) {
                     </div>
                 </div>`;
         } else if (ride.role === 'passenger') {
-            // Other passenger bookings (e.g., approved)
             return `
                 <div class="ride-item clickable" data-ride-id="${ride.ride_id}" onclick="showDriverRideDetails(${ride.ride_id}, '${ride.departure}', '${ride.arrival}', '${timeStr}', '${dateStr}', ${ride.seats_available}, ${ride.seats_total}, ${ride.price}, '${ride.description || ''}', '${ride.role}', '${ride.status}', '${ride.cancel_reason || ''}', ${ride.booking_id})">
                     <div class="ride-top">
@@ -122,11 +119,10 @@ function renderRides(rides, isBooking) {
                     ${ride.status !== 'cancelled' ? `
                         <div class="ride-actions">
                             <button class="cancel-button" onclick="cancelRide(${ride.booking_id})">Скасувати</button>
-                            ${ride.driver_telegram_id ? `<button class="contact-button" onclick="contactDriver('${ride.driver_telegram_id}', ${ride.booking_id})">Зв’язатися з водієм</button>` : ''}
+                            ${ride.driver_telegram_id ? `<button class="contact-button" onclick="contactDriver('${ride.driver_telegram_id}', ${ride.booking_id}, ${ride.ride_id})">Зв’язатися з водієм</button>` : ''}
                         </div>` : ''}
                 </div>`;
         } else {
-            // Driver rides
             return `
                 <div class="ride-item clickable" data-ride-id="${ride.ride_id}" onclick="showDriverRideDetails(${ride.ride_id}, '${ride.departure}', '${ride.arrival}', '${timeStr}', '${dateStr}', ${ride.seats_available}, ${ride.seats_total}, ${ride.price}, '${ride.description || ''}', '${ride.role}', '${ride.status || ''}', '${ride.cancel_reason || ''}', ${ride.booking_id || null})">
                     <div class="ride-top">
@@ -179,9 +175,7 @@ async function showDriverRideDetails(rideId, departure, arrival, time, date, sea
     const occupiedSeats = seatsTotal - seatsAvailable;
 
     if (role === 'passenger' && status === 'cancelled') {
-        // Determine who cancelled based on cancel_reason
         const cancelText = cancelReason && (cancelReason.includes('Driver') || cancelReason.includes('Водій')) ? 'Скасовано водієм' : 'Скасовано пасажиром';
-        // Simplified view for cancelled passenger bookings
         resultsContainer.innerHTML = `
             <div class="ride-details">
                 <p class="ride-date">${time}, ${formattedDate}</p>
@@ -198,7 +192,6 @@ async function showDriverRideDetails(rideId, departure, arrival, time, date, sea
         if (!tgId) throw new Error('Не вдалося отримати Telegram ID');
 
         if (role === 'passenger') {
-            // Passenger view for non-cancelled bookings
             resultsContainer.innerHTML = `
                 <div class="ride-details">
                     <p class="ride-date">${time}, ${formattedDate}</p>
@@ -210,10 +203,9 @@ async function showDriverRideDetails(rideId, departure, arrival, time, date, sea
                 </div>
                 ${status !== 'cancelled' ? `
                     <div class="ride-actions" style="position: absolute; bottom: 20px; width: calc(100% - 40px);">
-                        <button class="cancel-button" onclick="cancelRide(${bookingId})">Скасувати бронювання</button>
+                        <button class="cancel-button" onclick="cancelRide(${bookingId})">Скасувати</button>
                     </div>` : ''}`;
         } else {
-            // Driver view
             const res = await fetch(`${API_BASE_URL}/api/ride-passengers?rideId=${rideId}&tgId=${tgId}`, {
                 headers: { 'ngrok-skip-browser-warning': 'true' }
             });
@@ -234,7 +226,7 @@ async function showDriverRideDetails(rideId, departure, arrival, time, date, sea
                     }
                     const photoUrl = passenger.photo_url || 'https://t.me/i/userpic/320/default.svg';
                     return `
-                        <div class="passenger-item" onclick="showPassengerInfo(${rideId}, ${passenger.booking_id}, '${photoUrl}', '${passenger.passenger_name}', ${passenger.rating || 'null'}, '${passenger.status}')">
+                        <div class="passenger-item" onclick="showPassengerInfo(${rideId}, ${passenger.booking_id}, '${photoUrl}', '${passenger.passenger_name}', ${passenger.rating || 'null'}, '${passenger.status}', '${passenger.passenger_telegram_id}')">
                             <div class="passenger-info">
                                 <img src="${photoUrl}" alt="Profile Photo" class="passenger-photo">
                                 <div class="passenger-text">
@@ -244,8 +236,8 @@ async function showDriverRideDetails(rideId, departure, arrival, time, date, sea
                             </div>
                             ${passenger.status === 'pending' ? `
                                 <div class="passenger-actions">
-                                    <button class="approve-button" onclick="approveBooking(${passenger.booking_id}, ${rideId})">Підтвердити</button>
-                                    <button class="cancel-booking-button" onclick="cancelBooking(${passenger.booking_id}, ${rideId})">Скасувати</button>
+                                    <button class="approve-button" onclick="approveBooking(${passenger.booking_id}, ${rideId})">Підтвердити запит</button>
+                                    <button class="cancel-booking-button" onclick="cancelBooking(${passenger.booking_id}, ${rideId})">Скасувати запит</button>
                                 </div>
                             ` : ''}
                         </div>
@@ -288,7 +280,7 @@ async function showDriverRideDetails(rideId, departure, arrival, time, date, sea
     navigate('driver-ride-details', { rideId });
 }
 
-function showPassengerInfo(rideId, bookingId, photoUrl, name, rating, status) {
+function showPassengerInfo(rideId, bookingId, photoUrl, name, rating, status, passengerTelegramId) {
     document.getElementById('passenger-photo').src = photoUrl || 'https://placehold.co/100x100';
     document.getElementById('passenger-name').textContent = name || 'Невідомий пасажир';
     document.getElementById('passenger-rating').textContent = `Рейтинг: ★${rating || 'N/A'}`;
@@ -297,52 +289,86 @@ function showPassengerInfo(rideId, bookingId, photoUrl, name, rating, status) {
 
     const cancelButton = document.getElementById('cancel-booking-btn');
     const approveButton = document.getElementById('approve-booking-btn');
+    const contactButton = document.getElementById('contact-passenger-btn');
 
-    // Check if buttons exist in the DOM
+    // Перевірка наявності кнопок у DOM
     if (!cancelButton) {
         console.warn('Cancel button (cancel-booking-btn) not found in the DOM.');
     }
     if (!approveButton) {
         console.warn('Approve button (approve-booking-btn) not found in the DOM.');
     }
+    if (!contactButton) {
+        console.warn('Contact button (contact-passenger-btn) not found in the DOM.');
+    }
 
-    // Handle button visibility based on booking status
+    // Обробка видимості та поведінки кнопок залежно від статусу бронювання
     if (status === 'pending') {
         if (approveButton) {
+            approveButton.textContent = 'Підтвердити запит';
             approveButton.style.display = 'block';
             approveButton.onclick = () => approveBooking(bookingId, rideId);
         }
         if (cancelButton) {
+            cancelButton.textContent = 'Скасувати запит';
             cancelButton.style.display = 'block';
             cancelButton.onclick = () => cancelBooking(bookingId, rideId);
+        }
+        if (contactButton && passengerTelegramId && /^\d+$/.test(passengerTelegramId)) {
+            contactButton.style.display = 'block';
+            contactButton.onclick = () => contactPassenger(passengerTelegramId, bookingId, rideId);
+        } else if (contactButton) {
+            contactButton.style.display = 'none';
+            contactButton.onclick = null;
         }
     } else if (status === 'approved') {
         if (approveButton) {
+            approveButton.textContent = 'Підтверджено';
             approveButton.style.display = 'none';
             approveButton.onclick = null;
         }
         if (cancelButton) {
+            cancelButton.textContent = 'Скасувати';
             cancelButton.style.display = 'block';
             cancelButton.onclick = () => cancelBooking(bookingId, rideId);
         }
+        if (contactButton && passengerTelegramId && /^\d+$/.test(passengerTelegramId)) {
+            contactButton.style.display = 'block';
+            contactButton.onclick = () => contactPassenger(passengerTelegramId, bookingId, rideId);
+        } else if (contactButton) {
+            contactButton.style.display = 'none';
+            contactButton.onclick = null;
+        }
     } else if (status === 'cancelled') {
         if (approveButton) {
+            approveButton.textContent = 'Підтвердити запит';
             approveButton.style.display = 'none';
             approveButton.onclick = null;
         }
         if (cancelButton) {
+            cancelButton.textContent = 'Скасувати запит';
             cancelButton.style.display = 'none';
             cancelButton.onclick = null;
+        }
+        if (contactButton) {
+            contactButton.style.display = 'none';
+            contactButton.onclick = null;
         }
         alert(`Бронювання вже скасовано: статус "${getStatusText(status)}".`);
     } else {
         if (approveButton) {
+            approveButton.textContent = 'Підтвердити запит';
             approveButton.style.display = 'none';
             approveButton.onclick = null;
         }
         if (cancelButton) {
+            cancelButton.textContent = 'Скасувати запит';
             cancelButton.style.display = 'none';
             cancelButton.onclick = null;
+        }
+        if (contactButton) {
+            contactButton.style.display = 'none';
+            contactButton.onclick = null;
         }
         console.warn(`Невідомий статус бронювання: ${status}`);
     }

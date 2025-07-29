@@ -1,4 +1,4 @@
-const pages = ['search', 'create', 'my-rides', 'profile', 'search-results', 'driver-ride-details', 'passenger-info'];
+const pages = ['search', 'create', 'my-rides', 'profile', 'inbox', 'chat', 'search-results', 'driver-ride-details', 'passenger-info'];
 let isNavigating = false;
 
 function navigate(page, params = {}) {
@@ -25,7 +25,7 @@ function navigate(page, params = {}) {
         return;
     }
 
-    if (['search', 'create', 'my-rides', 'profile'].includes(page)) {
+    if (['search', 'create', 'my-rides', 'profile', 'inbox'].includes(page)) {
         const navItems = document.querySelectorAll('.nav-item');
         navItems.forEach(item => item.classList.remove('active'));
         const navItem = document.querySelector(`.nav-item[onclick="navigate('${page}')"]`);
@@ -60,10 +60,12 @@ function navigate(page, params = {}) {
         hash = `#search-results/${encodeURIComponent(params.departure)}/${encodeURIComponent(params.arrival)}/${params.date}/${params.seats}`;
     } else if (page === 'passenger-info' && params.rideId && params.bookingId) {
         hash = `#my-rides/${params.rideId}/${params.bookingId}`;
+    } else if (page === 'chat' && params.chatId) {
+        hash = `#chat/${params.chatId}`;
     }
     history.pushState({ page, ...params }, '', hash);
 
-    if (['search-results', 'driver-ride-details', 'passenger-info'].includes(page)) {
+    if (['search-results', 'driver-ride-details', 'passenger-info', 'chat'].includes(page)) {
         Telegram.WebApp.BackButton.show();
     } else {
         Telegram.WebApp.BackButton.hide();
@@ -73,6 +75,10 @@ function navigate(page, params = {}) {
         loadMyRides();
     } else if (page === 'profile') {
         loadProfile();
+    } else if (page === 'inbox') {
+        loadInbox();
+    } else if (page === 'chat' && params.chatId) {
+        loadChat(params);
     } else if (page === 'driver-ride-details' && params.rideId && !newPage.classList.contains('active')) {
         const rideItem = document.querySelector(`.ride-item[data-ride-id="${params.rideId}"]`);
         if (rideItem) {
@@ -81,6 +87,8 @@ function navigate(page, params = {}) {
             console.error(`No ride-item found for rideId: ${params.rideId}`);
         }
     }
+
+    console.log(`Navigation completed to page: ${page}, params:`, params);
 }
 
 window.addEventListener('load', () => {
@@ -90,14 +98,20 @@ window.addEventListener('load', () => {
         return;
     }
 
-    const [page, rideId, bookingId] = hash.split('/');
+    const [page, param1, param2] = hash.split('/');
     if (pages.includes(page)) {
-        navigate(page, { rideId, bookingId });
-    } else if (page === 'my-rides' && rideId) {
-        if (bookingId) {
-            navigate('passenger-info', { rideId, bookingId });
+        if (page === 'chat' && param1) {
+            navigate('chat', { chatId: param1 });
+        } else if (page === 'inbox') {
+            navigate('inbox');
+        } else if (page === 'my-rides' && param1) {
+            if (param2) {
+                navigate('passenger-info', { rideId: param1, bookingId: param2 });
+            } else {
+                navigate('driver-ride-details', { rideId: param1 });
+            }
         } else {
-            navigate('driver-ride-details', { rideId });
+            navigate(page);
         }
     } else {
         navigate('search');
@@ -111,14 +125,20 @@ window.addEventListener('popstate', () => {
         return;
     }
 
-    const [page, rideId, bookingId] = hash.split('/');
+    const [page, param1, param2] = hash.split('/');
     if (pages.includes(page)) {
-        navigate(page, { rideId, bookingId });
-    } else if (page === 'my-rides' && rideId) {
-        if (bookingId) {
-            navigate('passenger-info', { rideId, bookingId });
+        if (page === 'chat' && param1) {
+            navigate('chat', { chatId: param1 });
+        } else if (page === 'inbox') {
+            navigate('inbox');
+        } else if (page === 'my-rides' && param1) {
+            if (param2) {
+                navigate('passenger-info', { rideId: param1, bookingId: param2 });
+            } else {
+                navigate('driver-ride-details', { rideId: param1 });
+            }
         } else {
-            navigate('driver-ride-details', { rideId });
+            navigate(page);
         }
     } else {
         navigate('search');
@@ -126,5 +146,13 @@ window.addEventListener('popstate', () => {
 });
 
 Telegram.WebApp.BackButton.onClick(() => {
-    history.back();
+    const hash = location.hash.replace('#', '');
+    const [page, param1] = hash.split('/');
+    if (page === 'chat' && param1) {
+        navigate('inbox');
+    } else if (page === 'inbox') {
+        navigate('search');
+    } else {
+        history.back();
+    }
 });
