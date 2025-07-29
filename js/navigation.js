@@ -79,13 +79,6 @@ function navigate(page, params = {}) {
         loadInbox();
     } else if (page === 'chat' && params.chatId) {
         loadChat(params);
-    } else if (page === 'driver-ride-details' && params.rideId && !newPage.classList.contains('active')) {
-        const rideItem = document.querySelector(`.ride-item[data-ride-id="${params.rideId}"]`);
-        if (rideItem) {
-            rideItem.click();
-        } else {
-            console.error(`No ride-item found for rideId: ${params.rideId}`);
-        }
     }
 
     console.log(`Navigation completed to page: ${page}, params:`, params);

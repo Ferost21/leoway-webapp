@@ -33,7 +33,8 @@ async function loadMyRides() {
         // Перевіряємо хеш для автоматичного відкриття деталей
         const hash = location.hash.replace('#', '');
         const [page, rideId, bookingId] = hash.split('/');
-        if (page === 'my-rides' && rideId && !document.getElementById('driver-ride-details-page').classList.contains('active')) {
+        const driverRideDetailsPage = document.getElementById('driver-ride-details-page');
+        if (page === 'my-rides' && rideId && !driverRideDetailsPage.classList.contains('active')) {
             const ride = rides.find(r => r.ride_id === parseInt(rideId));
             if (ride) {
                 const dt = new Date(ride.departure_time);
@@ -149,6 +150,16 @@ function getStatusText(status) {
 }
 
 async function showDriverRideDetails(rideId, departure, arrival, time, date, seatsAvailable, seatsTotal, price, description, role, status, cancelReason, bookingId) {
+    const driverRideDetailsPage = document.getElementById('driver-ride-details-page');
+    const currentHash = location.hash.replace('#', '');
+    const [currentPage, currentRideId] = currentHash.split('/');
+
+    // Prevent re-navigation if already on the correct driver-ride-details page
+    if (currentPage === 'my-rides' && parseInt(currentRideId) === rideId && driverRideDetailsPage.classList.contains('active')) {
+        console.info(`Already on driver-ride-details for rideId: ${rideId}, skipping navigation`);
+        return;
+    }
+
     const resultsContainer = document.getElementById('driver-ride-details-results');
 
     let formattedDate;
