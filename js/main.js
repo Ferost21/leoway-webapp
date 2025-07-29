@@ -129,25 +129,38 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         }
 
-        // Додати initData до всіх запитів
-        function addInitDataToFetch(fetchFunction) {
-            return async function (...args) {
-                const url = args[0];
-                const options = args[1] || {};
-                const urlObj = new URL(url, API_BASE_URL);
-                urlObj.searchParams.set('initData', encodeURIComponent(initData));
-                options.headers = {
-                    ...options.headers,
-                    'Content-Type': 'application/json',
-                    'ngrok-skip-browser-warning': 'true'
-                };
-                return fetchFunction(urlObj.toString(), options);
-            };
-        }
-
-        // Перевизначити fetch для автоматичного додавання initData
+        // Перевизначити fetch для додавання initData
         const originalFetch = window.fetch;
-        window.fetch = addInitDataToFetch(originalFetch);
+        window.fetch = async function (url, options = {}) {
+            const urlObj = new URL(url, API_BASE_URL);
+            // Додавати initData лише для захищених ендпоінтів
+            if (urlObj.pathname.includes('/api/user-rating') || 
+                urlObj.pathname.includes('/api/chats') || 
+                urlObj.pathname.includes('/api/my-rides') || 
+                urlObj.pathname.includes('/api/ride-passengers') ||
+                urlObj.pathname.includes('/api/book-ride') ||
+                urlObj.pathname.includes('/api/create-ride') ||
+                urlObj.pathname.includes('/api/cancel-ride') ||
+                urlObj.pathname.includes('/api/delete-ride') ||
+                urlObj.pathname.includes('/api/start-chat') ||
+                urlObj.pathname.includes('/api/send-message') ||
+                urlObj.pathname.includes('/api/update-booking-status')) {
+                urlObj.searchParams.set('initData', initData); // Без encodeURIComponent
+            }
+            options.headers = {
+                ...options.headers,
+                'Content-Type': 'application/json',
+                'ngrok-skip-browser-warning': 'true'
+            };
+            console.log(`Sending request to ${urlObj.toString()} with initData: ${initData}`);
+            const response = await originalFetch(urlObj.toString(), options);
+            if (response.status === 401 || response.status === 422) {
+                console.error(`Error ${response.status} for ${urlObj.pathname}: ${await response.text()}`);
+                webApp.showAlert('Помилка автентифікації. Відкрийте додаток через Telegram.');
+                webApp.close();
+            }
+            return response;
+        };
     } else {
         console.error('No user or initData available');
         webApp.showAlert('Не вдалося отримати дані користувача. Будь ласка, відкрийте додаток через Telegram.');
