@@ -88,7 +88,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Ініціалізація користувача
     const user = webApp.initDataUnsafe.user;
-    if (user && user.id) {
+    const initData = webApp.initData || '';
+    if (user && user.id && initData) {
         const isInitialized = localStorage.getItem(`userInitialized_${user.id}`);
         if (!isInitialized) {
             fetch(`${API_BASE_URL}/api/init-user`, {
@@ -100,13 +101,23 @@ document.addEventListener('DOMContentLoaded', () => {
                 body: JSON.stringify({
                     tgId: user.id,
                     firstName: user.first_name || 'Невідомий користувач',
-                    photoUrl: user.photo_url || null
+                    photoUrl: user.photo_url || null,
+                    initData: initData
                 })
             })
-            .then(res => res.json())
+            .then(res => {
+                if (!res.ok) {
+                    throw new Error(`HTTP error! status: ${res.status}`);
+                }
+                return res.json();
+            })
             .then(data => {
                 if (data.error) {
                     console.error('Error initializing user:', data.error);
+                    if (data.error.includes('initData')) {
+                        webApp.showAlert('Помилка автентифікації. Будь ласка, відкрийте додаток через Telegram.');
+                        webApp.close();
+                    }
                 } else {
                     localStorage.setItem(`userInitialized_${user.id}`, 'true');
                     console.log('User initialized successfully:', data.message);
@@ -114,8 +125,33 @@ document.addEventListener('DOMContentLoaded', () => {
             })
             .catch(err => {
                 console.error('Network error initializing user:', err);
+                webApp.showAlert('Помилка мережі. Будь ласка, перевірте підключення та спробуйте ще раз.');
             });
         }
+
+        // Додати initData до всіх запитів
+        function addInitDataToFetch(fetchFunction) {
+            return async function (...args) {
+                const url = args[0];
+                const options = args[1] || {};
+                const urlObj = new URL(url, API_BASE_URL);
+                urlObj.searchParams.set('initData', encodeURIComponent(initData));
+                options.headers = {
+                    ...options.headers,
+                    'Content-Type': 'application/json',
+                    'ngrok-skip-browser-warning': 'true'
+                };
+                return fetchFunction(urlObj.toString(), options);
+            };
+        }
+
+        // Перевизначити fetch для автоматичного додавання initData
+        const originalFetch = window.fetch;
+        window.fetch = addInitDataToFetch(originalFetch);
+    } else {
+        console.error('No user or initData available');
+        webApp.showAlert('Не вдалося отримати дані користувача. Будь ласка, відкрийте додаток через Telegram.');
+        webApp.close();
     }
 
     // Ініціалізація сторінки через navigate
