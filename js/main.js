@@ -4,9 +4,6 @@ webApp.ready();
 let isModalOpen = false;
 let isDriverRideModalOpen = false;
 let currentPage = 'search';
-let isNavigating = false;
-let lastNavigationTime = 0;
-const NAVIGATION_DEBOUNCE_MS = 500; // Debounce navigation by 500ms
 
 const API_BASE_URL = 'https://d6585ffde7de.ngrok-free.app';
 
@@ -137,7 +134,18 @@ document.addEventListener('DOMContentLoaded', () => {
         window.fetch = async function (url, options = {}) {
             const urlObj = new URL(url, API_BASE_URL);
             // Додавати initData лише для захищених ендпоінтів
-            if (urlObj.pathname.startsWith('/api/') && !urlObj.pathname.includes('/api/cities')) {
+            if (urlObj.pathname.includes('/api/user-rating') || 
+                urlObj.pathname.includes('/api/chats') || 
+                urlObj.pathname.includes('/api/my-rides') || 
+                urlObj.pathname.includes('/api/ride-passengers') ||
+                urlObj.pathname.includes('/api/book-ride') ||
+                urlObj.pathname.includes('/api/create-ride') ||
+                urlObj.pathname.includes('/api/cancel-ride') ||
+                urlObj.pathname.includes('/api/delete-ride') ||
+                urlObj.pathname.includes('/api/start-chat') ||
+                urlObj.pathname.includes('/api/send-message') ||
+                urlObj.pathname.includes('/api/update-booking-status') ||
+                urlObj.pathname.includes('/api/messages')) { // Added /api/messages
                 urlObj.searchParams.set('initData', initData); // Без encodeURIComponent
             }
             options.headers = {
@@ -164,190 +172,3 @@ document.addEventListener('DOMContentLoaded', () => {
     navigate('search');
     loadProfile();
 });
-
-const pages = ['search', 'create', 'my-rides', 'profile', 'inbox', 'chat', 'search-results', 'driver-ride-details', 'passenger-info'];
-
-function navigate(page, params = {}) {
-    const now = Date.now();
-    if (isNavigating || now - lastNavigationTime < NAVIGATION_DEBOUNCE_MS) {
-        console.info(`Navigation to ${page} skipped due to ongoing navigation or debounce`);
-        return;
-    }
-    isNavigating = true;
-    lastNavigationTime = now;
-
-    if (!pages.includes(page)) {
-        console.error(`Page ${page} not found`);
-        navigate('search');
-        return;
-    }
-
-    const currentActivePage = document.querySelector('.page.active');
-    const newPage = document.getElementById(`${page}-page`);
-
-    if (!newPage) {
-        console.error(`Page element #${page}-page not found`);
-        navigate('search');
-        isNavigating = false;
-        lastNavigationTime = 0;
-        return;
-    }
-
-    if (['search', 'create', 'my-rides', 'profile', 'inbox'].includes(page)) {
-        const navItems = document.querySelectorAll('.nav-item');
-        navItems.forEach(item => item.classList.remove('active'));
-        const navItem = document.querySelector(`.nav-item[onclick="navigate('${page}')"]`);
-        if (navItem) navItem.classList.add('active');
-    }
-
-    if (currentActivePage) {
-        currentActivePage.classList.add('fade-out');
-        setTimeout(() => {
-            document.querySelectorAll('.page').forEach(p => {
-                p.classList.remove('active', 'fade-out', 'fade-in');
-                p.style.display = 'none';
-            });
-            newPage.style.display = 'block';
-            newPage.classList.add('active', 'fade-in');
-            isNavigating = false;
-        }, 300);
-    } else {
-        document.querySelectorAll('.page').forEach(p => {
-            p.classList.remove('active', 'fade-in');
-            p.style.display = 'none';
-        });
-        newPage.style.display = 'block';
-        newPage.classList.add('active', 'fade-in');
-        isNavigating = false;
-    }
-
-    let hash = `#${page}`;
-    if (page === 'driver-ride-details' && params.rideId) {
-        hash = `#my-rides/${params.rideId}`;
-    } else if (page === 'search-results' && params.departure && params.arrival && params.date && params.seats) {
-        hash = `#search-results/${encodeURIComponent(params.departure)}/${encodeURIComponent(params.arrival)}/${params.date}/${params.seats}`;
-    } else if (page === 'passenger-info' && params.rideId && params.bookingId) {
-        hash = `#my-rides/${params.rideId}/${params.bookingId}`;
-    } else if (page === 'chat' && params.chatId) {
-        hash = `#chat/${params.chatId}`;
-    }
-    history.pushState({ page, ...params }, '', hash);
-
-    if (['search-results', 'driver-ride-details', 'passenger-info', 'chat'].includes(page)) {
-        Telegram.WebApp.BackButton.show();
-    } else {
-        Telegram.WebApp.BackButton.hide();
-    }
-
-    if (page === 'my-rides') {
-        loadMyRides();
-    } else if (page === 'profile') {
-        loadProfile();
-    } else if (page === 'inbox') {
-        loadInbox();
-    } else if (page === 'chat' && params.chatId) {
-        loadChat(params);
-    } else if (page === 'driver-ride-details' && params.rideId) {
-        loadDriverRideDetails(params.rideId); // Call load function instead of simulating click
-    }
-
-    console.log(`Navigation completed to page: ${page}, params:`, params);
-}
-
-window.addEventListener('load', () => {
-    const hash = location.hash.replace('#', '');
-    if (!hash) {
-        navigate('search');
-        return;
-    }
-
-    const [page, param1, param2] = hash.split('/');
-    if (pages.includes(page)) {
-        if (page === 'chat' && param1) {
-            navigate('chat', { chatId: param1 });
-        } else if (page === 'inbox') {
-            navigate('inbox');
-        } else if (page === 'my-rides' && param1) {
-            if (param2) {
-                navigate('passenger-info', { rideId: param1, bookingId: param2 });
-            } else {
-                navigate('driver-ride-details', { rideId: param1 });
-            }
-        } else {
-            navigate(page);
-        }
-    } else {
-        navigate('search');
-    }
-});
-
-window.addEventListener('popstate', (event) => {
-    const now = Date.now();
-    if (now - lastNavigationTime < NAVIGATION_DEBOUNCE_MS) {
-        console.info('Popstate event ignored due to debounce');
-        return;
-    }
-
-    const hash = location.hash.replace('#', '');
-    if (!hash) {
-        navigate('search');
-        return;
-    }
-
-    const [page, param1, param2] = hash.split('/');
-    if (pages.includes(page)) {
-        if (page === 'chat' && param1) {
-            navigate('chat', { chatId: param1 });
-        } else if (page === 'inbox') {
-            navigate('inbox');
-        } else if (page === 'my-rides' && param1) {
-            if (param2) {
-                navigate('passenger-info', { rideId: param1, bookingId: param2 });
-            } else {
-                navigate('driver-ride-details', { rideId: param1 });
-            }
-        } else {
-            navigate(page);
-        }
-    } else {
-        navigate('search');
-    }
-});
-
-Telegram.WebApp.BackButton.onClick(() => {
-    const hash = location.hash.replace('#', '');
-    const [page, param1, param2] = hash.split('/');
-    if (page === 'chat' && param1) {
-        navigate('inbox');
-    } else if (page === 'inbox') {
-        navigate('search');
-    } else if (page === 'my-rides' && param1) {
-        if (param2) {
-            navigate('driver-ride-details', { rideId: param1 }); // Go to driver-ride-details
-        } else {
-            navigate('my-rides'); // Go to my-rides
-        }
-    } else if (page === 'search-results' || page === 'passenger-info') {
-        navigate('my-rides');
-    } else {
-        navigate('search');
-    }
-});
-
-// Placeholder for loadDriverRideDetails (implement based on your actual logic)
-function loadDriverRideDetails(rideId) {
-    console.log(`Loading driver ride details for rideId: ${rideId}`);
-    // Implement the logic to load ride details, e.g., fetch from /api/ride-passengers
-    fetch(`${API_BASE_URL}/api/ride-passengers?rideId=${rideId}&tgId=${webApp.initDataUnsafe.user.id}`)
-        .then(res => res.json())
-        .then(data => {
-            // Update the DOM with ride details and passengers
-            const page = document.getElementById('driver-ride-details-page');
-            // Example: Update page content (adjust based on your HTML structure)
-            page.innerHTML = `<h2>Ride ${rideId}</h2><pre>${JSON.stringify(data, null, 2)}</pre>`;
-        })
-        .catch(err => {
-            console.error('Error loading driver ride details:', err);
-            webApp.showAlert('Помилка завантаження деталей поїздки.');
-        });
-}
