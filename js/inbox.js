@@ -20,11 +20,34 @@ async function loadInbox(params = {}) {
         const conversations = await res.json();
         const scrollableContent = document.querySelector('#inbox-page .scrollable-content');
 
-        conversationList.innerHTML = conversations.length === 0
-            ? '<div class="no-messages">Розмови відсутні.</div>'
-            : renderConversations(conversations);
+        // Fetch passenger photos for each conversation
+        const conversationsWithPhotos = await Promise.all(conversations.map(async (conversation) => {
+            try {
+                const resPassengers = await fetch(`${API_BASE_URL}/api/ride-passengers?rideId=${conversation.ride_id}&tgId=${tgId}`, {
+                    headers: { 'ngrok-skip-browser-warning': 'true' }
+                });
+                if (resPassengers.ok) {
+                    const passengers = await resPassengers.json();
+                    const passenger = passengers.find(p => p.booking_id === conversation.booking_id);
+                    return {
+                        ...conversation,
+                        photo_url: passenger?.photo_url || 'https://t.me/i/userpic/320/default.svg'
+                    };
+                } else {
+                    console.warn(`Failed to fetch passenger photo for bookingId: ${conversation.booking_id}`);
+                    return { ...conversation, photo_url: 'https://t.me/i/userpic/320/default.svg' };
+                }
+            } catch (err) {
+                console.error(`Error fetching photo for bookingId: ${conversation.booking_id}`, err.message);
+                return { ...conversation, photo_url: 'https://t.me/i/userpic/320/default.svg' };
+            }
+        }));
 
-        if (conversations.length === 0) {
+        conversationList.innerHTML = conversationsWithPhotos.length === 0
+            ? '<div class="no-messages">Розмови відсутні.</div>'
+            : renderConversations(conversationsWithPhotos);
+
+        if (conversationsWithPhotos.length === 0) {
             scrollableContent.classList.add('no-messages-container');
         } else {
             scrollableContent.classList.remove('no-messages-container');
@@ -53,11 +76,16 @@ function renderConversations(conversations) {
             : '';
         return `
             <div class="conversation-item" onclick="navigate('chat', { chatId: ${conversation.chat_id}, contactName: '${conversation.contact_name}', bookingId: ${conversation.booking_id}, rideId: ${conversation.ride_id} })">
+                <img src="${conversation.photo_url}" alt="Contact Photo" class="conversation-photo">
                 <div class="conversation-info">
-                    <h3>${conversation.contact_name}</h3>
-                    <p>Бронювання №${conversation.booking_id}</p>
-                    <p class="last-message">${lastMessage}</p>
-                    <p class="last-message-time">${lastMessageTime}</p>
+                    <div class="conversation-header">
+                        <h3>${conversation.contact_name}</h3>
+                        <p class="booking-id">Бронювання №${conversation.booking_id}</p>
+                    </div>
+                    <div class="conversation-content">
+                        <p class="last-message">${lastMessage}</p>
+                        <p class="last-message-time">${lastMessageTime}</p>
+                    </div>
                 </div>
             </div>
         `;

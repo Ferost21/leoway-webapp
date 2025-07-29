@@ -1,0 +1,91 @@
+/* Styling for the inbox page */
+#inbox-page .scrollable-content {
+    padding: 10px;
+    overflow-y: auto;
+    height: calc(100vh - 120px); /* Adjust based on your header/footer height */
+}
+
+.conversation-item {
+    display: flex;
+    align-items: center;
+    padding: 10px;
+    border-bottom: 1px solid var(--border-color);
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.conversation-item:hover {
+    background-color: var(--hover-bg-color);
+}
+
+.conversation-photo {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    margin-right: 10px;
+    object-fit: cover;
+}
+
+.conversation-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.conversation-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 5px;
+}
+
+.conversation-header h3 {
+    margin: 0;
+    font-size: 16px;
+    color: var(--text-color);
+}
+
+.conversation-header .booking-id {
+    margin: 0;
+    font-size: 14px;
+    color: var(--text-color);
+    opacity: 0.7;
+}
+
+.conversation-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.conversation-content .last-message {
+    margin: 0;
+    font-size: 14px;
+    color: var(--text-color);
+    opacity: 0.7;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 60%;
+}
+
+.conversation-content .last-message-time {
+    margin: 0;
+    font-size: 12px;
+    color: var(--text-color);
+    opacity: 0.5;
+}
+
+.no-messages-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+}
+
+.no-messages {
+    font-size: 16px;
+    color: var(--text-color);
+    opacity: 0.7;
+    text-align: center;
+}
