@@ -97,11 +97,13 @@ window.addEventListener('load', () => {
             navigate('chat', { chatId: param1 });
         } else if (page === 'inbox') {
             navigate('inbox');
-        } else if (page === 'my-rides' && param1) {
+        } else if (page === 'my-rides') {
             if (param2) {
                 navigate('passenger-info', { rideId: param1, bookingId: param2 });
-            } else {
+            } else if (param1) {
                 navigate('driver-ride-details', { rideId: param1 });
+            } else {
+                navigate('my-rides');
             }
         } else {
             navigate(page);
@@ -124,11 +126,13 @@ window.addEventListener('popstate', () => {
             navigate('chat', { chatId: param1 });
         } else if (page === 'inbox') {
             navigate('inbox');
-        } else if (page === 'my-rides' && param1) {
+        } else if (page === 'my-rides') {
             if (param2) {
                 navigate('passenger-info', { rideId: param1, bookingId: param2 });
-            } else {
+            } else if (param1) {
                 navigate('driver-ride-details', { rideId: param1 });
+            } else {
+                navigate('my-rides');
             }
         } else {
             navigate(page);
@@ -140,12 +144,16 @@ window.addEventListener('popstate', () => {
 
 Telegram.WebApp.BackButton.onClick(() => {
     const hash = location.hash.replace('#', '');
-    const [page, param1] = hash.split('/');
+    const [page, param1, param2] = hash.split('/');
     if (page === 'chat' && param1) {
         navigate('inbox');
     } else if (page === 'inbox') {
         navigate('search');
+    } else if (page === 'my-rides' && param2) {
+        navigate('driver-ride-details', { rideId: param1 });
+    } else if (page === 'my-rides' && param1) {
+        navigate('my-rides');
     } else {
-        history.back();
+        navigate('search');
     }
 });
