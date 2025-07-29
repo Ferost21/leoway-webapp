@@ -1,22 +1,21 @@
-.conversation-list {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
+/* Styling for the inbox page */
+#inbox-page .scrollable-content {
     padding: 10px;
+    overflow-y: auto;
+    height: calc(100vh - 120px); /* Adjust based on your header/footer height */
 }
 
 .conversation-item {
     display: flex;
     align-items: center;
     padding: 10px;
-    background: var(--ride-bg-color);
-    border-radius: 8px;
+    border-bottom: 1px solid var(--border-color);
     cursor: pointer;
-    transition: background 0.2s;
+    transition: background-color 0.2s;
 }
 
 .conversation-item:hover {
-    background: var(--hover-bg-color);
+    background-color: var(--hover-bg-color);
 }
 
 .conversation-photo {
@@ -31,20 +30,19 @@
     flex: 1;
     display: flex;
     flex-direction: column;
-    gap: 5px;
 }
 
 .conversation-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    margin-bottom: 5px;
 }
 
 .conversation-header h3 {
     margin: 0;
     font-size: 16px;
     color: var(--text-color);
-    font-weight: 500;
 }
 
 .conversation-header .booking-id {
@@ -54,38 +52,41 @@
     opacity: 0.7;
 }
 
-.conversation-last-message {
+.conversation-content {
     display: flex;
     justify-content: space-between;
     align-items: center;
 }
 
-.conversation-last-message .last-message {
+.conversation-content .last-message {
     margin: 0;
     font-size: 14px;
     color: var(--text-color);
     opacity: 0.7;
+    flex: 1;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    max-width: 60%;
 }
 
-.conversation-last-message .last-message-time {
+.conversation-content .last-message-time {
     margin: 0;
     font-size: 12px;
     color: var(--text-color);
     opacity: 0.5;
+    width: 80px; /* Fixed width to ensure alignment */
+    text-align: right;
 }
 
 .no-messages-container {
     display: flex;
     justify-content: center;
     align-items: center;
-    height: calc(100% - 60px);
+    height: 100%;
 }
 
 .no-messages {
+    font-size: 16px;
     color: var(--text-color);
     opacity: 0.7;
     text-align: center;
