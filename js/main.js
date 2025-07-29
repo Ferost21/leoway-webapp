@@ -144,7 +144,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 urlObj.pathname.includes('/api/delete-ride') ||
                 urlObj.pathname.includes('/api/start-chat') ||
                 urlObj.pathname.includes('/api/send-message') ||
-                urlObj.pathname.includes('/api/update-booking-status')) {
+                urlObj.pathname.includes('/api/update-booking-status') ||
+                urlObj.pathname.includes('/api/messages')) { // Added /api/messages
                 urlObj.searchParams.set('initData', initData); // Без encodeURIComponent
             }
             options.headers = {
