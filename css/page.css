@@ -133,7 +133,8 @@
     gap: 10px;
     width: 100%;
     /* justify-content: center; Центрування вмісту по горизонталі */
-    padding-left: 50px; /* Додано для зміщення вмісту нижче */
+    padding-left: 80px; /* Додано для зміщення вмісту нижче */
+    padding-top: 20px;
 }
 
 #chat-contact-photo {
