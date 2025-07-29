@@ -132,8 +132,8 @@
     align-items: center;
     gap: 10px;
     width: 100%;
-    justify-content: center; /* Центрування вмісту по горизонталі */
-    padding-top: 20px; /* Додано для зміщення вмісту нижче */
+    /* justify-content: center; Центрування вмісту по горизонталі */
+    padding-left: 50px; /* Додано для зміщення вмісту нижче */
 }
 
 #chat-contact-photo {
