@@ -1,22 +1,21 @@
-.conversation-list {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
+/* Styling for the inbox page */
+#inbox-page .scrollable-content {
     padding: 10px;
+    overflow-y: auto;
+    height: calc(100vh - 120px); /* Adjust based on your header/footer height */
 }
 
 .conversation-item {
     display: flex;
     align-items: center;
     padding: 10px;
-    background: var(--ride-bg-color);
-    border-radius: 8px;
+    border-bottom: 1px solid var(--border-color);
     cursor: pointer;
-    transition: background 0.2s;
+    transition: background-color 0.2s;
 }
 
 .conversation-item:hover {
-    background: var(--hover-bg-color);
+    background-color: var(--hover-bg-color);
 }
 
 .conversation-photo {
@@ -31,20 +30,19 @@
     flex: 1;
     display: flex;
     flex-direction: column;
-    gap: 5px;
 }
 
 .conversation-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    margin-bottom: 5px;
 }
 
 .conversation-header h3 {
     margin: 0;
     font-size: 16px;
     color: var(--text-color);
-    font-weight: 500;
 }
 
 .conversation-header .booking-id {
@@ -54,13 +52,13 @@
     opacity: 0.7;
 }
 
-.conversation-last-message {
+.conversation-content {
     display: flex;
     justify-content: space-between;
     align-items: center;
 }
 
-.conversation-last-message .last-message {
+.conversation-content .last-message {
     margin: 0;
     font-size: 14px;
     color: var(--text-color);
@@ -68,10 +66,10 @@
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    max-width: 60%;
+    max-width: 65%;
 }
 
-.conversation-last-message .last-message-time {
+.conversation-content .last-message-time {
     margin: 0;
     font-size: 12px;
     color: var(--text-color);
@@ -82,11 +80,121 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    height: calc(100% - 60px);
+    height: 100%;
 }
 
 .no-messages {
+    font-size: 16px;
     color: var(--text-color);
     opacity: 0.7;
     text-align: center;
+}
+
+/* Styling for the chat page */
+#chat-page {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.chat-header {
+    padding: 10px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.chat-header-content {
+    display: flex;
+    align-items: center;
+}
+
+#chat-contact-photo {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    margin-right: 10px;
+}
+
+.chat-contact-info {
+    flex: 1;
+}
+
+#chat-contact-name {
+    margin: 0;
+    font-size: 16px;
+    color: var(--text-color);
+}
+
+#chat-booking-id {
+    margin: 0;
+    font-size: 14px;
+    color: var(--text-color);
+    opacity: 0.7;
+}
+
+#chat-messages {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    min-height: 0;
+    padding: 10px;
+    overflow-y: auto;
+    height: calc(100vh - 160px); /* Adjust based on header and input height */
+}
+
+.message {
+    margin: 5px 0;
+    padding: 8px 12px;
+    border-radius: 8px;
+    max-width: 70%;
+}
+
+.message.sent {
+    background-color: var(--sent-message-bg);
+    align-self: flex-end;
+    text-align: right;
+}
+
+.message.received {
+    background-color: var(--received-message-bg);
+    align-self: flex-start;
+}
+
+.message p {
+    margin: 0;
+    font-size: 14px;
+    color: var(--text-color);
+}
+
+.message .message-time {
+    font-size: 12px;
+    color: var(--text-color);
+    opacity: 0.5;
+    margin-top: 2px;
+    display: block;
+}
+
+.chat-input {
+    display: flex;
+    padding: 10px;
+    border-top: 1px solid var(--border-color);
+    background-color: var(--background-color);
+}
+
+#message-input {
+    flex: 1;
+    padding: 8px;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    margin-right: 10px;
+    font-size: 14px;
+}
+
+#send-message-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    display: flex;
+    align-items: center;
 }
