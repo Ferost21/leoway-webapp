@@ -155,6 +155,9 @@ async function loadChat(params) {
             ? '<div class="no-messages">Повідомлення відсутні.</div>'
             : renderMessages(messages);
 
+        // Скролимо донизу
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+
         // Налаштування відправки повідомлення
         sendButton.onclick = () => sendMessage(chatId, bookingId, rideId);
         messageInput.onkeypress = (e) => {
@@ -164,13 +167,14 @@ async function loadChat(params) {
         // Обробка фокусу на message-input для мобільних пристроїв
         messageInput.onfocus = () => {
             setTimeout(() => {
+                chatMessages.scrollTop = chatMessages.scrollHeight;
                 messageInput.scrollIntoView({ behavior: 'smooth', block: 'end' });
             }, 300);
         };
 
         // Обробка зміни розміру екрана
         const handleResize = () => {
-            messageInput.scrollIntoView({ behavior: 'smooth', block: 'end' });
+            chatMessages.scrollTop = chatMessages.scrollHeight;
         };
         window.addEventListener('resize', handleResize);
 
@@ -245,6 +249,9 @@ async function sendMessage(chatId, bookingId, rideId) {
         chatMessages.innerHTML = messages.length === 0
             ? '<div class="no-messages">Повідомлення відсутні.</div>'
             : renderMessages(messages);
+
+        // Скролимо донизу після надсилання
+        chatMessages.scrollTop = chatMessages.scrollHeight;
     } catch (err) {
         alert('Помилка при надсиланні повідомлення: ' + err.message);
     }
