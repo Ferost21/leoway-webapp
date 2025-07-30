@@ -93,7 +93,7 @@
 
 #my-rides-page .scrollable-content,
 #inbox-page .scrollable-content {
-    margin-top: 72px; /* Додано 62px (висота .my-rides-title-box) + 10px запас */
+    margin-top: 70px; /* Збільшено з 55px до 70px, щоб уникнути перекриття */
     padding-bottom: 20px;
 }
 
