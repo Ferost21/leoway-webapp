@@ -122,7 +122,7 @@
     position: sticky;
     top: 0;
     background: var(--modal-bg-color);
-    padding: 10px 20px;
+    padding: 10px 0; /* Removed horizontal padding to allow full-width divider */
     border-bottom: 1px solid var(--border-color);
     z-index: 102;
     display: flex;
@@ -136,43 +136,48 @@
     display: flex;
     align-items: center;
     gap: 10px;
+    padding: 0 20px; /* Padding applied only to content */
     width: 100%;
-    justify-content: center;
-    padding-top: 22px;
+    justify-content: center; /* Center the photo and text block */
+    height: 40px; /* Match photo height */
 }
 
 #chat-contact-photo {
     width: 40px;
     height: 40px;
     border-radius: 50%;
+    flex-shrink: 0; /* Prevent photo from shrinking */
 }
 
 .chat-contact-info {
     display: flex;
     flex-direction: column;
-    justify-content: flex-end;
-    align-items: center;
+    justify-content: center; /* Vertically center text within photo height */
+    align-items: flex-start; /* Left-align text relative to itself */
+    height: 100%; /* Match container height */
+    margin: 0; /* Remove any default margins */
 }
 
 #chat-contact-name {
     font-size: 16px;
     font-weight: bold;
     color: var(--text-color);
-    margin-bottom: 0;
+    margin: 0; /* Remove default margins */
+    padding: 0; /* Ensure no extra padding */
 }
 
 #chat-booking-id {
     margin: 0;
     font-size: 12px;
     color: var(--text-secondary-color);
-    padding-bottom: 40px; /* Aligns bottom with photo height */
+    padding: 0; /* Remove padding to fit within photo height */
 }
 
 .chat-divider {
     border: 0;
     border-top: 1px solid var(--border-color);
     width: 100%; /* Full width of #chat-page */
-    margin: 0; /* No margin to ensure edge-to-edge */
+    margin: 0 -20px; /* Extend to edges by countering content padding */
 }
 
 .chat-ride-info {
