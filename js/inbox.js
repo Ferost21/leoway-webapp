@@ -67,13 +67,26 @@ function renderConversations(conversations) {
     return conversations.map(conversation => {
         const lastMessage = conversation.last_message || 'Немає повідомлень';
         const lastMessageTime = conversation.last_message_time
-            ? new Date(conversation.last_message_time).toLocaleString('uk-UA', {
-                day: '2-digit',
-                month: '2-digit',
-                hour: '2-digit',
-                minute: '2-digit'
-            })
-            : '';
+            ? new Date(conversation.last_message_time)
+            : null;
+        let formattedTime = '';
+
+        if (lastMessageTime) {
+            const now = new Date();
+            const diffDays = Math.floor((now - lastMessageTime) / (1000 * 60 * 60 * 24));
+            const weekday = lastMessageTime.toLocaleString('uk-UA', { weekday: 'short' }).slice(0, 2); // e.g., "Пн", "Вт"
+
+            if (diffDays === 0) {
+                formattedTime = lastMessageTime.toLocaleTimeString('uk-UA', { hour: '2-digit', minute: '2-digit' });
+            } else if (diffDays === 1) {
+                formattedTime = 'Вчора';
+            } else if (diffDays > 1 && diffDays <= 7) {
+                formattedTime = weekday;
+            } else {
+                formattedTime = lastMessageTime.toLocaleDateString('uk-UA', { day: '2-digit', month: '2-digit' });
+            }
+        }
+
         return `
             <div class="conversation-item" onclick="navigate('chat', { chatId: ${conversation.chat_id}, contactName: '${conversation.contact_name}', bookingId: ${conversation.booking_id}, rideId: ${conversation.ride_id} })">
                 <img src="${conversation.photo_url}" alt="Contact Photo" class="conversation-photo">
@@ -83,8 +96,10 @@ function renderConversations(conversations) {
                         <p class="booking-id">Бронювання №${conversation.booking_id}</p>
                     </div>
                     <div class="conversation-content">
-                        <p class="last-message">${lastMessage}</p>
-                        <p class="last-message-time">${lastMessageTime}</p>
+                        <div class="conversation-last-message">
+                            <p class="last-message">${lastMessage}</p>
+                            <p class="last-message-time" style="margin-left: auto; text-align: right;">${formattedTime}</p>
+                        </div>
                     </div>
                 </div>
             </div>
