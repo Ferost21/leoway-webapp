@@ -102,9 +102,8 @@ async function loadChat(params) {
     const chatContactPhoto = document.getElementById('chat-contact-photo');
     const chatContactName = document.getElementById('chat-contact-name');
     const chatBookingId = document.getElementById('chat-booking-id');
-    const chatRideDetails = document.getElementById('chat-ride-details');
 
-    if (!chatPage || !chatMessages || !sendButton || !messageInput || !chatContactPhoto || !chatContactName || !chatBookingId || !chatRideDetails) {
+    if (!chatPage || !chatMessages || !sendButton || !messageInput || !chatContactPhoto || !chatContactName || !chatBookingId) {
         console.error('One or more DOM elements are missing:', {
             chatPage: !!chatPage,
             chatMessages: !!chatMessages,
@@ -112,8 +111,7 @@ async function loadChat(params) {
             messageInput: !!messageInput,
             chatContactPhoto: !!chatContactPhoto,
             chatContactName: !!chatContactName,
-            chatBookingId: !!chatBookingId,
-            chatRideDetails: !!chatRideDetails
+            chatBookingId: !!chatBookingId
         });
         navigate('inbox');
         return;
@@ -142,24 +140,6 @@ async function loadChat(params) {
         } else {
             console.warn(`Failed to fetch passenger photo: ${resPassengers.status} ${resPassengers.statusText}`);
             chatContactPhoto.src = 'https://t.me/i/userpic/320/default.svg';
-        }
-
-        // Завантажуємо інформацію про поїздку
-        const resRide = await fetch(`${API_BASE_URL}/api/ride-details?rideId=${rideId}&tgId=${tgId}`, {
-            headers: { 'ngrok-skip-browser-warning': 'true' }
-        });
-        if (resRide.ok) {
-            const ride = await resRide.json();
-            chatRideDetails.innerHTML = `
-                <p><strong>Звідки:</strong> ${ride.departure}</p>
-                <p><strong>Куди:</strong> ${ride.arrival}</p>
-                <p><strong>Дата:</strong> ${new Date(ride.date).toLocaleDateString('uk-UA', { day: '2-digit', month: '2-digit', year: 'numeric' })}</p>
-                <p><strong>Час:</strong> ${ride.time}</p>
-                <p><strong>Кількість місць:</strong> ${ride.seats}</p>
-            `;
-        } else {
-            console.warn(`Failed to fetch ride details: ${resRide.status} ${resRide.statusText}`);
-            chatRideDetails.innerHTML = '<p>Не вдалося завантажити інформацію про поїздку.</p>';
         }
 
         // Завантажуємо повідомлення
@@ -229,7 +209,7 @@ function renderMessages(messages) {
 
 async function sendMessage(chatId, bookingId, rideId) {
     const tgId = webApp.initDataUnsafe.user?.id;
-    const initData = webApp.initData || '';
+    const initData = webApp.initData || ''; // Отримуємо initData
     const messageInput = document.getElementById('message-input');
     const chatMessages = document.getElementById('chat-messages');
     const content = messageInput.value.trim();

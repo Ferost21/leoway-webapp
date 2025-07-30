@@ -146,24 +146,24 @@
                 <div id="conversation-list" class="conversation-list"></div>
             </div>
         </div>
-        <div id="chat-page" class="page">
+        <div id="chat-page" class="page" data-chat-id="" data-contact-name="" data-booking-id="" data-ride-id="">
             <div class="chat-header">
                 <div class="chat-header-content">
-                    <img id="chat-contact-photo" src="https://t.me/i/userpic/320/default.svg" alt="Contact Photo">
+                    <img id="chat-contact-photo" src="https://placehold.co/40x40" alt="Contact Photo">
                     <div class="chat-contact-info">
-                        <h3 id="chat-contact-name">Співрозмовник</h3>
+                        <span id="chat-contact-name">Співрозмовник</span>
                         <p id="chat-booking-id">Бронювання №0</p>
                     </div>
                 </div>
             </div>
-            <div class="chat-ride-info">
-                <div id="chat-ride-details"></div>
-            </div>
-            <div class="chat-messages" id="chat-messages"></div>
+            <div id="chat-messages" class="chat-messages"></div>
             <div class="chat-input">
-                <input type="text" id="message-input" placeholder="Написати повідомлення...">
-                <button id="send-message-btn">
-                    <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"></path></svg>
+                <input type="text" id="message-input" placeholder="Введіть повідомлення..." aria-label="Введіть повідомлення">
+                <button id="send-message-btn" aria-label="Надіслати повідомлення">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--button-text-color)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M22 2L11 13"></path>
+                        <path d="M22 2L15 22L11 13L2 9L22 2Z"></path>
+                    </svg>
                 </button>
             </div>
         </div>
