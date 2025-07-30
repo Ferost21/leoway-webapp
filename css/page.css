@@ -133,7 +133,6 @@
     gap: 10px;
     width: 100%;
     justify-content: center;
-    padding-top: 22px;
 }
 
 #chat-contact-photo {
@@ -170,11 +169,6 @@
 #chat-ride-details p {
     margin: 5px 0;
     font-size: 14px;
-    color: var(--text-color);
-    font-weight: 500;
-}
-
-#chat-ride-details p strong {
     color: var(--text-color);
     font-weight: 500;
 }
@@ -222,7 +216,7 @@
     color: var(--text-secondary-color);
     text-align: right;
     display: block;
-    margin-top: pokud 5px;
+    margin-top: 5px;
 }
 
 .chat-input {
