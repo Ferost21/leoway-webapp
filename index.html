@@ -146,24 +146,30 @@
                 <div id="conversation-list" class="conversation-list"></div>
             </div>
         </div>
-        <div id="chat-page" class="page" data-chat-id="" data-contact-name="" data-booking-id="" data-ride-id="">
+        <div id="chat-page" class="page">
             <div class="chat-header">
                 <div class="chat-header-content">
-                    <img id="chat-contact-photo" src="https://placehold.co/40x40" alt="Contact Photo">
+                    <img id="chat-contact-photo" src="https://t.me/i/userpic/320/default.svg" alt="Contact Photo">
                     <div class="chat-contact-info">
-                        <span id="chat-contact-name">Співрозмовник</span>
+                        <h3 id="chat-contact-name">Співрозмовник</h3>
                         <p id="chat-booking-id">Бронювання №0</p>
                     </div>
                 </div>
             </div>
-            <div id="chat-messages" class="chat-messages"></div>
+            <div class="chat-ride-info">
+                <div id="chat-ride-details">
+                    <p><strong>Звідки:</strong> Н/Д</p>
+                    <p><strong>Куди:</strong> Н/Д</p>
+                    <p><strong>Дата:</strong> Н/Д</p>
+                    <p><strong>Час:</strong> Н/Д</p>
+                    <p><strong>Кількість місць:</strong> Н/Д</p>
+                </div>
+            </div>
+            <div class="chat-messages" id="chat-messages"></div>
             <div class="chat-input">
-                <input type="text" id="message-input" placeholder="Введіть повідомлення..." aria-label="Введіть повідомлення">
-                <button id="send-message-btn" aria-label="Надіслати повідомлення">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--button-text-color)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M22 2L11 13"></path>
-                        <path d="M22 2L15 22L11 13L2 9L22 2Z"></path>
-                    </svg>
+                <input type="text" id="message-input" placeholder="Напишіть повідомлення...">
+                <button id="send-message-btn">
+                    <svg viewBox="0 0 24 24"><path d="M2 21l21-9-21-9v7l15 2-15 2z"/></svg>
                 </button>
             </div>
         </div>

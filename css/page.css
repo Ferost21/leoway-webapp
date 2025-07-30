@@ -124,7 +124,7 @@
     z-index: 102;
     display: flex;
     align-items: center;
-    min-height: 60px; /* Фіксована висота для точного розрахунку */
+    min-height: 60px;
 }
 
 .chat-header-content {
@@ -132,7 +132,7 @@
     align-items: center;
     gap: 10px;
     width: 100%;
-    justify-content: center; /* Центрування вмісту по горизонталі */
+    justify-content: center;
     padding-top: 22px;
 }
 
@@ -159,6 +159,24 @@
     color: var(--text-secondary-color);
 }
 
+.chat-ride-info {
+    background: var(--ride-bg-color);
+    padding: 10px 20px;
+    border-bottom: 1px solid var(--border-color);
+    z-index: 101;
+}
+
+#chat-ride-details p {
+    margin: 5px 0;
+    font-size: 14px;
+    color: var(--text-color);
+}
+
+#chat-ride-details p strong {
+    color: var(--text-color);
+    font-weight: 500;
+}
+
 .chat-messages {
     flex-grow: 1;
     overflow-y: auto;
@@ -168,8 +186,7 @@
     gap: 10px;
     min-height: 0;
     box-sizing: border-box;
-    /* Враховуємо висоту chat-header (60px) і chat-input (60px) */
-    max-height: calc(100vh - 163px);
+    max-height: calc(100vh - 223px);
     overscroll-behavior: contain;
 }
 
@@ -219,7 +236,7 @@
     border-top: 1px solid var(--border-color);
     z-index: 103;
     box-sizing: border-box;
-    min-height: 60px; /* Фіксована висота для точного розрахунку */
+    min-height: 60px;
 }
 
 .chat-input input {
