@@ -1,19 +1,20 @@
 .conversation-list {
     display: flex;
     flex-direction: column;
-    gap: 10px;
-    padding: 10px;
+    padding: 0;
 }
 
 .conversation-item {
     display: flex;
     align-items: center;
-    padding: 15px; /* Збільшено з 0 до 15px для більшого розміру */
+    padding: 12px 16px; /* Компактніші відступи, як у Telegram */
     background: var(--ride-bg-color);
     border-radius: 0;
     cursor: pointer;
     transition: background 0.2s;
-    min-height: 70px; /* Фіксована мінімальна висота для однакового розміру */
+    min-height: 72px; /* Збільшено для відповідності мобільному дизайну Telegram */
+    box-shadow: 0 1px 0 var(--border-color); /* Легка тінь для розмежування */
+    position: relative; /* Для позиціонування статусу */
 }
 
 .conversation-item:hover {
@@ -21,24 +22,27 @@
 }
 
 .conversation-photo {
-    width: 40px;
-    height: 40px;
+    width: 48px; /* Більше, як у Telegram */
+    height: 48px;
     border-radius: 50%;
-    margin-right: 10px;
+    margin-right: 12px; /* Трохи більше відступу для балансу */
     object-fit: cover;
+    flex-shrink: 0; /* Фіксуємо розмір фото */
 }
 
 .conversation-info {
     flex: 1;
     display: flex;
     flex-direction: column;
-    gap: 5px;
+    justify-content: center; /* Центруємо вертикально */
+    overflow: hidden; /* Уникаємо переповнення тексту */
 }
 
 .conversation-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    margin-bottom: 2px; /* Легкий відступ між ім’ям і повідомленням */
 }
 
 .conversation-header h3 {
@@ -46,13 +50,21 @@
     font-size: 16px;
     color: var(--text-color);
     font-weight: 500;
+    white-space: nowrap; /* Запобігаємо розривам */
+    overflow: hidden;
+    text-overflow: ellipsis; /* Обрізаємо довгий текст */
+    max-width: 70%; /* Додаємо обмеження для імені */
 }
 
 .conversation-header .booking-id {
     margin: 0;
     font-size: 14px;
-    color: var(--text-color);
+    color: var(--text-secondary-color);
     opacity: 0.7;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 20%; /* Обмежуємо ширину номера бронювання */
 }
 
 .conversation-last-message {
@@ -65,7 +77,7 @@
     margin: 0;
     font-size: 14px;
     color: var(--text-color);
-    opacity: 0.7;
+    opacity: 0.6; /* Сірий колір, як у Telegram */
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -75,10 +87,25 @@
 .conversation-last-message .last-message-time {
     margin: 0;
     font-size: 12px;
-    color: var(--text-color);
+    color: var(--text-secondary-color);
     opacity: 0.5;
-    text-align: right;
     white-space: nowrap;
+    text-align: right;
+    min-width: 40px; /* Фіксована ширина для часу */
+}
+
+/* Додаємо іконку статусу (наприклад, галочки) */
+.conversation-item.unread .conversation-header h3 {
+    font-weight: 600; /* Жирний текст для непрочитаних */
+}
+
+.conversation-item.unread .conversation-last-message .last-message {
+    opacity: 1; /* Повний колір для непрочитаних */
+}
+
+/* Стиль для роздільної лінії знизу (опціонально) */
+.conversation-item:not(:last-child) {
+    border-bottom: 1px solid var(--border-color);
 }
 
 .no-messages-container {

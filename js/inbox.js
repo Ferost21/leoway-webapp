@@ -20,7 +20,6 @@ async function loadInbox(params = {}) {
         const conversations = await res.json();
         const scrollableContent = document.querySelector('#inbox-page .scrollable-content');
 
-        // Fetch passenger photos for each conversation
         const conversationsWithPhotos = await Promise.all(conversations.map(async (conversation) => {
             try {
                 const resPassengers = await fetch(`${API_BASE_URL}/api/ride-passengers?rideId=${conversation.ride_id}&tgId=${tgId}`, {
@@ -74,7 +73,7 @@ function renderConversations(conversations) {
         if (lastMessageTime) {
             const now = new Date();
             const diffDays = Math.floor((now - lastMessageTime) / (1000 * 60 * 60 * 24));
-            const weekday = lastMessageTime.toLocaleString('uk-UA', { weekday: 'short' }).slice(0, 2); // e.g., "Пн", "Вт"
+            const weekday = lastMessageTime.toLocaleString('uk-UA', { weekday: 'short' }).slice(0, 2);
 
             if (diffDays === 0) {
                 formattedTime = lastMessageTime.toLocaleTimeString('uk-UA', { hour: '2-digit', minute: '2-digit' });
@@ -87,19 +86,20 @@ function renderConversations(conversations) {
             }
         }
 
+        // Додаємо клас unread, якщо є непрочитані повідомлення (приклад логіки)
+        const isUnread = conversation.unread_count > 0; // Припустимо, що є поле unread_count
+
         return `
-            <div class="conversation-item" onclick="navigate('chat', { chatId: ${conversation.chat_id}, contactName: '${conversation.contact_name}', bookingId: ${conversation.booking_id}, rideId: ${conversation.ride_id} })">
+            <div class="conversation-item${isUnread ? ' unread' : ''}" onclick="navigate('chat', { chatId: ${conversation.chat_id}, contactName: '${conversation.contact_name}', bookingId: ${conversation.booking_id}, rideId: ${conversation.ride_id} })">
                 <img src="${conversation.photo_url}" alt="Contact Photo" class="conversation-photo">
                 <div class="conversation-info">
                     <div class="conversation-header">
                         <h3>${conversation.contact_name}</h3>
                         <p class="booking-id">Бронювання №${conversation.booking_id}</p>
                     </div>
-                    <div class="conversation-content">
-                        <div class="conversation-last-message">
-                            <p class="last-message">${lastMessage}</p>
-                            <p class="last-message-time" style="margin-left: auto; text-align: right;">${formattedTime}</p>
-                        </div>
+                    <div class="conversation-last-message">
+                        <p class="last-message">${lastMessage}</p>
+                        <p class="last-message-time">${formattedTime}</p>
                     </div>
                 </div>
             </div>
@@ -134,18 +134,15 @@ async function loadChat(params) {
         return;
     }
 
-    // Зберігаємо параметри в dataset
     chatPage.dataset.chatId = chatId;
     chatPage.dataset.contactName = contactName;
     chatPage.dataset.bookingId = bookingId;
     chatPage.dataset.rideId = rideId;
 
-    // Встановлюємо ім’я та номер бронювання
     chatContactName.textContent = contactName;
     chatBookingId.textContent = `Бронювання №${bookingId}`;
 
     try {
-        // Завантажуємо фото співрозмовника
         const tgId = webApp.initDataUnsafe.user?.id;
         const resPassengers = await fetch(`${API_BASE_URL}/api/ride-passengers?rideId=${rideId}&tgId=${tgId}`, {
             headers: { 'ngrok-skip-browser-warning': 'true' }
@@ -159,7 +156,6 @@ async function loadChat(params) {
             chatContactPhoto.src = 'https://t.me/i/userpic/320/default.svg';
         }
 
-        // Завантажуємо інформацію про поїздку
         const resRide = await fetch(`${API_BASE_URL}/api/my-rides?tgId=${tgId}`, {
             headers: { 'ngrok-skip-browser-warning': 'true' }
         });
@@ -177,7 +173,6 @@ async function loadChat(params) {
             chatRideDetails.textContent = 'Не вдалося завантажити інформацію про поїздку';
         }
 
-        // Завантажуємо повідомлення
         const resMessages = await fetch(`${API_BASE_URL}/api/messages?chatId=${chatId}`, {
             headers: { 'ngrok-skip-browser-warning': 'true' }
         });
@@ -190,16 +185,13 @@ async function loadChat(params) {
             ? '<div class="no-messages">Повідомлення відсутні.</div>'
             : renderMessages(messages);
 
-        // Скролимо донизу
         chatMessages.scrollTop = chatMessages.scrollHeight;
 
-        // Налаштування відправки повідомлення
         sendButton.onclick = () => sendMessage(chatId, bookingId, rideId);
         messageInput.onkeypress = (e) => {
             if (e.key === 'Enter') sendMessage(chatId, bookingId, rideId);
         };
 
-        // Обробка фокусу на message-input для мобільних пристроїв
         messageInput.onfocus = () => {
             setTimeout(() => {
                 chatMessages.scrollTop = chatMessages.scrollHeight;
@@ -207,13 +199,11 @@ async function loadChat(params) {
             }, 300);
         };
 
-        // Обробка зміни розміру екрана
         const handleResize = () => {
             chatMessages.scrollTop = chatMessages.scrollHeight;
         };
         window.addEventListener('resize', handleResize);
 
-        // Очищення слухача при закритті чату
         chatPage.addEventListener('remove', () => {
             window.removeEventListener('resize', handleResize);
         }, { once: true });
