@@ -33,8 +33,7 @@ async function loadMyRides() {
         // Перевіряємо хеш для автоматичного відкриття деталей
         const hash = location.hash.replace('#', '');
         const [page, rideId, bookingId] = hash.split('/');
-        const driverRideDetailsPage = document.getElementById('driver-ride-details-page');
-        if (page === 'my-rides' && rideId && !driverRideDetailsPage.classList.contains('active')) {
+        if (page === 'my-rides' && rideId && !document.getElementById('driver-ride-details-page').classList.contains('active')) {
             const ride = rides.find(r => r.ride_id === parseInt(rideId));
             if (ride) {
                 const dt = new Date(ride.departure_time);
@@ -150,16 +149,6 @@ function getStatusText(status) {
 }
 
 async function showDriverRideDetails(rideId, departure, arrival, time, date, seatsAvailable, seatsTotal, price, description, role, status, cancelReason, bookingId) {
-    const driverRideDetailsPage = document.getElementById('driver-ride-details-page');
-    const currentHash = location.hash.replace('#', '');
-    const [currentPage, currentRideId] = currentHash.split('/');
-
-    // Prevent re-navigation if already on the correct driver-ride-details page
-    if (currentPage === 'my-rides' && parseInt(currentRideId) === rideId && driverRideDetailsPage.classList.contains('active')) {
-        console.info(`Already on driver-ride-details for rideId: ${rideId}, skipping navigation`);
-        return;
-    }
-
     const resultsContainer = document.getElementById('driver-ride-details-results');
 
     let formattedDate;
@@ -291,8 +280,8 @@ async function showDriverRideDetails(rideId, departure, arrival, time, date, sea
     navigate('driver-ride-details', { rideId });
 }
 
-function showPassengerInfo(rideId, bookingId, photoUrl, name, rating, status, passengerTelegramId) {
-    document.getElementById('passenger-photo').src = photoUrl || 'https://placehold.co/100x100';
+async function showPassengerInfo(rideId, bookingId, photoUrl, name, rating, status, passengerTelegramId) {
+    document.getElementById('passenger-photo').src = photoUrl || 'https://t.me/i/userpic/320/default.svg';
     document.getElementById('passenger-name').textContent = name || 'Невідомий пасажир';
     document.getElementById('passenger-rating').textContent = `Рейтинг: ★${rating || 'N/A'}`;
     document.getElementById('passenger-status').textContent = `Статус: ${getStatusText(status) || 'N/A'}`;
@@ -327,7 +316,7 @@ function showPassengerInfo(rideId, bookingId, photoUrl, name, rating, status, pa
         }
         if (contactButton && passengerTelegramId && /^\d+$/.test(passengerTelegramId)) {
             contactButton.style.display = 'block';
-            contactButton.onclick = () => contactPassenger(passengerTelegramId, bookingId, rideId);
+            contactButton.onclick = () => contactPassenger(passengerTelegramId, bookingId, rideId, name);
         } else if (contactButton) {
             contactButton.style.display = 'none';
             contactButton.onclick = null;
@@ -345,7 +334,7 @@ function showPassengerInfo(rideId, bookingId, photoUrl, name, rating, status, pa
         }
         if (contactButton && passengerTelegramId && /^\d+$/.test(passengerTelegramId)) {
             contactButton.style.display = 'block';
-            contactButton.onclick = () => contactPassenger(passengerTelegramId, bookingId, rideId);
+            contactButton.onclick = () => contactPassenger(passengerTelegramId, bookingId, rideId, name);
         } else if (contactButton) {
             contactButton.style.display = 'none';
             contactButton.onclick = null;
@@ -385,4 +374,52 @@ function showPassengerInfo(rideId, bookingId, photoUrl, name, rating, status, pa
     }
 
     navigate('passenger-info', { rideId, bookingId });
+}
+
+async function contactPassenger(passengerTelegramId, bookingId, rideId, passengerName) {
+    const tgId = webApp.initDataUnsafe.user?.id;
+    if (!tgId) {
+        alert('Не вдалося отримати ваш Telegram ID!');
+        console.error('Не вдалося отримати Telegram ID');
+        return;
+    }
+
+    if (!passengerTelegramId || !/^\d+$/.test(passengerTelegramId)) {
+        alert('Недійсний Telegram ID пасажира!');
+        console.error('Недійсний passengerTelegramId:', passengerTelegramId);
+        return;
+    }
+
+    try {
+        const res = await fetch(`${API_BASE_URL}/api/start-chat`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'ngrok-skip-browser-warning': 'true'
+            },
+            body: JSON.stringify({
+                tgId,
+                passengerTelegramId,
+                bookingId,
+                rideId
+            })
+        });
+
+        if (!res.ok) {
+            const errorData = await res.json();
+            throw new Error(errorData.detail || 'Не вдалося розпочати чат');
+        }
+
+        const { chatId } = await res.json();
+        console.log(`Chat started successfully, chatId: ${chatId}`);
+        navigate('chat', {
+            chatId,
+            contactName: passengerName || 'Пасажир',
+            bookingId,
+            rideId
+        });
+    } catch (err) {
+        console.error('Помилка при спробі розпочати чат:', err.message);
+        alert(`Помилка при спробі розпочати чат: ${err.message}`);
+    }
 }
