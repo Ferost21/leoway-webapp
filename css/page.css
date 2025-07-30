@@ -136,10 +136,9 @@
     display: flex;
     align-items: center;
     gap: 10px;
-    padding: 0 20px; /* Padding applied only to content */
     width: 100%;
-    justify-content: center; /* Center the photo and text block */
-    height: 40px; /* Match photo height */
+    justify-content: center;
+    padding-top: 22px;
 }
 
 #chat-contact-photo {
