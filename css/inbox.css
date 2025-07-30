@@ -53,10 +53,10 @@
     font-size: 16px;
     color: var(--text-color);
     font-weight: 500;
-    white-space: nowrap; /* Запобігаємо розривам */
+    white-space: nowrap;
     overflow: hidden;
-    text-overflow: ellipsis; /* Обрізаємо довгий текст */
-    max-width: 70%; /* Обмеження для імені */
+    text-overflow: ellipsis;
+    max-width: 60%; /* Зменшено з 70%, щоб дати більше місця для booking-id */
 }
 
 .conversation-header .booking-id {
@@ -67,7 +67,7 @@
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    max-width: 20%; /* Обмежуємо ширину номера бронювання */
+    max-width: 30%; /* Збільшено з 20% для більшого місця */
 }
 
 .conversation-last-message {

@@ -97,7 +97,7 @@
 }
 
 #inbox-page .scrollable-content {
-    margin-top: 70px; /* Зберігаємо відступ зверху */
+    margin-top: 80px; /* Зберігаємо відступ зверху */
     padding: 0 0 20px; /* Прибираємо горизонтальні padding, залишаємо вертикальний знизу */
 }
 
