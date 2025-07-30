@@ -166,6 +166,13 @@
     z-index: 101;
 }
 
+#chat-ride-details {
+    background: var(--ride-bg-color);
+    padding: 10px;
+    border-radius: 8px;
+    margin-bottom: 10px;
+}
+
 #chat-ride-details p {
     margin: 5px 0;
     font-size: 14px;
@@ -402,9 +409,4 @@
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-}
-
-.last-message-time {
-    font-size: 12px;
-    color: var(--text-secondary-color);
 }
