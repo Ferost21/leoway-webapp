@@ -124,7 +124,7 @@
     z-index: 102;
     display: flex;
     align-items: center;
-    min-height: 60px;
+    min-height: 60px; /* Відновлено зі старого page.css */
 }
 
 .chat-header-content {
@@ -132,8 +132,8 @@
     align-items: center;
     gap: 10px;
     width: 100%;
-    justify-content: center;
-    /* padding-top: 22px; */
+    justify-content: center; /* Центрування вмісту по горизонталі */
+    padding-top: 22px;
 }
 
 #chat-contact-photo {
@@ -183,7 +183,7 @@
     gap: 10px;
     min-height: 0;
     box-sizing: border-box;
-    max-height: calc(100vh - 223px);
+    max-height: calc(100vh - 163px); /* Враховуємо chat-header (60px), chat-ride-info (~43px), chat-input (60px) */
     overscroll-behavior: contain;
 }
 
@@ -233,7 +233,7 @@
     border-top: 1px solid var(--border-color);
     z-index: 103;
     box-sizing: border-box;
-    min-height: 60px;
+    min-height: 60px; /* Відновлено зі старого page.css */
 }
 
 .chat-input input {
