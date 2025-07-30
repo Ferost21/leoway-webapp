@@ -135,10 +135,14 @@ async function loadChat(params) {
         const resPassengers = await fetch(`${API_BASE_URL}/api/ride-passengers?rideId=${rideId}&tgId=${tgId}`, {
             headers: { 'ngrok-skip-browser-warning': 'true' }
         });
+        let isDriver = false;
+        let bookedSeats = 0;
+
         if (resPassengers.ok) {
             const passengers = await resPassengers.json();
             const passenger = passengers.find(p => p.booking_id === bookingId);
             chatContactPhoto.src = passenger?.photo_url || 'https://t.me/i/userpic/320/default.svg';
+            bookedSeats = passenger?.seats_booked || 0; // Кількість місць для конкретного пасажира
         } else {
             console.warn(`Failed to fetch passenger photo: ${resPassengers.status} ${resPassengers.statusText}`);
             chatContactPhoto.src = 'https://t.me/i/userpic/320/default.svg';
@@ -153,10 +157,13 @@ async function loadChat(params) {
             const ride = rides.find(r => r.ride_id === rideId);
             if (ride) {
                 const departureTime = new Date(ride.departure_time);
+                // Перевіряємо, чи є користувач водієм
+                isDriver = ride.driver_id === tgId;
+                const displaySeats = isDriver ? ride.seats_booked || ride.seats_total : bookedSeats;
                 chatRideDetails.innerHTML = `
                     <p>${ride.departure} - ${ride.arrival}</p>
                     <p>${departureTime.toLocaleTimeString('uk-UA', { hour: '2-digit', minute: '2-digit' })}, ${departureTime.toLocaleDateString('uk-UA', { day: '2-digit', month: '2-digit' })}</p>
-                    <p>Забронюваних місць: ${ride.seats_booked || ride.seats_total}</p>
+                    <p>Забронюваних місць: ${displaySeats}</p>
                 `;
             } else {
                 chatRideDetails.innerHTML = `
