@@ -126,8 +126,8 @@
     border-bottom: 1px solid var(--border-color);
     z-index: 102;
     display: flex;
-    align-items: center;
-    min-height: 60px;
+    flex-direction: column;
+    gap: 10px;
 }
 
 .chat-header-content {
@@ -162,11 +162,14 @@
     color: var(--text-secondary-color);
 }
 
+.chat-divider {
+    border: 0;
+    border-top: 1px solid var(--border-color);
+    margin: 0;
+}
+
 .chat-ride-info {
-    background: var(--ride-bg-color);
     padding: 10px 20px;
-    border-bottom: 1px solid var(--border-color);
-    z-index: 101;
     text-align: center;
 }
 
