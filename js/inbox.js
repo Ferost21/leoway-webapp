@@ -130,7 +130,7 @@ async function loadChat(params) {
     chatBookingId.textContent = `Бронювання №${bookingId}`;
 
     try {
-        // Завантажуємо фото співрозмовника та кількість місць для пасажира
+        // Завантажуємо фото співрозмовника
         const tgId = webApp.initDataUnsafe.user?.id;
         let isDriver = false;
         let bookedSeats = 0;
@@ -140,11 +140,10 @@ async function loadChat(params) {
         });
         if (resPassengers.ok) {
             const passengers = await resPassengers.json();
-            console.log('Passengers data:', passengers); // Додаємо лог для діагностики
+            console.log('Passengers data:', passengers); // Логування для діагностики
             const passenger = passengers.find(p => p.booking_id === bookingId);
             if (passenger) {
                 chatContactPhoto.src = passenger.photo_url || 'https://t.me/i/userpic/320/default.svg';
-                bookedSeats = passenger.seats_booked || 0; // Кількість місць для конкретного пасажира
                 console.log(`Found passenger for bookingId ${bookingId}:`, passenger); // Логування пасажира
             } else {
                 console.warn(`Passenger not found for bookingId: ${bookingId}`);
@@ -161,19 +160,19 @@ async function loadChat(params) {
         });
         if (resRide.ok) {
             const rides = await resRide.json();
-            console.log('Rides data:', rides); // Додаємо лог для діагностики
+            console.log('Rides data:', rides); // Логування для діагностики
             const ride = rides.find(r => r.ride_id === rideId);
             if (ride) {
                 const departureTime = new Date(ride.departure_time);
                 // Перевіряємо, чи є користувач водієм
                 isDriver = ride.driver_id === tgId;
-                // Для пасажира використовуємо bookedSeats з passenger, для водія — ride.seats_booked
-                const displaySeats = isDriver ? (ride.seats_booked || ride.seats_total) : bookedSeats;
-                console.log(`isDriver: ${isDriver}, displaySeats: ${displaySeats}, bookedSeats: ${bookedSeats}`); // Логування
+                // Для пасажира беремо seats_booked з ride, для водія — seats_booked або seats_total
+                bookedSeats = ride.seats_booked || 0; // Використовуємо ride.seats_booked для всіх
+                console.log(`isDriver: ${isDriver}, bookedSeats: ${bookedSeats}, ride:`, ride); // Логування
                 chatRideDetails.innerHTML = `
                     <p>${ride.departure} - ${ride.arrival}</p>
                     <p>${departureTime.toLocaleTimeString('uk-UA', { hour: '2-digit', minute: '2-digit' })}, ${departureTime.toLocaleDateString('uk-UA', { day: '2-digit', month: '2-digit' })}</p>
-                    <p>Забронюваних місць: ${displaySeats}</p>
+                    <p>Забронюваних місць: ${bookedSeats}</p>
                 `;
             } else {
                 console.warn(`Ride not found for rideId: ${rideId}`);
