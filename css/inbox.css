@@ -8,11 +8,14 @@
 .conversation-item {
     display: flex;
     align-items: center;
-    padding: 10px;
+    padding: 10px 0; /* Remove horizontal padding, keep vertical */
     background: var(--ride-bg-color);
     border-radius: 8px;
     cursor: pointer;
     transition: background 0.2s;
+    width: 100%; /* Ensure full width */
+    box-sizing: border-box; /* Include padding in width calculation */
+    margin: 0 20px; /* Match the max-width boundary of .bottom-nav */
 }
 
 .conversation-item:hover {

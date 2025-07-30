@@ -94,6 +94,7 @@
 #my-rides-page .scrollable-content,
 #inbox-page .scrollable-content {
     margin-top: 55px;
+    padding: 10px 0; /* Remove horizontal padding, keep vertical */
     padding-bottom: 20px;
 }
 
