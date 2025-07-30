@@ -209,6 +209,7 @@ function renderMessages(messages) {
 
 async function sendMessage(chatId, bookingId, rideId) {
     const tgId = webApp.initDataUnsafe.user?.id;
+    const initData = webApp.initData || ''; // Отримуємо initData
     const messageInput = document.getElementById('message-input');
     const chatMessages = document.getElementById('chat-messages');
     const content = messageInput.value.trim();
@@ -229,7 +230,7 @@ async function sendMessage(chatId, bookingId, rideId) {
                 'Content-Type': 'application/json',
                 'ngrok-skip-browser-warning': 'true'
             },
-            body: JSON.stringify({ chatId, senderId: tgId, bookingId, rideId, content })
+            body: JSON.stringify({ chatId, senderId: tgId, bookingId, rideId, content, initData })
         });
 
         if (!res.ok) {
@@ -238,7 +239,6 @@ async function sendMessage(chatId, bookingId, rideId) {
         }
 
         messageInput.value = '';
-        // Перезавантажуємо повідомлення
         const resMessages = await fetch(`${API_BASE_URL}/api/messages?chatId=${chatId}`, {
             headers: { 'ngrok-skip-browser-warning': 'true' }
         });
@@ -250,7 +250,6 @@ async function sendMessage(chatId, bookingId, rideId) {
             ? '<div class="no-messages">Повідомлення відсутні.</div>'
             : renderMessages(messages);
 
-        // Скролимо донизу після надсилання
         chatMessages.scrollTop = chatMessages.scrollHeight;
     } catch (err) {
         alert('Помилка при надсиланні повідомлення: ' + err.message);

@@ -105,6 +105,7 @@ async function contactDriver(driverTelegramId, bookingId, rideId) {
 
 async function contactPassenger(passengerTelegramId, bookingId, rideId) {
     const userTgId = webApp.initDataUnsafe.user?.id;
+    const initData = webApp.initData || ''; // Отримуємо initData
     if (!userTgId) {
         alert('Не вдалося отримати ваш Telegram ID!');
         return;
@@ -124,14 +125,13 @@ async function contactPassenger(passengerTelegramId, bookingId, rideId) {
                 'Content-Type': 'application/json',
                 'ngrok-skip-browser-warning': 'true'
             },
-            body: JSON.stringify({ userTgId, bookingId, contactTgId: passengerTelegramId, rideId })
+            body: JSON.stringify({ userTgId, bookingId, contactTgId: passengerTelegramId, rideId, initData })
         });
         if (!res.ok) {
             const errorData = await res.json();
             throw new Error(errorData.detail || 'Помилка при створенні чату');
         }
         const result = await res.json();
-        // Отримуємо ім’я пасажира з API
         const passengerRes = await fetch(`${API_BASE_URL}/api/ride-passengers?rideId=${rideId}&tgId=${userTgId}`, {
             headers: { 'ngrok-skip-browser-warning': 'true' }
         });
@@ -140,8 +140,6 @@ async function contactPassenger(passengerTelegramId, bookingId, rideId) {
             const passengers = await passengerRes.json();
             const passenger = passengers.find(p => p.passenger_telegram_id === passengerTelegramId);
             contactName = passenger?.passenger_name || 'Пасажир';
-        } else {
-            console.warn(`Failed to fetch passenger info: ${passengerRes.status} ${passengerRes.statusText}`);
         }
         navigate('chat', { chatId: result.chatId, contactName, bookingId, rideId });
     } catch (err) {
