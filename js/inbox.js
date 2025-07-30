@@ -138,8 +138,9 @@ async function loadChat(params) {
         const resPassengers = await fetch(`${API_BASE_URL}/api/ride-passengers?rideId=${rideId}&tgId=${tgId}`, {
             headers: { 'ngrok-skip-browser-warning': 'true' }
         });
+        let passengers = [];
         if (resPassengers.ok) {
-            const passengers = await resPassengers.json();
+            passengers = await resPassengers.json();
             console.log('Passengers data:', passengers); // Логування для діагностики
             const passenger = passengers.find(p => p.booking_id === bookingId);
             if (passenger) {
@@ -166,8 +167,12 @@ async function loadChat(params) {
                 const departureTime = new Date(ride.departure_time);
                 // Перевіряємо, чи є користувач водієм
                 isDriver = ride.driver_id === tgId;
-                // Для пасажира беремо seats_booked з ride, для водія — seats_booked або seats_total
-                bookedSeats = ride.seats_booked || 0; // Використовуємо ride.seats_booked для всіх
+                // Для пасажира беремо seats_booked з ride, для водія — суму seats_booked з passengers
+                if (isDriver && passengers.length > 0) {
+                    bookedSeats = passengers.reduce((sum, p) => sum + (p.seats_booked || 0), 0);
+                } else {
+                    bookedSeats = ride.seats_booked || 0;
+                }
                 console.log(`isDriver: ${isDriver}, bookedSeats: ${bookedSeats}, ride:`, ride); // Логування
                 chatRideDetails.innerHTML = `
                     <p>${ride.departure} - ${ride.arrival}</p>
