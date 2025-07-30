@@ -91,10 +91,14 @@
     padding-bottom: 20px;
 }
 
-#my-rides-page .scrollable-content,
-#inbox-page .scrollable-content {
+#my-rides-page .scrollable-content {
     margin-top: 70px; /* Збільшено з 55px до 70px, щоб уникнути перекриття */
     padding-bottom: 20px;
+}
+
+#inbox-page .scrollable-content {
+    margin-top: 70px; /* Зберігаємо відступ зверху */
+    padding: 0 0 20px; /* Прибираємо горизонтальні padding, залишаємо вертикальний знизу */
 }
 
 #passenger-info-page .scrollable-content {
