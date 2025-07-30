@@ -133,7 +133,7 @@
     gap: 10px;
     width: 100%;
     justify-content: center;
-    padding-top: 22px;
+    /* padding-top: 22px; */
 }
 
 #chat-contact-photo {
