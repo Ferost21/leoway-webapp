@@ -1,16 +1,15 @@
 .conversation-list {
     display: flex;
     flex-direction: column;
-    gap: 10px;
-    padding: 10px;
+    padding: 0; /* Видалено padding для усунення проміжків зверху та знизу */
 }
 
 .conversation-item {
     display: flex;
     align-items: center;
-    padding: 10px;
+    padding: 0; /* Видалено внутрішній padding для усунення проміжків */
     background: var(--ride-bg-color);
-    border-radius: 8px;
+    border-radius: 0; /* Видалено заокруглення */
     cursor: pointer;
     transition: background 0.2s;
 }
