@@ -164,12 +164,14 @@
     padding: 10px 20px;
     border-bottom: 1px solid var(--border-color);
     z-index: 101;
+    text-align: center;
 }
 
 #chat-ride-details p {
     margin: 5px 0;
     font-size: 14px;
     color: var(--text-color);
+    font-weight: 500;
 }
 
 #chat-ride-details p strong {
@@ -220,7 +222,7 @@
     color: var(--text-secondary-color);
     text-align: right;
     display: block;
-    margin-top: 5px;
+    margin-top: pokud 5px;
 }
 
 .chat-input {

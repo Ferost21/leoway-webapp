@@ -154,18 +154,24 @@ async function loadChat(params) {
             if (ride) {
                 const departureTime = new Date(ride.departure_time);
                 chatRideDetails.innerHTML = `
-                    <p><strong>Звідки:</strong> ${ride.departure}</p>
-                    <p><strong>Куди:</strong> ${ride.arrival}</p>
-                    <p><strong>Дата:</strong> ${departureTime.toLocaleDateString('uk-UA', { day: '2-digit', month: '2-digit', year: 'numeric' })}</p>
-                    <p><strong>Час:</strong> ${departureTime.toLocaleTimeString('uk-UA', { hour: '2-digit', minute: '2-digit' })}</p>
-                    <p><strong>Кількість місць:</strong> ${ride.seats_booked || ride.seats_total}</p>
+                    <p>${ride.departure} - ${ride.arrival}</p>
+                    <p>${departureTime.toLocaleTimeString('uk-UA', { hour: '2-digit', minute: '2-digit' })}, ${departureTime.toLocaleDateString('uk-UA', { day: '2-digit', month: '2-digit' })}</p>
+                    <p>Забронюваних місць: ${ride.seats_booked || ride.seats_total}</p>
                 `;
             } else {
-                chatRideDetails.innerHTML = '<p>Поїздка не знайдена.</p>';
+                chatRideDetails.innerHTML = `
+                    <p>Поїздка не знайдена</p>
+                    <p>Н/Д</p>
+                    <p>Забронюваних місць: Н/Д</p>
+                `;
             }
         } else {
             console.warn(`Failed to fetch ride details: ${resRide.status} ${resRide.statusText}`);
-            chatRideDetails.innerHTML = '<p>Не вдалося завантажити інформацію про поїздку.</p>';
+            chatRideDetails.innerHTML = `
+                <p>Не вдалося завантажити</p>
+                <p>Н/Д</p>
+                <p>Забронюваних місць: Н/Д</p>
+            `;
         }
 
         // Завантажуємо повідомлення
