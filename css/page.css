@@ -167,8 +167,8 @@
     text-align: center;
 }
 
-#chat-ride-details p {
-    margin: 5px 0;
+#chat-ride-details {
+    margin: 0;
     font-size: 14px;
     color: var(--text-color);
     font-weight: 500;

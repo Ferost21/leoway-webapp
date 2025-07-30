@@ -132,26 +132,15 @@ async function loadChat(params) {
     try {
         // Завантажуємо фото співрозмовника
         const tgId = webApp.initDataUnsafe.user?.id;
-        let isDriver = false;
-        let bookedSeats = 0;
-
         const resPassengers = await fetch(`${API_BASE_URL}/api/ride-passengers?rideId=${rideId}&tgId=${tgId}`, {
             headers: { 'ngrok-skip-browser-warning': 'true' }
         });
-        let passengers = [];
         if (resPassengers.ok) {
-            passengers = await resPassengers.json();
-            console.log('Passengers data:', passengers); // Логування для діагностики
+            const passengers = await resPassengers.json();
             const passenger = passengers.find(p => p.booking_id === bookingId);
-            if (passenger) {
-                chatContactPhoto.src = passenger.photo_url || 'https://t.me/i/userpic/320/default.svg';
-                console.log(`Found passenger for bookingId ${bookingId}:`, passenger); // Логування пасажира
-            } else {
-                console.warn(`Passenger not found for bookingId: ${bookingId}`);
-                chatContactPhoto.src = 'https://t.me/i/userpic/320/default.svg';
-            }
+            chatContactPhoto.src = passenger?.photo_url || 'https://t.me/i/userpic/320/default.svg';
         } else {
-            console.warn(`Failed to fetch passenger data: ${resPassengers.status} ${resPassengers.statusText}`);
+            console.warn(`Failed to fetch passenger photo: ${resPassengers.status} ${resPassengers.statusText}`);
             chatContactPhoto.src = 'https://t.me/i/userpic/320/default.svg';
         }
 
@@ -161,39 +150,16 @@ async function loadChat(params) {
         });
         if (resRide.ok) {
             const rides = await resRide.json();
-            console.log('Rides data:', rides); // Логування для діагностики
             const ride = rides.find(r => r.ride_id === rideId);
             if (ride) {
                 const departureTime = new Date(ride.departure_time);
-                // Перевіряємо, чи є користувач водієм
-                isDriver = ride.driver_id === tgId;
-                // Для пасажира беремо seats_booked з ride, для водія — суму seats_booked з passengers
-                if (isDriver && passengers.length > 0) {
-                    bookedSeats = passengers.reduce((sum, p) => sum + (p.seats_booked || 0), 0);
-                } else {
-                    bookedSeats = ride.seats_booked || 0;
-                }
-                console.log(`isDriver: ${isDriver}, bookedSeats: ${bookedSeats}, ride:`, ride); // Логування
-                chatRideDetails.innerHTML = `
-                    <p>${ride.departure} - ${ride.arrival}</p>
-                    <p>${departureTime.toLocaleTimeString('uk-UA', { hour: '2-digit', minute: '2-digit' })}, ${departureTime.toLocaleDateString('uk-UA', { day: '2-digit', month: '2-digit' })}</p>
-                    <p>Забронюваних місць: ${bookedSeats}</p>
-                `;
+                chatRideDetails.textContent = `${ride.departure} - ${ride.arrival}, ${departureTime.toLocaleTimeString('uk-UA', { hour: '2-digit', minute: '2-digit' })}, ${departureTime.toLocaleDateString('uk-UA', { day: '2-digit', month: '2-digit' })}`;
             } else {
-                console.warn(`Ride not found for rideId: ${rideId}`);
-                chatRideDetails.innerHTML = `
-                    <p>Поїздка не знайдена</p>
-                    <p>Н/Д</p>
-                    <p>Забронюваних місць: Н/Д</p>
-                `;
+                chatRideDetails.textContent = 'Поїздка не знайдена';
             }
         } else {
             console.warn(`Failed to fetch ride details: ${resRide.status} ${resRide.statusText}`);
-            chatRideDetails.innerHTML = `
-                <p>Не вдалося завантажити</p>
-                <p>Н/Д</p>
-                <p>Забронюваних місць: Н/Д</p>
-            `;
+            chatRideDetails.textContent = 'Не вдалося завантажити інформацію про поїздку';
         }
 
         // Завантажуємо повідомлення
