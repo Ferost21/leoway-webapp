@@ -168,6 +168,35 @@ document.addEventListener('DOMContentLoaded', () => {
         webApp.close();
     }
 
+    const startParam = webApp.initDataUnsafe.start_param;
+    if (startParam && startParam.startsWith('chat_')) {
+        const chatId = parseInt(startParam.substring(5));
+        fetch(`${API_BASE_URL}/api/chat-info?chatId=${chatId}`, {
+            headers: { 'ngrok-skip-browser-warning': 'true' }
+        })
+        .then(res => {
+            if (!res.ok) throw new Error('Failed to fetch chat info');
+            return res.json();
+        })
+        .then(data => {
+            navigate('chat', {
+                chatId: data.chat_id,
+                contactName: data.contact_name,
+                bookingId: data.booking_id,
+                rideId: data.ride_id
+            });
+        })
+        .catch(err => {
+            console.error('Error loading chat from start_param:', err);
+            webApp.showAlert('Помилка відкриття чату. Спробуйте ще раз.');
+            navigate('search');
+        });
+    } else {
+        // Ініціалізація сторінки через navigate
+        navigate('search');
+        loadProfile();
+    }
+
     // Ініціалізація сторінки через navigate
     navigate('search');
     loadProfile();
