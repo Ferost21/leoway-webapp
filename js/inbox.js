@@ -86,8 +86,7 @@ function renderConversations(conversations) {
             }
         }
 
-        // Додаємо клас unread, якщо є непрочитані повідомлення (приклад логіки)
-        const isUnread = conversation.unread_count > 0; // Припустимо, що є поле unread_count
+        const isUnread = conversation.unread_count > 0;
 
         return `
             <div class="conversation-item${isUnread ? ' unread' : ''}" onclick="navigate('chat', { chatId: ${conversation.chat_id}, contactName: '${conversation.contact_name}', bookingId: ${conversation.booking_id}, rideId: ${conversation.ride_id} })">
@@ -215,19 +214,32 @@ async function loadChat(params) {
 
 function renderMessages(messages) {
     const tgId = webApp.initDataUnsafe.user?.id;
-    return messages.map(message => {
-        const isSentByUser = message.sender_id === tgId;
-        const messageTime = new Date(message.sent_at).toLocaleString('uk-UA', {
+    // Group messages by date
+    const messagesByDate = messages.reduce((acc, message) => {
+        const messageDate = new Date(message.sent_at).toLocaleDateString('uk-UA', {
             day: '2-digit',
-            month: '2-digit',
-            hour: '2-digit',
-            minute: '2-digit'
+            month: 'long'
         });
+        if (!acc[messageDate]) {
+            acc[messageDate] = [];
+        }
+        acc[messageDate].push(message);
+        return acc;
+    }, {});
+
+    // Render messages grouped by date
+    return Object.entries(messagesByDate).map(([date, dateMessages]) => {
+        const messageHtml = dateMessages.map(message => {
+            const isSentByUser = message.sender_id === tgId;
+            return `
+                <div class="message ${isSentByUser ? 'sent' : 'received'}">
+                    <p>${message.content}</p>
+                </div>
+            `;
+        }).join('');
         return `
-            <div class="message ${isSentByUser ? 'sent' : 'received'}">
-                <p>${message.content}</p>
-                <span class="message-time">${messageTime}</span>
-            </div>
+            <div class="message-date-header">${date}</div>
+            ${messageHtml}
         `;
     }).join('');
 }

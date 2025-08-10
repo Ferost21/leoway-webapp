@@ -92,13 +92,13 @@
 }
 
 #my-rides-page .scrollable-content {
-    margin-top: 70px; /* Збільшено з 55px до 70px, щоб уникнути перекриття */
+    margin-top: 70px;
     padding-bottom: 20px;
 }
 
 #inbox-page .scrollable-content {
-    margin-top: 90px; /* Зберігаємо відступ зверху */
-    padding: 0 0 20px; /* Прибираємо горизонтальні padding, залишаємо вертикальний знизу */
+    margin-top: 90px;
+    padding: 0 0 20px;
 }
 
 #passenger-info-page .scrollable-content {
@@ -126,7 +126,7 @@
     position: sticky;
     top: 0;
     background: var(--modal-bg-color);
-    padding: 10px 0; /* Removed horizontal padding to allow full-width divider */
+    padding: 10px 0;
     border-bottom: 1px solid var(--border-color);
     z-index: 102;
     display: flex;
@@ -149,38 +149,38 @@
     width: 40px;
     height: 40px;
     border-radius: 50%;
-    flex-shrink: 0; /* Prevent photo from shrinking */
+    flex-shrink: 0;
 }
 
 .chat-contact-info {
     display: flex;
     flex-direction: column;
-    justify-content: center; /* Vertically center text within photo height */
-    align-items: flex-start; /* Left-align text relative to itself */
-    height: 100%; /* Match container height */
-    margin: 0; /* Remove any default margins */
+    justify-content: center;
+    align-items: flex-start;
+    height: 100%;
+    margin: 0;
 }
 
 #chat-contact-name {
     font-size: 16px;
     font-weight: bold;
     color: var(--text-color);
-    margin: 0; /* Remove default margins */
-    padding: 0; /* Ensure no extra padding */
+    margin: 0;
+    padding: 0;
 }
 
 #chat-booking-id {
     margin: 0;
     font-size: 12px;
     color: var(--text-secondary-color);
-    padding: 0; /* Remove padding to fit within photo height */
+    padding: 0;
 }
 
 .chat-divider {
     border: 0;
     border-top: 1px solid var(--border-color);
-    width: 100%; /* Full width of #chat-page */
-    margin: 0 -20px; /* Extend to edges by countering content padding */
+    width: 100%;
+    margin: 0 -20px;
 }
 
 .chat-ride-info {
@@ -206,6 +206,19 @@
     box-sizing: border-box;
     max-height: calc(100vh - 163px);
     overscroll-behavior: contain;
+}
+
+.message-date-header {
+    text-align: center;
+    font-size: 12px;
+    color: var(--text-secondary-color);
+    background: var(--modal-bg-color);
+    padding: 8px 0;
+    margin: 10px 0 5px;
+    border-radius: 12px;
+    position: sticky;
+    top: 0;
+    z-index: 1;
 }
 
 .message {
