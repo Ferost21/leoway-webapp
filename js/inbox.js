@@ -235,10 +235,25 @@ function renderMessages(messages) {
             const sentTime = message.sent_at
                 ? new Date(message.sent_at).toLocaleTimeString('uk-UA', { hour: '2-digit', minute: '2-digit' })
                 : 'Невідомий час';
+            // Add read indicator for sent messages
+            const readIndicator = isSentByUser
+                ? `
+                    <span class="message-read-indicator">
+                        ${message.is_read
+                            ? `<svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M2 8.5L5.5 12L13 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                    <path d="M9 12L14.5 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>` // Double checkmark for read
+                            : `<svg width="12" height="12" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                 <path d="M2 8.5L5.5 12L13 4.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                               </svg>` // Single checkmark for sent (unread)
+                        }
+                    </span>`
+                : '';
             return `
                 <div class="message ${isSentByUser ? 'sent' : 'received'}">
                     <p>${message.content}</p>
-                    <span class="message-time">${sentTime}</span>
+                    <span class="message-time">${sentTime}${readIndicator}</span>
                 </div>
             `;
         }).join('');
