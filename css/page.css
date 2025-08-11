@@ -196,14 +196,15 @@
 }
 
 .chat-messages {
-    flex: 1 1 auto; /* Take remaining space, allow shrinking */
-    overflow-y: auto; /* Ensure scrolling */
+    flex-grow: 1;
+    overflow-y: auto;
     padding: 10px 15px;
     display: flex;
     flex-direction: column;
     gap: 10px;
-    min-height: 0; /* Prevent flex item from growing beyond container */
+    min-height: 0;
     box-sizing: border-box;
+    max-height: calc(100vh - 163px);
     overscroll-behavior: contain;
 }
 
