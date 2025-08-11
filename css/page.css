@@ -204,11 +204,9 @@
     gap: 10px;
     min-height: 0;
     box-sizing: border-box;
-    /* приберемо max-height */
-    /* max-height: calc(100vh - 163px); */
-    padding-bottom: 70px; /* висота chat-input + невеликий запас */
+    max-height: calc(100vh - 163px);
+    overscroll-behavior: contain;
 }
-
 
 .message-date-header {
     text-align: center;
