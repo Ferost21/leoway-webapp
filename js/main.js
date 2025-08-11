@@ -145,8 +145,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 urlObj.pathname.includes('/api/start-chat') ||
                 urlObj.pathname.includes('/api/send-message') ||
                 urlObj.pathname.includes('/api/update-booking-status') ||
-                urlObj.pathname.includes('/api/messages')) { // Added /api/messages
-                urlObj.searchParams.set('initData', initData); // Без encodeURIComponent
+                urlObj.pathname.includes('/api/messages') ||
+                urlObj.pathname.includes('/api/chat-info')) {
+                urlObj.searchParams.set('initData', initData);
             }
             options.headers = {
                 ...options.headers,
@@ -162,42 +163,39 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             return response;
         };
+
+        // Обробка tgWebAppStartParam для deep linking
+        const startParam = webApp.initDataUnsafe.start_param || new URLSearchParams(window.location.search).get('tgWebAppStartParam');
+        if (startParam && startParam.startsWith('chat_')) {
+            const chatId = parseInt(startParam.substring(5));
+            fetch(`${API_BASE_URL}/api/chat-info?chatId=${chatId}`, {
+                headers: { 'ngrok-skip-browser-warning': 'true' }
+            })
+            .then(res => {
+                if (!res.ok) throw new Error(`Failed to fetch chat info: ${res.statusText}`);
+                return res.json();
+            })
+            .then(data => {
+                navigate('chat', {
+                    chatId: data.chat_id,
+                    contactName: data.contact_name,
+                    bookingId: data.booking_id,
+                    rideId: data.ride_id
+                });
+            })
+            .catch(err => {
+                console.error('Error loading chat from start_param:', err);
+                webApp.showAlert('Помилка відкриття чату. Спробуйте ще раз.');
+                navigate('search');
+            });
+        } else {
+            // Ініціалізація сторінки через navigate
+            navigate('search');
+            loadProfile();
+        }
     } else {
         console.error('No user or initData available');
         webApp.showAlert('Не вдалося отримати дані користувача. Будь ласка, відкрийте додаток через Telegram.');
         webApp.close();
     }
-
-    const startParam = webApp.initDataUnsafe.start_param;
-    if (startParam && startParam.startsWith('chat_')) {
-        const chatId = parseInt(startParam.substring(5));
-        fetch(`${API_BASE_URL}/api/chat-info?chatId=${chatId}`, {
-            headers: { 'ngrok-skip-browser-warning': 'true' }
-        })
-        .then(res => {
-            if (!res.ok) throw new Error('Failed to fetch chat info');
-            return res.json();
-        })
-        .then(data => {
-            navigate('chat', {
-                chatId: data.chat_id,
-                contactName: data.contact_name,
-                bookingId: data.booking_id,
-                rideId: data.ride_id
-            });
-        })
-        .catch(err => {
-            console.error('Error loading chat from start_param:', err);
-            webApp.showAlert('Помилка відкриття чату. Спробуйте ще раз.');
-            navigate('search');
-        });
-    } else {
-        // Ініціалізація сторінки через navigate
-        navigate('search');
-        loadProfile();
-    }
-
-    // Ініціалізація сторінки через navigate
-    navigate('search');
-    loadProfile();
 });
