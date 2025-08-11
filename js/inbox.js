@@ -231,9 +231,14 @@ function renderMessages(messages) {
     return Object.entries(messagesByDate).map(([date, dateMessages]) => {
         const messageHtml = dateMessages.map(message => {
             const isSentByUser = message.sender_id === tgId;
+            // Fallback to current time if sent_at is invalid
+            const sentTime = message.sent_at
+                ? new Date(message.sent_at).toLocaleTimeString('uk-UA', { hour: '2-digit', minute: '2-digit' })
+                : 'Невідомий час';
             return `
                 <div class="message ${isSentByUser ? 'sent' : 'received'}">
                     <p>${message.content}</p>
+                    <span class="message-time">${sentTime}</span>
                 </div>
             `;
         }).join('');

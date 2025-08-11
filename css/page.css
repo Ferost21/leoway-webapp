@@ -111,6 +111,7 @@
     top: 0;
     left: 0;
     right: 0;
+    bottom: 0;
     width: 100%;
     max-width: 600px;
     margin: 0 auto;
@@ -180,7 +181,7 @@
     border: 0;
     border-top: 1px solid var(--border-color);
     width: 100%;
-    margin: 0 -20px;
+    margin: 0;
 }
 
 .chat-ride-info {
@@ -197,7 +198,7 @@
 
 .chat-messages {
     position: absolute;
-    top: 163px; /* висота твого хедера у чаті */
+    top: 140px; /* висота chat-header */
     bottom: 60px; /* висота chat-input */
     left: 0;
     right: 0;
@@ -207,6 +208,7 @@
     flex-direction: column;
     gap: 10px;
     box-sizing: border-box;
+    overscroll-behavior: contain;
 }
 
 .message-date-header {
@@ -214,45 +216,56 @@
     font-size: 12px;
     color: var(--text-secondary-color);
     background: var(--modal-bg-color);
-    padding: 8px 0;
-    margin: 10px 0 5px;
+    padding: 8px 15px; /* було 8px 0 */
     border-radius: 12px;
     position: sticky;
     top: 0;
     z-index: 1;
+    display: inline-block; /* щоб не розтягувалось на весь екран */
+    margin: 0 auto; /* центрування */
 }
 
 .message {
     max-width: 80%;
-    padding: 10px;
+    padding: 10px 30px 14px 12px; /* Зробив справа трохи більше місця під час */
     border-radius: 8px;
     word-wrap: break-word;
+    position: relative; /* для абсолютного позиціонування часу */
 }
 
 .message.sent {
     background-color: var(--button-bg-color);
     color: var(--button-text-color);
     margin-left: auto;
+    margin-right: 0px; /* Space from the edge */
 }
 
 .message.received {
     background-color: var(--modal-bg-color);
     color: var(--text-color);
     margin-right: auto;
+    margin-left: 0px; /* Space from the edge */
     border: 1px solid var(--border-color);
 }
 
 .message p {
     margin: 0;
     font-size: 14px;
+    line-height: 1.4; /* Improved readability */
 }
 
 .message-time {
-    font-size: 12px;
+    position: absolute;
+    bottom: 4px;
+    right: 8px;
+    font-size: 11px;
     color: var(--text-secondary-color);
-    text-align: right;
-    display: block;
-    margin-top: 5px;
+    opacity: 0.7;
+    white-space: nowrap; /* щоб час не переносився */
+}
+
+.message.received .message-time {
+    right: 8px; /* все одно справа, навіть для отриманих */
 }
 
 .chat-input {
@@ -261,7 +274,7 @@
     left: 0;
     right: 0;
     background: var(--modal-bg-color);
-    padding: 10px 20px;
+    padding: 0px 10px;
     display: flex;
     align-items: center;
     gap: 10px;
