@@ -55,11 +55,20 @@ function swapLocations() {
 async function submitSearch() {
     const departure = document.getElementById('departure').value.trim();
     const arrival = document.getElementById('arrival').value.trim();
-    const date = document.getElementById('date').value.trim();
+    const dateInput = document.getElementById('date').value.trim(); // Очікується формат РРРР-ММ-ДД
     const seats = document.getElementById('seats').value.trim();
 
-    if (!departure || !arrival || !date || !seats) return alert('Заповніть усі поля!');
+    if (!departure || !arrival || !dateInput || !seats) return alert('Заповніть усі поля!');
     if (departure.length > 255 || arrival.length > 255) return alert('Назви місць мають бути до 255 символів!');
+
+    // Конвертація дати з РРРР-ММ-ДД у ДД-ММ-РРРР
+    let date;
+    try {
+        const [year, month, day] = dateInput.split('-');
+        date = `${day}-${month}-${year}`;
+    } catch (e) {
+        return alert('Невірний формат дати!');
+    }
 
     try {
         const res = await fetch(`${API_BASE_URL}/api/search-rides`, {
@@ -72,26 +81,41 @@ async function submitSearch() {
         });
         if (!res.ok) throw new Error('Не вдалося отримати поїздки');
         const rides = await res.json();
+
+        // Separate rides into non-parsed and parsed
+        const nonParsedRides = rides.filter(ride => !ride.is_parsed);
+        const parsedRides = rides.filter(ride => ride.is_parsed);
+
+        // Sort each group by departure_time
+        const sortByDepartureTime = (a, b) => new Date(a.departure_time) - new Date(b.departure_time);
+        nonParsedRides.sort(sortByDepartureTime);
+        parsedRides.sort(sortByDepartureTime);
+
+        // Combine sorted arrays: non-parsed first, then parsed
+        const sortedRides = [...nonParsedRides, ...parsedRides];
+
         const searchResults = document.getElementById('search-results');
-        searchResults.innerHTML = rides.length === 0
+        searchResults.innerHTML = sortedRides.length === 0
             ? '<div class="no-rides">Поїздок не знайдено.</div>'
-            : rides.map(ride => {
+            : sortedRides.map(ride => {
                 const dt = new Date(ride.departure_time);
                 const timeStr = dt.toLocaleTimeString('uk-UA', { hour: '2-digit', minute: '2-digit' });
                 const dateStr = dt.toLocaleDateString('uk-UA', { day: '2-digit', month: '2-digit' });
+                const isParsed = ride.is_parsed;
                 return `
                     <div class="ride-item">
                         <div class="ride-top">
                             <div class="ride-route">
                                 <p class="route">${ride.departure} → ${ride.arrival}</p>
                                 <p>${timeStr}, ${dateStr}</p>
-                                <p>Місць: ${ride.seats_available}/${ride.seats_total}</p>
-                                ${ride.description ? `<p>Опис: ${ride.description}</p>` : ''}
-                                <p>Водій: ${ride.driver_name} ★ ${ride.driver_rating.toFixed(1)}</p>
+                                ${!isParsed ? `<p>Місць: ${ride.seats_available}/${ride.seats_total}</p>` : ''}
+                                ${ride.description ? `<p>Опис: ${isParsed ? `<a href="${ride.description}" target="_blank">Деталі</a>` : ride.description}</p>` : ''}
+                                ${!isParsed ? `<p>Водій: ${ride.driver_name} ★ ${ride.driver_rating.toFixed(1)}</p>` : `<p>Водій: ${ride.driver_name}</p>`}
                             </div>
-                            <div class="price-tag">${ride.price} ₴</div>
+                            ${!isParsed ? `<div class="price-tag">${ride.price} ₴</div>` : ''}
                         </div>
-                        <button class="book-button" onclick="bookRide(${ride.id}, ${seats}, '${ride.driver_telegram_id}')">Забронювати</button>
+                        ${!isParsed ? `<button class="book-button" onclick="bookRide(${ride.id}, ${seats}, '${ride.driver_telegram_id}')">Забронювати</button>` 
+                                    : `<a class="book-button" href="${ride.description}" target="_blank" style="text-decoration: none; text-align: center; display: flex; justify-content: center; align-items: center;">Перейти до чату</a>`}
                     </div>`;
             }).join('');
 
@@ -110,7 +134,6 @@ async function submitSearch() {
         subtitle.textContent = `${formatShortDate(date)}, ${seatsNumber} ${seatWord}`;
         titleBox.appendChild(subtitle);
 
-        // Переходимо на сторінку результатів
         navigate('search-results');
     } catch (err) {
         alert('Помилка при пошуку поїздок: ' + err.message);
