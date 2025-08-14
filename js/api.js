@@ -16,7 +16,8 @@ async function bookRide(rideId, seats, driverTelegramId) {
                 tgId: user.id,
                 firstName: user.first_name || "Невідомий користувач",
                 photoUrl: user.photo_url || null,
-                seats
+                seats,
+                initData: webApp.initData || ''
             })
         });
         if (!res.ok) {
@@ -43,7 +44,7 @@ async function cancelRide(bookingId) {
                 'Content-Type': 'application/json',
                 'ngrok-skip-browser-warning': 'true'
             },
-            body: JSON.stringify({ bookingId, tgId })
+            body: JSON.stringify({ bookingId, tgId, initData: webApp.initData || '' })
         });
         if (!res.ok) {
             const errorData = await res.json();
@@ -78,7 +79,7 @@ async function contactDriver(driverTelegramId, bookingId, rideId) {
                 'Content-Type': 'application/json',
                 'ngrok-skip-browser-warning': 'true'
             },
-            body: JSON.stringify({ userTgId, bookingId, contactTgId: driverTelegramId, rideId })
+            body: JSON.stringify({ userTgId, bookingId, contactTgId: driverTelegramId, rideId, initData: webApp.initData || '' })
         });
         if (!res.ok) {
             const errorData = await res.json();
@@ -125,7 +126,7 @@ async function contactPassenger(passengerTelegramId, bookingId, rideId) {
                 'Content-Type': 'application/json',
                 'ngrok-skip-browser-warning': 'true'
             },
-            body: JSON.stringify({ userTgId, bookingId, contactTgId: passengerTelegramId, rideId, initData })
+            body: JSON.stringify({ userTgId, bookingId, contactTgId: passengerTelegramId, rideId, initData: webApp.initData || '' })
         });
         if (!res.ok) {
             const errorData = await res.json();
@@ -157,7 +158,7 @@ async function approveBooking(bookingId, rideId) {
                 'Content-Type': 'application/json',
                 'ngrok-skip-browser-warning': 'true'
             },
-            body: JSON.stringify({ bookingId, tgId, status: 'approved' })
+            body: JSON.stringify({ bookingId, tgId, status: 'approved', initData: webApp.initData || '' })
         });
         if (!res.ok) {
             const errorData = await res.json();
@@ -194,7 +195,13 @@ async function cancelBooking(bookingId, rideId) {
                 'Content-Type': 'application/json',
                 'ngrok-skip-browser-warning': 'true'
             },
-            body: JSON.stringify({ bookingId, tgId, status: 'cancelled', rideId })
+            body: JSON.stringify({
+                bookingId,
+                tgId,
+                status: 'cancelled',
+                initData: webApp.initData || ''  // Додати це
+                // Видалити rideId, якщо не потрібно
+                })
         });
         if (!res.ok) {
             const errorData = await res.json();
@@ -230,7 +237,7 @@ async function deleteRide(rideId) {
                 'Content-Type': 'application/json',
                 'ngrok-skip-browser-warning': 'true'
             },
-            body: JSON.stringify({ rideId, tgId })
+            body: JSON.stringify({ rideId, tgId, initData: webApp.initData || '' })
         });
         if (!res.ok) {
             const errorData = await res.json();
