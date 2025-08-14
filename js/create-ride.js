@@ -15,10 +15,11 @@ function submitCreateRide() {
         time: document.getElementById("create-time").value,
         description: document.getElementById("create-description").value.trim(),
         seats: parseInt(document.getElementById("create-seats").value),
-        price: parseFloat(document.getElementById("create-price").value)
+        price: parseFloat(document.getElementById("create-price").value),
+        initData: webApp.initData || ''  // Додаємо initData
     };
 
-    if (!data.departure || !data.arrival || !data.date || !data.time || !data.seats || !data.price) {
+    if (!data.departure || !data.arrival || !data.date || !data.time || !data.seats || !data.price || !data.initData) {
         alert("Будь ласка, заповніть усі обов'язкові поля.");
         return;
     }
@@ -31,7 +32,20 @@ function submitCreateRide() {
         },
         body: JSON.stringify(data)
     })
-    .then(res => res.json())
+    .then(res => {
+        if (!res.ok) {
+            return res.text().then(text => {
+                let errorData;
+                try {
+                    errorData = JSON.parse(text);
+                } catch {
+                    errorData = { detail: text };
+                }
+                throw new Error(errorData.detail || "Помилка створення поїздки");
+            });
+        }
+        return res.json();
+    })
     .then(response => {
         if (response.error) {
             alert("Помилка: " + response.error);
@@ -41,7 +55,7 @@ function submitCreateRide() {
         }
     })
     .catch(err => {
-        alert("Помилка при з'єднанні з сервером.");
+        alert("Помилка при створенні поїздки: " + err.message);
         console.error(err);
     });
 }
