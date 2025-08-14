@@ -323,9 +323,8 @@
 }
 
 .chat-input button {
-    background: var(--button-bg-color);
+    background: transparent; /* No background */
     border: none;
-    border-radius: 8px;
     padding: 10px;
     cursor: pointer;
     display: flex;
@@ -336,12 +335,17 @@
 }
 
 .chat-input button:hover {
-    background: var(--button-hover-bg-color);
+    background: transparent; /* No background on hover */
 }
 
 .chat-input button svg {
     width: 24px;
     height: 24px;
+    fill: var(--button-bg-color); /* Green icon */
+}
+
+.chat-input button:hover svg {
+    fill: var(--button-hover-bg-color); /* Slightly darker green on hover */
 }
 
 .my-rides-title-box {
