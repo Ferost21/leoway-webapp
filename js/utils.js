@@ -1,6 +1,25 @@
 function formatShortDate(dateStr) {
-    const parts = dateStr.split('-');
-    return parts.length === 3 ? `${parts[0]}.${parts[1]}` : dateStr;
+    const dt = new Date(dateStr);
+    if (isNaN(dt)) {
+        return dateStr; // Якщо дата невалідна, повернути оригінал
+    }
+    const day = dt.toLocaleDateString('uk-UA', { day: 'numeric' }); // "17"
+    const month = dt.toLocaleDateString('uk-UA', { month: 'long' }); // "серпень"
+    const monthGenitive = {
+        'січень': 'січня',
+        'лютий': 'лютого',
+        'березень': 'березня',
+        'квітень': 'квітня',
+        'травень': 'травня',
+        'червень': 'червня',
+        'липень': 'липня',
+        'серпень': 'серпня',
+        'вересень': 'вересня',
+        'жовтень': 'жовтня',
+        'листопад': 'листопада',
+        'грудень': 'грудня'
+    }[month];
+    return `${day} ${monthGenitive}`;
 }
 
 function getStatusText(status) {

@@ -55,17 +55,17 @@ function swapLocations() {
 async function submitSearch() {
     const departure = document.getElementById('departure').value.trim();
     const arrival = document.getElementById('arrival').value.trim();
-    const dateInput = document.getElementById('date').value.trim(); // Очікується формат РРРР-ММ-ДД
+    const dateInput = document.getElementById('date').value.trim(); // Очікується формат ДД-ММ-РРРР
     const seats = document.getElementById('seats').value.trim();
 
     if (!departure || !arrival || !dateInput || !seats) return alert('Заповніть усі поля!');
     if (departure.length > 255 || arrival.length > 255) return alert('Назви місць мають бути до 255 символів!');
 
-    // Конвертація дати з РРРР-ММ-ДД у ДД-ММ-РРРР
+    // Конвертація дати з ДД-ММ-РРРР у РРРР-ММ-ДД для запиту до API
     let date;
     try {
-        const [year, month, day] = dateInput.split('-');
-        date = `${day}-${month}-${year}`;
+        const [day, month, year] = dateInput.split('-');
+        date = `${year}-${month}-${day}`; // Конвертація в РРРР-ММ-ДД
     } catch (e) {
         return alert('Невірний формат дати!');
     }
@@ -81,6 +81,9 @@ async function submitSearch() {
         });
         if (!res.ok) throw new Error('Не вдалося отримати поїздки');
         const rides = await res.json();
+
+        // Лог для діагностики
+        console.log('API response:', rides);
 
         // Separate rides into non-parsed and parsed
         const nonParsedRides = rides.filter(ride => !ride.is_parsed);
@@ -102,6 +105,8 @@ async function submitSearch() {
                 const timeStr = dt.toLocaleTimeString('uk-UA', { hour: '2-digit', minute: '2-digit' });
                 const dateStr = dt.toLocaleDateString('uk-UA', { day: '2-digit', month: '2-digit' });
                 const isParsed = ride.is_parsed;
+                // Лог для діагностики
+                console.log(`Ride ID: ${ride.id}, is_parsed: ${isParsed}, additional_info: ${ride.additional_info}, description: ${ride.description}`);
                 return `
                     <div class="ride-item">
                         <div class="ride-top">
@@ -109,7 +114,7 @@ async function submitSearch() {
                                 <p class="route">${ride.departure} → ${ride.arrival}</p>
                                 <p>${timeStr}, ${dateStr}</p>
                                 ${!isParsed ? `<p>Місць: ${ride.seats_available}/${ride.seats_total}</p>` : ''}
-                                ${ride.description ? `<p>Опис: ${isParsed ? `<a href="${ride.description}" target="_blank">Деталі</a>` : ride.description}</p>` : ''}
+                                ${isParsed ? `<p class="description">Опис: ${ride.additional_info || 'відсутній'}</p>` : (!isParsed && ride.description ? `<p class="description">Опис: ${ride.description}</p>` : '')}
                                 ${!isParsed ? `<p>Водій: ${ride.driver_name} ★ ${ride.driver_rating.toFixed(1)}</p>` : `<p>Водій: ${ride.driver_name}</p>`}
                             </div>
                             ${!isParsed ? `<div class="price-tag">${ride.price} ₴</div>` : ''}

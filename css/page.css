@@ -57,11 +57,12 @@
 }
 
 .scrollable-content {
-    height: 100%;
+    height: calc(100% - 80px); /* Висота з урахуванням верхнього елемента */
     overflow-y: auto;
     overscroll-behavior: contain;
-    padding: 20px;
+    padding: 10px;
     box-sizing: border-box;
+    padding-bottom: 60px; /* Додаємо відступ, рівний висоті .bottom-nav */
 }
 
 .scrollable-content.no-rides-container,
@@ -87,7 +88,7 @@
 
 #search-results-page .scrollable-content,
 #driver-ride-details-page .scrollable-content {
-    margin-top: 90px;
+    margin-top: 95px;
     padding-bottom: 20px;
 }
 
