@@ -60,7 +60,7 @@
     height: calc(100% - 80px); /* Висота з урахуванням верхнього елемента */
     overflow-y: auto;
     overscroll-behavior: contain;
-    padding: 10px;
+    padding: 20px;
     box-sizing: border-box;
     padding-bottom: 60px; /* Додаємо відступ, рівний висоті .bottom-nav */
 }
