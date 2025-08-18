@@ -137,3 +137,26 @@ button:hover {
         display: block !important;
     }
 }
+
+/* Видимий інпут, який рендерить flatpickr */
+.flatpickr-alt-input {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    background: var(--input-bg-color);
+    color: var(--text-color) !important;
+    -webkit-text-fill-color: var(--text-color) !important; /* iOS Safari fix */
+    caret-color: var(--text-color);
+    box-sizing: border-box;
+}
+
+/* Оригінальний інпут: лишаємо у DOM для значення, але не показуємо */
+input.flatpickr-input {
+    position: absolute !important;
+    left: -9999px !important;
+    width: 0 !important;
+    height: 0 !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+}
