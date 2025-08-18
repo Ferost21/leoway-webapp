@@ -39,48 +39,34 @@ document.addEventListener('DOMContentLoaded', () => {
     webApp.ready();
     updateTheme();
 
-    flatpickr("#date", {
-    dateFormat: "d-m-Y",
-    altInput: true,
-    altFormat: "d-m-Y",
-    disableMobile: true,
-    allowInput: false,
-    minDate: "today",
-    locale: "uk",
-    onReady: (selectedDates, dateStr, instance) => {
-        // плейсхолдер на видимому інпуті
-        if (instance.altInput) instance.altInput.placeholder = "Дата (ДД-ММ-РРРР)";
-    }
-    });
+    try {
+        flatpickr("#date", {
+            dateFormat: "d-m-Y",
+            minDate: "today",
+            locale: "uk",
+            onReady: () => {
+                const dateInput = document.getElementById('date');
+                dateInput.placeholder = "Дата (ДД-ММ-РРРР)";
+                if (webApp.requestFullscreen && window.innerWidth <= 600) {
+                    webApp.requestFullscreen().catch(() => {});
+                }
+            }
+        });
+    } catch (err) {}
 
     flatpickr("#create-date", {
-    dateFormat: "d-m-Y",
-    altInput: true,
-    altFormat: "d-m-Y",
-    disableMobile: true,
-    allowInput: false,
-    minDate: "today",
-    locale: "uk",
-    onReady: (sd, ds, inst) => {
-        if (inst.altInput) inst.altInput.placeholder = "Дата (ДД-ММ-РРРР)";
-    }
+        dateFormat: "d-m-Y",
+        minDate: "today",
+        locale: "uk"
     });
 
     flatpickr("#create-time", {
-    enableTime: true,
-    noCalendar: true,
-    dateFormat: "H:i",
-    altInput: true,
-    altFormat: "H:i",
-    time_24hr: true,
-    disableMobile: true,
-    allowInput: false,
-    locale: "uk",
-    onReady: (sd, ds, inst) => {
-        if (inst.altInput) inst.altInput.placeholder = "Час (ГГ:ХХ)";
-    }
+        enableTime: true,
+        noCalendar: true,
+        dateFormat: "H:i",
+        time_24hr: true,
+        locale: "uk"
     });
-
 
     setupSuggestions('departure', 'departure-suggestions');
     setupSuggestions('arrival', 'arrival-suggestions');
