@@ -55,7 +55,10 @@ async function loadInbox(params = {}) {
         scrollableContent.scrollTop = 0;
     } catch (err) {
         console.error('Помилка при завантаженні розмов:', err.message);
-        conversationList.innerHTML = `<div class="no-messages">Помилка при завантаженні розмов: ${err.message}</div>`;
+        const errorMessage = err.message === 'Failed to fetch'
+            ? 'Немає з\'єднання з сервером. Перевірте інтернет і спробуйте знову.'
+            : err.message;
+        conversationList.innerHTML = `<div class="no-messages">Помилка при завантаженні розмов: ${errorMessage}</div>`;
         const scrollableContent = document.querySelector('#inbox-page .scrollable-content');
         scrollableContent.classList.add('no-messages-container');
     }

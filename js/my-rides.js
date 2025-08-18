@@ -30,7 +30,6 @@ async function loadMyRides() {
 
         scrollableContent.scrollTop = 0;
 
-        // Перевіряємо хеш для автоматичного відкриття деталей
         const hash = location.hash.replace('#', '');
         const [page, rideId, bookingId] = hash.split('/');
         const driverRideDetailsPage = document.getElementById('driver-ride-details-page');
@@ -62,7 +61,10 @@ async function loadMyRides() {
         }
     } catch (err) {
         console.error('Помилка при завантаженні поїздок:', err.message);
-        document.getElementById('my-rides-results').innerHTML = '<div class="no-rides">Помилка при завантаженні поїздок: ' + err.message + '</div>';
+        const errorMessage = err.message === 'Failed to fetch'
+            ? 'Немає з\'єднання з сервером. Перевірте інтернет і спробуйте знову.'
+            : err.message;
+        document.getElementById('my-rides-results').innerHTML = `<div class="no-rides">Помилка при завантаженні поїздок: ${errorMessage}</div>`;
         const scrollableContent = document.querySelector('#my-rides-page .scrollable-content');
         scrollableContent.classList.add('no-rides-container');
     }
