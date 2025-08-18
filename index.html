@@ -53,20 +53,25 @@
     <!-- Контейнер для сторінок -->
     <div class="page-container">
         <!-- Сторінка пошуку -->
-        <div id="search-page" class="page active">
+        <div id="search-page" class="page">
             <div class="scrollable-content">
+                <!-- Add Beta Test Notice -->
+                <div class="beta-notice" id="beta-notice">
+                    <p>Це бета-версія програми. Дякуємо за тестування! <span class="close-beta-notice" onclick="document.getElementById('beta-notice').style.display='none'">×</span></p>
+                </div>
+                <!-- Existing content -->
                 <h1>Пошук поїздки</h1>
-                <div class="input-wrapper">
-                    <input id="departure" placeholder="Місце відправлення" autocomplete="off">
-                    <button class="swap-button" onclick="swapLocations()" aria-label="Змінити місця"></button>
+                <div class="input-group">
+                    <input type="text" id="departure" placeholder="Звідки">
                     <div id="departure-suggestions" class="suggestions"></div>
                 </div>
-                <div class="input-wrapper">
-                    <input id="arrival" placeholder="Місце прибуття" autocomplete="off">
+                <button class="swap-button" onclick="swapLocations()">↔</button>
+                <div class="input-group">
+                    <input type="text" id="arrival" placeholder="Куди">
                     <div id="arrival-suggestions" class="suggestions"></div>
                 </div>
-                <input id="date" type="text" placeholder="Дата (ДД-ММ-РРРР)" readonly>
-                <input id="seats" type="number" placeholder="Кількість місць" min="1" max="10">
+                <input type="text" id="date" placeholder="Дата (ДД-ММ-РРРР)">
+                <input type="number" id="seats" placeholder="Кількість пасажирів" min="1">
                 <button onclick="submitSearch()">Пошук</button>
             </div>
         </div>

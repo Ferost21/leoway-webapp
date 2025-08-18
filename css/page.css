@@ -57,7 +57,7 @@
 }
 
 .scrollable-content {
-    height: calc(100% - 80px); /* Висота з урахуванням верхнього елемента */
+    height: calc(100% - 10px); /* Висота з урахуванням верхнього елемента */
     overflow-y: auto;
     overscroll-behavior: contain;
     padding: 20px;
@@ -487,4 +487,26 @@
 .last-message-time {
     font-size: 12px;
     color: var(--text-secondary-color);
+}
+
+.beta-notice {
+    position: relative;
+    background-color: var(--button-bg-color);
+    color: var(--button-text-color);
+    padding: 10px 30px 10px 10px;
+    margin: 10px 20px;
+    border-radius: 8px;
+    text-align: center;
+    font-size: 14px;
+    font-weight: 500;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.close-beta-notice {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    font-size: 18px;
 }
