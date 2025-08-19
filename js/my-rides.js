@@ -15,14 +15,34 @@ async function loadMyRides() {
 
         if (!res.ok) throw new Error('Не вдалося отримати ваші поїздки');
 
-        const rides = await res.json();
+        const allRides = await res.json();
+        const now = new Date();
+        const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000); // Дата 7 днів тому
+
+        // Фільтрація активних поїздок (майбутні)
+        const activeRides = allRides.filter(ride => new Date(ride.departure_time) > now);
+
+        // Фільтрація архівних поїздок (минулі, але не старші за 7 днів)
+        const archivedRides = allRides.filter(ride => {
+            const departureDate = new Date(ride.departure_time);
+            return departureDate < now && departureDate > sevenDaysAgo;
+        });
+
         const scrollableContent = document.querySelector('#my-rides-page .scrollable-content');
 
-        document.getElementById('my-rides-results').innerHTML = rides.length === 0
-            ? '<div class="no-rides">У вас немає поїздок.</div>'
-            : renderRides(rides);
+        document.getElementById('my-rides-results').innerHTML = activeRides.length === 0
+            ? '<div class="no-rides">У вас немає активних поїздок.</div>'
+            : renderRides(activeRides);
 
-        if (rides.length === 0) {
+        // Показ кнопки "Архівні поїздки", якщо є архівні
+        const archivedBtn = document.getElementById('archived-rides-btn');
+        if (archivedRides.length > 0) {
+            archivedBtn.style.display = 'block';
+        } else {
+            archivedBtn.style.display = 'none';
+        }
+
+        if (activeRides.length === 0) {
             scrollableContent.classList.add('no-rides-container');
         } else {
             scrollableContent.classList.remove('no-rides-container');
@@ -34,7 +54,7 @@ async function loadMyRides() {
         const [page, rideId, bookingId] = hash.split('/');
         const driverRideDetailsPage = document.getElementById('driver-ride-details-page');
         if (page === 'my-rides' && rideId && !driverRideDetailsPage.classList.contains('active')) {
-            const ride = rides.find(r => r.ride_id === parseInt(rideId));
+            const ride = allRides.find(r => r.ride_id === parseInt(rideId));
             if (ride) {
                 const dt = new Date(ride.departure_time);
                 const timeStr = dt.toLocaleTimeString('uk-UA', { hour: '2-digit', minute: '2-digit' });
@@ -66,6 +86,57 @@ async function loadMyRides() {
             : err.message;
         document.getElementById('my-rides-results').innerHTML = `<div class="no-rides">Помилка при завантаженні поїздок: ${errorMessage}</div>`;
         const scrollableContent = document.querySelector('#my-rides-page .scrollable-content');
+        scrollableContent.classList.add('no-rides-container');
+    }
+}
+
+async function loadArchivedRides() {
+    const tgId = webApp.initDataUnsafe.user?.id;
+    if (!tgId) {
+        document.getElementById('archived-rides-results').innerHTML = '<div class="no-rides">Не вдалося отримати ваш Telegram ID!</div>';
+        const scrollableContent = document.querySelector('#archived-rides-page .scrollable-content');
+        scrollableContent.classList.add('no-rides-container');
+        console.error('Не вдалося отримати Telegram ID');
+        return;
+    }
+
+    try {
+        const res = await fetch(`${API_BASE_URL}/api/my-rides?tgId=${tgId}`, {
+            headers: { 'ngrok-skip-browser-warning': 'true' }
+        });
+
+        if (!res.ok) throw new Error('Не вдалося отримати ваші поїздки');
+
+        const allRides = await res.json();
+        const now = new Date();
+        const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+
+        // Фільтрація архівних поїздок (минулі, але не старші за 7 днів)
+        const archivedRides = allRides.filter(ride => {
+            const departureDate = new Date(ride.departure_time);
+            return departureDate < now && departureDate > sevenDaysAgo;
+        });
+
+        const scrollableContent = document.querySelector('#archived-rides-page .scrollable-content');
+
+        document.getElementById('archived-rides-results').innerHTML = archivedRides.length === 0
+            ? '<div class="no-rides">У вас немає архівних поїздок.</div>'
+            : renderRides(archivedRides);
+
+        if (archivedRides.length === 0) {
+            scrollableContent.classList.add('no-rides-container');
+        } else {
+            scrollableContent.classList.remove('no-rides-container');
+        }
+
+        scrollableContent.scrollTop = 0;
+    } catch (err) {
+        console.error('Помилка при завантаженні архівних поїздок:', err.message);
+        const errorMessage = err.message === 'Failed to fetch'
+            ? 'Немає з\'єднання з сервером. Перевірте інтернет і спробуйте знову.'
+            : err.message;
+        document.getElementById('archived-rides-results').innerHTML = `<div class="no-rides">Помилка при завантаженні архівних поїздок: ${errorMessage}</div>`;
+        const scrollableContent = document.querySelector('#archived-rides-page .scrollable-content');
         scrollableContent.classList.add('no-rides-container');
     }
 }

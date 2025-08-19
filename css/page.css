@@ -83,6 +83,17 @@
     margin-top: 60px;
 }
 
+#my-rides-page .no-rides,
+#archived-rides-page .no-rides {
+    text-align: center;
+    color: var(--text-color);
+    font-size: 16px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+}
+
 #search-page .scrollable-content,
 #create-page .scrollable-content {
     padding-top: 60px;
@@ -102,7 +113,7 @@
 
 #my-rides-page .scrollable-content {
     margin-top: 70px;
-    padding-bottom: 20px;
+    padding-bottom: 60px; /* Increased to accommodate the archived rides button */
 }
 
 #inbox-page .scrollable-content {
@@ -510,4 +521,36 @@
     border-radius: 10px;
     box-shadow: 0 2px 6px rgba(0,0,0,0.15);
     z-index: 1000;
+}
+
+#archived-rides-page .scrollable-content {
+    margin-top: 70px;
+    padding-bottom: 20px;
+}
+
+#archived-rides-title {
+    font-size: 18px;
+    margin: 0;
+    color: var(--text-color);
+}
+
+#archived-rides-btn {
+    position: fixed;
+    bottom: 70px; /* трохи вище нижнього меню */
+    left: 50%;
+    transform: translateX(-50%);
+    width: 90%;
+    max-width: 400px;
+    padding: 12px;
+    font-size: 16px;
+    border: none;
+    border-radius: 12px;
+    background: var(--modal-bg-color); /* фон як у сторінки */
+    color: var(--nav-active-color); /* той самий колір тексту як в нижньому меню */
+    cursor: pointer;
+    z-index: 1001;
+    text-align: center;
+}
+#archived-rides-btn:hover {
+    background: var(--hover-bg-color);
 }

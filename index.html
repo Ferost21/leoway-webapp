@@ -79,10 +79,24 @@
         <!-- Сторінка мої поїздки -->
         <div id="my-rides-page" class="page">
             <div class="my-rides-title-box">
-                <h2 id="my-rides-title">Мої поїздки</h2>
+                <h1 id="my-rides-title">Мої поїздки</h1>
             </div>
             <div class="scrollable-content">
-                <div id="my-rides-results" class="rides-tab active"></div>
+                <div id="my-rides-results"></div>
+            </div>
+            <button id="archived-rides-btn" onclick="navigate('archived-rides')" style="display: none;">
+                Архівні поїздки
+            </button>
+        </div>
+
+
+        <!-- Нова сторінка архівні поїздки -->
+        <div id="archived-rides-page" class="page">
+            <div class="my-rides-title-box">
+                <h1 id="archived-rides-title">Архівні поїздки</h1>
+            </div>
+            <div class="scrollable-content">
+                <div id="archived-rides-results"></div>
             </div>
         </div>
 
