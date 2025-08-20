@@ -28,26 +28,33 @@ function updateTheme() {
     root.style.setProperty('--status-approved-color', isDark ? '#2ecc71' : '#27ae60');
     root.style.setProperty('--status-pending-color', isDark ? '#f1c40f' : '#f39c12');
     root.style.setProperty('--status-cancelled-color', isDark ? '#e74c3c' : '#e74c3c');
-    root.style.setProperty('--contact-button-bg-color', themeParams.link_color || (isDark ? '#3498db' : '#2980b9'));
-    root.style.setProperty('--contact-button-hover-bg-color', themeParams.link_color || (isDark ? '#2980b9' : '#2471a3'));
-
-    webApp.setHeaderColor(themeParams.bg_color || (isDark ? '#1f2a2d' : '#ffffff'), 'bg_color');
-    webApp.setBackgroundColor(themeParams.bg_color || (isDark ? '#1f2a2d' : '#f5f5f5'));
+    root.style.setProperty('--contact-button-bg-color', themeParams.button_color || (isDark ? '#3498db' : '#2980b9'));
+    root.style.setProperty('--contact-button-hover-bg-color', themeParams.button_color || (isDark ? '#2980b9' : '#2574a9'));
+    root.style.setProperty('--text-secondary-color', themeParams.secondary_text_color || (isDark ? '#bdc3c7' : '#7f8c8d'));
+    root.style.setProperty('--link-color', themeParams.link_color || (isDark ? '#3498db' : '#2980b9'));
+    root.style.setProperty('--destructive-text-color', themeParams.destructive_text_color || (isDark ? '#e74c3c' : '#e74c3c'));
+    root.style.setProperty('--nav-active-color', themeParams.button_color || (isDark ? '#2ecc71' : '#27ae60'));
 }
+
+updateTheme();
 
 // Додаємо мок для DeviceStorage для локального тестування
 if (location.protocol === 'file:') {
+    console.warn('Running in local test mode with mocked DeviceStorage');
     window.Telegram.WebApp.DeviceStorage = {
-        get: (key, callback) => callback(null, localStorage.getItem(key)),
-        set: (key, value, callback) => { localStorage.setItem(key, value); callback(null); },
-        remove: (key, callback) => { localStorage.removeItem(key); callback(null); }
+        getItem: (key, callback) => callback(null, localStorage.getItem(key)),
+        setItem: (key, value, callback) => { localStorage.setItem(key, value); callback(null); },
+        removeItem: (key, callback) => { localStorage.removeItem(key); callback(null); }
     };
 }
 
 // Завантаження історії пошуку
 function loadSearchHistory() {
-    Telegram.WebApp.DeviceStorage.get('search_history', (error, result) => {
-        if (error) return console.error('Помилка завантаження історії:', error);
+    Telegram.WebApp.DeviceStorage.getItem('search_history', (error, result) => {
+        if (error) {
+            console.error('Помилка завантаження історії:', error);
+            return;
+        }
         const history = result ? JSON.parse(result) : [];
         displaySearchHistory(history);
     });
@@ -69,12 +76,14 @@ function displaySearchHistory(history) {
             <button onclick="deleteSearchHistoryItem(${index})">Видалити</button>
         `;
         historyItem.addEventListener('click', (e) => {
-            if (e.target.tagName !== 'BUTTON') {
+            if (e.target.tagName !== 'BUTTON') { // Уникаємо виклику при натисканні на кнопку "Видалити"
                 document.getElementById('departure').value = item.departure;
                 document.getElementById('arrival').value = item.arrival;
-                document.getElementById('date').value = item.date;
+                // Конвертація дати назад у формат ДД-ММ-РРРР для форми
+                const [year, month, day] = item.date.split('-');
+                document.getElementById('date').value = `${day}-${month}-${year}`;
                 document.getElementById('seats').value = item.seats;
-                submitSearch(); // Виклик пошуку з search.js
+                submitSearch();
             }
         });
         searchHistoryContainer.appendChild(historyItem);
@@ -83,13 +92,19 @@ function displaySearchHistory(history) {
 
 // Збереження пошуку в історії
 function saveSearchHistory(searchData) {
-    Telegram.WebApp.DeviceStorage.get('search_history', (error, result) => {
+    Telegram.WebApp.DeviceStorage.getItem('search_history', (error, result) => {
         let history = result ? JSON.parse(result) : [];
-        const exists = history.some(i => i.departure === searchData.departure && i.arrival === searchData.arrival && i.date === searchData.date && i.seats === searchData.seats);
+        // Перевіряємо, чи пошук уже існує
+        const exists = history.some(
+            item => item.departure === searchData.departure &&
+                    item.arrival === searchData.arrival &&
+                    item.date === searchData.date &&
+                    item.seats === searchData.seats
+        );
         if (!exists) {
-            history.unshift(searchData);
-            if (history.length > 10) history = history.slice(0, 10);
-            Telegram.WebApp.DeviceStorage.set('search_history', JSON.stringify(history), (error) => {
+            history.unshift(searchData); // Додаємо на початок
+            if (history.length > 10) history = history.slice(0, 10); // Обмежуємо до 10
+            Telegram.WebApp.DeviceStorage.setItem('search_history', JSON.stringify(history), (error) => {
                 if (error) console.error('Помилка збереження історії:', error);
                 loadSearchHistory();
             });
@@ -99,16 +114,20 @@ function saveSearchHistory(searchData) {
 
 // Видалення елемента історії
 function deleteSearchHistoryItem(index) {
-    Telegram.WebApp.DeviceStorage.get('search_history', (error, result) => {
-        if (error) return console.error('Помилка завантаження історії:', error);
+    Telegram.WebApp.DeviceStorage.getItem('search_history', (error, result) => {
+        if (error) {
+            console.error('Помилка завантаження історії:', error);
+            return;
+        }
         let history = result ? JSON.parse(result) : [];
         history.splice(index, 1);
-        Telegram.WebApp.DeviceStorage.set('search_history', JSON.stringify(history), (error) => {
+        Telegram.WebApp.DeviceStorage.setItem('search_history', JSON.stringify(history), (error) => {
             if (error) console.error('Помилка оновлення історії:', error);
             loadSearchHistory();
         });
     });
 }
+
 
 document.addEventListener('DOMContentLoaded', () => {
     webApp.ready();
