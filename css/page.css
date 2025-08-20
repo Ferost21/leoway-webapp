@@ -554,3 +554,50 @@
 #archived-rides-btn:hover {
     background: var(--hover-bg-color);
 }
+
+/* Стилі для історії пошуку */
+.search-history {
+    margin-bottom: 20px;
+    padding: 10px;
+    background: var(--modal-bg-color);
+    border-radius: 8px;
+}
+
+.history-item {
+    background: var(--ride-bg-color);
+    border: 1px solid var(--border-color);
+    padding: 10px;
+    margin-bottom: 10px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.2s ease;
+    color: var(--text-color);
+    font-size: 14px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.history-item:hover {
+    background: var(--hover-bg-color);
+}
+
+.history-item button {
+    background: var(--cancel-button-bg-color);
+    color: var(--button-text-color);
+    border: none;
+    padding: 5px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 12px;
+}
+
+.history-item button:hover {
+    background: var(--cancel-button-hover-bg-color);
+}
+
+.no-history {
+    text-align: center;
+    color: var(--text-secondary-color);
+    font-size: 14px;
+}

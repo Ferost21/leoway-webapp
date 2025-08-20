@@ -94,6 +94,7 @@ function navigate(page, params = {}) {
     else if (page === 'inbox') loadInbox();
     else if (page === 'chat' && params.chatId) loadChat(params);
     else if (page === 'archived-rides') loadArchivedRides();
+    else if (page === 'search') loadSearchHistory(); // Додаємо завантаження історії пошуку
 
     console.log(`Navigation completed to page: ${page}, params:`, params);
 }

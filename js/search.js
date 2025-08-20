@@ -139,6 +139,9 @@ async function submitSearch() {
         subtitle.textContent = `${formatShortDate(date)}, ${seatsNumber} ${seatWord}`;
         titleBox.appendChild(subtitle);
 
+        // Зберігаємо дані пошуку в історію
+        saveSearchHistory({ departure, arrival, date, seats });
+
         navigate('search-results');
     } catch (err) {
         alert('Помилка при пошуку поїздок: ' + err.message);

@@ -35,6 +35,81 @@ function updateTheme() {
     webApp.setBackgroundColor(themeParams.bg_color || (isDark ? '#1f2a2d' : '#f5f5f5'));
 }
 
+// Додаємо мок для DeviceStorage для локального тестування
+if (location.protocol === 'file:') {
+    window.Telegram.WebApp.DeviceStorage = {
+        get: (key, callback) => callback(null, localStorage.getItem(key)),
+        set: (key, value, callback) => { localStorage.setItem(key, value); callback(null); },
+        remove: (key, callback) => { localStorage.removeItem(key); callback(null); }
+    };
+}
+
+// Завантаження історії пошуку
+function loadSearchHistory() {
+    Telegram.WebApp.DeviceStorage.get('search_history', (error, result) => {
+        if (error) return console.error('Помилка завантаження історії:', error);
+        const history = result ? JSON.parse(result) : [];
+        displaySearchHistory(history);
+    });
+}
+
+// Відображення історії пошуку
+function displaySearchHistory(history) {
+    const searchHistoryContainer = document.getElementById('search-history');
+    searchHistoryContainer.innerHTML = '';
+    if (history.length === 0) {
+        searchHistoryContainer.innerHTML = '<p class="no-history">Історія пошуку порожня</p>';
+        return;
+    }
+    history.forEach((item, index) => {
+        const historyItem = document.createElement('div');
+        historyItem.className = 'history-item';
+        historyItem.innerHTML = `
+            <span>${item.departure} → ${item.arrival}, ${formatShortDate(item.date)}, ${item.seats} місць</span>
+            <button onclick="deleteSearchHistoryItem(${index})">Видалити</button>
+        `;
+        historyItem.addEventListener('click', (e) => {
+            if (e.target.tagName !== 'BUTTON') {
+                document.getElementById('departure').value = item.departure;
+                document.getElementById('arrival').value = item.arrival;
+                document.getElementById('date').value = item.date;
+                document.getElementById('seats').value = item.seats;
+                submitSearch(); // Виклик пошуку з search.js
+            }
+        });
+        searchHistoryContainer.appendChild(historyItem);
+    });
+}
+
+// Збереження пошуку в історії
+function saveSearchHistory(searchData) {
+    Telegram.WebApp.DeviceStorage.get('search_history', (error, result) => {
+        let history = result ? JSON.parse(result) : [];
+        const exists = history.some(i => i.departure === searchData.departure && i.arrival === searchData.arrival && i.date === searchData.date && i.seats === searchData.seats);
+        if (!exists) {
+            history.unshift(searchData);
+            if (history.length > 10) history = history.slice(0, 10);
+            Telegram.WebApp.DeviceStorage.set('search_history', JSON.stringify(history), (error) => {
+                if (error) console.error('Помилка збереження історії:', error);
+                loadSearchHistory();
+            });
+        }
+    });
+}
+
+// Видалення елемента історії
+function deleteSearchHistoryItem(index) {
+    Telegram.WebApp.DeviceStorage.get('search_history', (error, result) => {
+        if (error) return console.error('Помилка завантаження історії:', error);
+        let history = result ? JSON.parse(result) : [];
+        history.splice(index, 1);
+        Telegram.WebApp.DeviceStorage.set('search_history', JSON.stringify(history), (error) => {
+            if (error) console.error('Помилка оновлення історії:', error);
+            loadSearchHistory();
+        });
+    });
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     webApp.ready();
     updateTheme();
