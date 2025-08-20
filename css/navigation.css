@@ -25,6 +25,8 @@
     color: var(--text-color);
     cursor: pointer;
     transition: background 0.2s ease;
+    outline: none; /* Видаляємо стандартний обвід */
+    user-select: none; /* Забороняємо виділення тексту */
 }
 
 .nav-item.active {
