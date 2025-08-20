@@ -71,12 +71,14 @@ function displaySearchHistory(history) {
     history.forEach((item, index) => {
         const historyItem = document.createElement('div');
         historyItem.className = 'history-item';
+        const seatsNumber = parseInt(item.seats);
+        const seatWord = seatsNumber === 1 ? 'місце' : 'місць';
         historyItem.innerHTML = `
-            <span>${item.departure} → ${item.arrival}, ${formatShortDate(item.date)}, ${item.seats} місць</span>
-            <button onclick="deleteSearchHistoryItem(${index})">Видалити</button>
+            <span>${item.departure} - ${item.arrival}<br>${formatShortDate(item.date)}, ${item.seats} ${seatWord}</span>
+            <span class="delete-icon" onclick="deleteSearchHistoryItem(${index})">×</span>
         `;
         historyItem.addEventListener('click', (e) => {
-            if (e.target.tagName !== 'BUTTON') { // Уникаємо виклику при натисканні на кнопку "Видалити"
+            if (e.target.className !== 'delete-icon') { // Уникаємо виклику при натисканні на хрестик
                 document.getElementById('departure').value = item.departure;
                 document.getElementById('arrival').value = item.arrival;
                 // Конвертація дати назад у формат ДД-ММ-РРРР для форми
@@ -86,6 +88,8 @@ function displaySearchHistory(history) {
                 submitSearch();
             }
         });
+        historyItem.setAttribute('role', 'button');
+        historyItem.setAttribute('tabindex', '0');
         searchHistoryContainer.appendChild(historyItem);
     });
 }

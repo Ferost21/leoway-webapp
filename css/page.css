@@ -601,3 +601,16 @@
     color: var(--text-secondary-color);
     font-size: 14px;
 }
+
+/* Стилі для хрестика видалення */
+.delete-icon {
+    color: var(--text-color);
+    font-size: 16px;
+    cursor: pointer;
+    padding: 2px 5px;
+    transition: color 0.2s ease;
+}
+
+.delete-icon:hover {
+    color: var(--link-color);
+}
