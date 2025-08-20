@@ -1,50 +1,3 @@
-// Функція для збереження чатів у localStorage
-function saveChatsLocally(tgId, conversations) {
-    try {
-        localStorage.setItem(`chats_${tgId}`, JSON.stringify(conversations));
-        console.log('Chats saved to localStorage:', conversations);
-    } catch (err) {
-        console.error('Error saving chats to localStorage:', err.message);
-    }
-}
-
-// Функція для отримання чатів з localStorage
-function getLocalChats(tgId) {
-    try {
-        const chats = localStorage.getItem(`chats_${tgId}`);
-        return chats ? JSON.parse(chats) : [];
-    } catch (err) {
-        console.error('Error retrieving chats from localStorage:', err.message);
-        return [];
-    }
-}
-
-// Функція для синхронізації локальних чатів із сервером
-async function syncLocalChats(tgId) {
-    const localChats = getLocalChats(tgId);
-    if (localChats.length === 0) return;
-
-    try {
-        const res = await fetch(`${API_BASE_URL}/api/chats?tgId=${tgId}`, {
-            headers: { 'ngrok-skip-browser-warning': 'true' }
-        });
-
-        if (res.ok) {
-            const serverChats = await res.json();
-            // Оновлюємо локальні чати даними з сервера
-            saveChatsLocally(tgId, serverChats);
-            console.log('Local chats synchronized with server');
-            return serverChats;
-        } else {
-            console.warn('Failed to sync chats with server, using local chats');
-            return localChats;
-        }
-    } catch (err) {
-        console.warn('Network error during chat sync, using local chats:', err.message);
-        return localChats;
-    }
-}
-
 async function loadInbox(params = {}) {
     const tgId = webApp.initDataUnsafe.user?.id;
     if (!tgId) {
@@ -65,9 +18,6 @@ async function loadInbox(params = {}) {
         if (!res.ok) throw new Error('Не вдалося отримати ваші розмови');
 
         const conversations = await res.json();
-        // Зберігаємо чати локально після успішного отримання з сервера
-        saveChatsLocally(tgId, conversations);
-
         const scrollableContent = document.querySelector('#inbox-page .scrollable-content');
 
         const conversationsWithPhotos = await Promise.all(conversations.map(async (conversation) => {
@@ -108,20 +58,9 @@ async function loadInbox(params = {}) {
         const errorMessage = err.message === 'Failed to fetch'
             ? 'Немає з\'єднання з сервером. Перевірте інтернет і спробуйте знову.'
             : err.message;
-
-        // Якщо немає підключення, використовуємо локально збережені чати
-        const localChats = getLocalChats(tgId);
-        if (localChats.length > 0) {
-            const scrollableContent = document.querySelector('#inbox-page .scrollable-content');
-            conversationList.innerHTML = renderConversations(localChats);
-            scrollableContent.classList.remove('no-messages-container');
-            scrollableContent.scrollTop = 0;
-            console.log('Loaded chats from localStorage:', localChats);
-        } else {
-            conversationList.innerHTML = `<div class="no-messages">Помилка при завантаженні розмов: ${errorMessage}</div>`;
-            const scrollableContent = document.querySelector('#inbox-page .scrollable-content');
-            scrollableContent.classList.add('no-messages-container');
-        }
+        conversationList.innerHTML = `<div class="no-messages">Помилка при завантаженні розмов: ${errorMessage}</div>`;
+        const scrollableContent = document.querySelector('#inbox-page .scrollable-content');
+        scrollableContent.classList.add('no-messages-container');
     }
 }
 
@@ -154,7 +93,7 @@ function renderConversations(conversations) {
 
         return `
             <div class="conversation-item${isUnread ? ' unread' : ''}" onclick="navigate('chat', { chatId: ${conversation.chat_id}, contactName: '${conversation.contact_name}', bookingId: ${conversation.booking_id}, rideId: ${conversation.ride_id} })">
-                <img src="${conversation.photo_url || 'https://t.me/i/userpic/320/default.svg'}" alt="Contact Photo" class="conversation-photo">
+                <img src="${conversation.photo_url}" alt="Contact Photo" class="conversation-photo">
                 <div class="conversation-info">
                     <div class="conversation-header">
                         <h3>${conversation.contact_name}</h3>
@@ -171,32 +110,79 @@ function renderConversations(conversations) {
 }
 
 async function loadChat(params) {
+    console.log(`loadChat called with params:`, params);
     const { chatId, contactName, bookingId, rideId } = params;
-    const tgId = webApp.initDataUnsafe.user?.id;
-    if (!tgId) {
-        document.getElementById('chat-messages').innerHTML = '<div class="no-messages">Не вдалося отримати ваш Telegram ID!</div>';
-        console.error('Не вдалося отримати Telegram ID');
+    const chatPage = document.getElementById('chat-page');
+    const chatMessages = document.getElementById('chat-messages');
+    const sendButton = document.getElementById('send-message-btn');
+    const messageInput = document.getElementById('message-input');
+    const chatContactPhoto = document.getElementById('chat-contact-photo');
+    const chatContactName = document.getElementById('chat-contact-name');
+    const chatBookingId = document.getElementById('chat-booking-id');
+    const chatRideDetails = document.getElementById('chat-ride-details');
+
+    if (!chatPage || !chatMessages || !sendButton || !messageInput || !chatContactPhoto || !chatContactName || !chatBookingId || !chatRideDetails) {
+        console.error('One or more DOM elements are missing:', {
+            chatPage: !!chatPage,
+            chatMessages: !!chatMessages,
+            sendButton: !!sendButton,
+            messageInput: !!messageInput,
+            chatContactPhoto: !!chatContactPhoto,
+            chatContactName: !!chatContactName,
+            chatBookingId: !!chatBookingId,
+            chatRideDetails: !!chatRideDetails
+        });
+        navigate('inbox');
         return;
     }
 
-    document.getElementById('chat-contact-name').textContent = contactName || 'Контакт';
-    document.getElementById('chat-booking-id').textContent = `Бронювання №${bookingId}`;
-    const chatRideDetails = document.getElementById('chat-ride-details');
-    chatRideDetails.textContent = `Поїздка №${rideId}`;
+    chatPage.dataset.chatId = chatId;
+    chatPage.dataset.contactName = contactName;
+    chatPage.dataset.bookingId = bookingId;
+    chatPage.dataset.rideId = rideId;
 
-    const chatMessages = document.getElementById('chat-messages');
-    const sendButton = document.getElementById('send-button');
-    const messageInput = document.getElementById('message-input');
-    const chatPage = document.getElementById('chat-page');
+    chatContactName.textContent = contactName;
+    chatBookingId.textContent = `Бронювання №${bookingId}`;
 
     try {
-        const res = await fetch(`${API_BASE_URL}/api/messages?chatId=${chatId}`, {
+        const tgId = webApp.initDataUnsafe.user?.id;
+        const resPassengers = await fetch(`${API_BASE_URL}/api/ride-passengers?rideId=${rideId}&tgId=${tgId}`, {
+            headers: { 'ngrok-skip-browser-warning': 'true' }
+        });
+        if (resPassengers.ok) {
+            const passengers = await resPassengers.json();
+            const passenger = passengers.find(p => p.booking_id === bookingId);
+            chatContactPhoto.src = passenger?.photo_url || 'https://t.me/i/userpic/320/default.svg';
+        } else {
+            console.warn(`Failed to fetch passenger photo: ${resPassengers.status} ${resPassengers.statusText}`);
+            chatContactPhoto.src = 'https://t.me/i/userpic/320/default.svg';
+        }
+
+        const resRide = await fetch(`${API_BASE_URL}/api/my-rides?tgId=${tgId}`, {
+            headers: { 'ngrok-skip-browser-warning': 'true' }
+        });
+        if (resRide.ok) {
+            const rides = await resRide.json();
+            const ride = rides.find(r => r.ride_id === rideId);
+            if (ride) {
+                const departureTime = new Date(ride.departure_time);
+                chatRideDetails.textContent = `${ride.departure} - ${ride.arrival}, ${departureTime.toLocaleTimeString('uk-UA', { hour: '2-digit', minute: '2-digit' })}, ${departureTime.toLocaleDateString('uk-UA', { day: '2-digit', month: '2-digit' })}`;
+            } else {
+                chatRideDetails.textContent = 'Поїздка не знайдена';
+            }
+        } else {
+            console.warn(`Failed to fetch ride details: ${resRide.status} ${resRide.statusText}`);
+            chatRideDetails.textContent = 'Не вдалося завантажити інформацію про поїздку';
+        }
+
+        const resMessages = await fetch(`${API_BASE_URL}/api/messages?chatId=${chatId}`, {
             headers: { 'ngrok-skip-browser-warning': 'true' }
         });
 
-        if (!res.ok) throw new Error('Не вдалося отримати повідомлення');
+        if (!resMessages.ok) throw new Error('Не вдалося отримати повідомлення');
 
-        const messages = await res.json();
+        const messages = await resMessages.json();
+        console.log(`Fetched ${messages.length} messages for chatId: ${chatId}`);
         chatMessages.innerHTML = messages.length === 0
             ? '<div class="no-messages">Повідомлення відсутні.</div>'
             : renderMessages(messages);
@@ -325,15 +311,6 @@ async function sendMessage(chatId, bookingId, rideId) {
             : renderMessages(messages);
 
         chatMessages.scrollTop = chatMessages.scrollHeight;
-
-        // Оновлюємо локальні чати після надсилання повідомлення
-        const updatedChats = await syncLocalChats(tgId);
-        const conversationList = document.getElementById('conversation-list');
-        if (conversationList) {
-            conversationList.innerHTML = updatedChats.length === 0
-                ? '<div class="no-messages">Розмови відсутні.</div>'
-                : renderConversations(updatedChats);
-        }
     } catch (err) {
         alert('Помилка при надсиланні повідомлення: ' + err.message);
     }
