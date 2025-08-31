@@ -61,18 +61,33 @@
             <div class="scrollable-content">
                 <h1>Пошук поїздки</h1>
                 <div class="input-wrapper">
-                    <input id="departure" placeholder="Місце відправлення" autocomplete="off">
+                    <button id="departure-btn" class="location-btn" onclick="openLocationModal('departure')">
+                        <span id="departure-text">Місце відправлення</span>
+                    </button>
                     <button class="swap-button" onclick="swapLocations()" aria-label="Змінити місця"></button>
-                    <div id="departure-suggestions" class="suggestions"></div>
                 </div>
                 <div class="input-wrapper">
-                    <input id="arrival" placeholder="Місце прибуття" autocomplete="off">
-                    <div id="arrival-suggestions" class="suggestions"></div>
+                    <button id="arrival-btn" class="location-btn" onclick="openLocationModal('arrival')">
+                        <span id="arrival-text">Місце прибуття</span>
+                    </button>
                 </div>
                 <input id="date" type="text" placeholder="Дата (ДД-ММ-РРРР)" readonly>
                 <input id="seats" type="number" placeholder="Кількість місць" min="1" max="10">
                 <button onclick="submitSearch()">Пошук</button>
                 <div id="search-history" class="search-history"></div>
+            </div>
+            <!-- Modal for location input -->
+            <div id="location-modal" class="modal" style="display: none;">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h2 id="modal-title">Виберіть місце</h2>
+                        <span class="close-modal" onclick="closeLocationModal()">&times;</span>
+                    </div>
+                    <div class="input-wrapper">
+                        <input id="modal-input" type="text" placeholder="Введіть назву міста">
+                        <div id="modal-suggestions" class="suggestions"></div>
+                    </div>
+                </div>
             </div>
         </div>
 

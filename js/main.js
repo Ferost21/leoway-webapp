@@ -78,10 +78,9 @@ function displaySearchHistory(history) {
             <span class="delete-icon" onclick="deleteSearchHistoryItem(${index})">×</span>
         `;
         historyItem.addEventListener('click', (e) => {
-            if (e.target.className !== 'delete-icon') { // Уникаємо виклику при натисканні на хрестик
-                document.getElementById('departure').value = item.departure;
-                document.getElementById('arrival').value = item.arrival;
-                // Конвертація дати назад у формат ДД-ММ-РРРР для форми
+            if (e.target.className !== 'delete-icon') {
+                document.getElementById('departure-text').textContent = item.departure;
+                document.getElementById('arrival-text').textContent = item.arrival;
                 const [year, month, day] = item.date.split('-');
                 document.getElementById('date').value = `${day}-${month}-${year}`;
                 document.getElementById('seats').value = item.seats;
@@ -98,7 +97,6 @@ function displaySearchHistory(history) {
 function saveSearchHistory(searchData) {
     Telegram.WebApp.DeviceStorage.getItem('search_history', (error, result) => {
         let history = result ? JSON.parse(result) : [];
-        // Перевіряємо, чи пошук уже існує
         const exists = history.some(
             item => item.departure === searchData.departure &&
                     item.arrival === searchData.arrival &&
@@ -106,8 +104,8 @@ function saveSearchHistory(searchData) {
                     item.seats === searchData.seats
         );
         if (!exists) {
-            history.unshift(searchData); // Додаємо на початок
-            if (history.length > 10) history = history.slice(0, 10); // Обмежуємо до 10
+            history.unshift(searchData);
+            if (history.length > 10) history = history.slice(0, 10);
             Telegram.WebApp.DeviceStorage.setItem('search_history', JSON.stringify(history), (error) => {
                 if (error) console.error('Помилка збереження історії:', error);
                 loadSearchHistory();
@@ -131,7 +129,6 @@ function deleteSearchHistoryItem(index) {
         });
     });
 }
-
 
 document.addEventListener('DOMContentLoaded', () => {
     webApp.ready();
@@ -166,20 +163,19 @@ document.addEventListener('DOMContentLoaded', () => {
         locale: "uk"
     });
 
-    setupSuggestions('departure', 'departure-suggestions');
-    setupSuggestions('arrival', 'arrival-suggestions');
+    setupSuggestions('modal-input', 'modal-suggestions');
     setupSuggestions('create-departure', 'create-departure-suggestions');
     setupSuggestions('create-arrival', 'create-arrival-suggestions');
 
     function updateSwapButtonVisibility() {
-        const departure = document.getElementById('departure').value.trim();
-        const arrival = document.getElementById('arrival').value.trim();
+        const departure = document.getElementById('departure-text').textContent.trim();
+        const arrival = document.getElementById('arrival-text').textContent.trim();
         const swapButton = document.querySelector('.swap-button');
-        swapButton.classList.toggle('visible', departure.length > 0 || arrival.length > 0);
+        swapButton.classList.toggle('visible', departure !== 'Місце відправлення' || arrival !== 'Місце прибуття');
     }
 
-    ['departure', 'arrival'].forEach(id => {
-        document.getElementById(id).addEventListener('input', updateSwapButtonVisibility);
+    ['departure-btn', 'arrival-btn'].forEach(id => {
+        document.getElementById(id).addEventListener('click', updateSwapButtonVisibility);
     });
 
     updateSwapButtonVisibility();
@@ -231,7 +227,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const originalFetch = window.fetch;
         window.fetch = async function (url, options = {}) {
             const urlObj = new URL(url, API_BASE_URL);
-            // Додавати initData лише для захищених ендпоінтів
             if (urlObj.pathname.includes('/api/user-rating') || 
                 urlObj.pathname.includes('/api/chats') || 
                 urlObj.pathname.includes('/api/my-rides') || 
@@ -262,6 +257,32 @@ document.addEventListener('DOMContentLoaded', () => {
             return response;
         };
 
+        // Обробка BackButton
+        Telegram.WebApp.BackButton.onClick(() => {
+            if (isModalOpen) {
+                closeLocationModal();
+            } else {
+                const state = history.state || {};
+                const currentPage = state.page;
+
+                if (currentPage === 'driver-ride-details') {
+                    navigate('my-rides');
+                } else if (currentPage === 'archived-rides') {
+                    navigate('my-rides');
+                } else if (currentPage === 'chat') {
+                    navigate('inbox');
+                } else if (currentPage === 'inbox') {
+                    navigate('search');
+                } else if (currentPage === 'passenger-info') {
+                    navigate('driver-ride-details', { rideId: state.rideId });
+                } else if (currentPage === 'search-results') {
+                    navigate('search');
+                } else {
+                    navigate('search');
+                }
+            }
+        });
+
         // Обробка tgWebAppStartParam для deep linking
         const startParam = webApp.initDataUnsafe.start_param || new URLSearchParams(window.location.search).get('tgWebAppStartParam');
         if (startParam && startParam.startsWith('chat_')) {
@@ -287,7 +308,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 navigate('search');
             });
         } else {
-            // Ініціалізація сторінки через navigate
             navigate('search');
             loadProfile();
         }

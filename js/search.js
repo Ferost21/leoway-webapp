@@ -35,6 +35,13 @@ function setupSuggestions(inputId, suggestionsId) {
         if (item) {
             input.value = item.dataset.name;
             suggestions.style.display = 'none';
+            if (inputId === 'modal-input') {
+                // Update the corresponding field and close modal
+                const fieldType = input.dataset.fieldType;
+                document.getElementById(`${fieldType}-text`).textContent = item.dataset.name;
+                closeLocationModal();
+                updateSwapButtonVisibility();
+            }
         }
     });
 
@@ -46,26 +53,55 @@ function setupSuggestions(inputId, suggestionsId) {
 }
 
 function swapLocations() {
-    const departure = document.getElementById('departure').value;
-    const arrival = document.getElementById('arrival').value;
-    document.getElementById('departure').value = arrival;
-    document.getElementById('arrival').value = departure;
+    const departureText = document.getElementById('departure-text').textContent;
+    const arrivalText = document.getElementById('arrival-text').textContent;
+    document.getElementById('departure-text').textContent = arrivalText === 'Місце прибуття' ? 'Місце відправлення' : arrivalText;
+    document.getElementById('arrival-text').textContent = departureText === 'Місце відправлення' ? 'Місце прибуття' : departureText;
+    updateSwapButtonVisibility();
+}
+
+function openLocationModal(fieldType) {
+    const modal = document.getElementById('location-modal');
+    const modalInput = document.getElementById('modal-input');
+    const modalTitle = document.getElementById('modal-title');
+    modalInput.value = '';
+    modalInput.dataset.fieldType = fieldType;
+    modalTitle.textContent = fieldType === 'departure' ? 'Місце відправлення' : 'Місце прибуття';
+    modal.style.display = 'flex';
+    modalInput.focus();
+    // Show BackButton to close modal
+    Telegram.WebApp.BackButton.show();
+}
+
+function closeLocationModal() {
+    const modal = document.getElementById('location-modal');
+    modal.style.display = 'none';
+    document.getElementById('modal-suggestions').style.display = 'none';
+    document.getElementById('modal-input').value = '';
+    // Hide BackButton if on search page
+    if (history.state?.page === 'search') {
+        Telegram.WebApp.BackButton.hide();
+    }
+    updateSwapButtonVisibility();
 }
 
 async function submitSearch() {
-    const departure = document.getElementById('departure').value.trim();
-    const arrival = document.getElementById('arrival').value.trim();
-    const dateInput = document.getElementById('date').value.trim(); // Очікується формат ДД-ММ-РРРР
+    const departure = document.getElementById('departure-text').textContent.trim();
+    const arrival = document.getElementById('arrival-text').textContent.trim();
+    const dateInput = document.getElementById('date').value.trim();
     const seats = document.getElementById('seats').value.trim();
 
-    if (!departure || !arrival || !dateInput || !seats) return alert('Заповніть усі поля!');
-    if (departure.length > 255 || arrival.length > 255) return alert('Назви місць мають бути до 255 символів!');
+    if (departure === 'Місце відправлення' || arrival === 'Місце прибуття' || !dateInput || !seats) {
+        return alert('Заповніть усі поля!');
+    }
+    if (departure.length > 255 || arrival.length > 255) {
+        return alert('Назви місць мають бути до 255 символів!');
+    }
 
-    // Конвертація дати з ДД-ММ-РРРР у РРРР-ММ-ДД для запиту до API
     let date;
     try {
         const [day, month, year] = dateInput.split('-');
-        date = `${year}-${month}-${day}`; // Конвертація в РРРР-ММ-ДД
+        date = `${year}-${month}-${day}`;
     } catch (e) {
         return alert('Невірний формат дати!');
     }
@@ -82,19 +118,15 @@ async function submitSearch() {
         if (!res.ok) throw new Error('Не вдалося отримати поїздки');
         const rides = await res.json();
 
-        // Лог для діагностики
         console.log('API response:', rides);
 
-        // Separate rides into non-parsed and parsed
         const nonParsedRides = rides.filter(ride => !ride.is_parsed);
         const parsedRides = rides.filter(ride => ride.is_parsed);
 
-        // Sort each group by departure_time
         const sortByDepartureTime = (a, b) => new Date(a.departure_time) - new Date(b.departure_time);
         nonParsedRides.sort(sortByDepartureTime);
         parsedRides.sort(sortByDepartureTime);
 
-        // Combine sorted arrays: non-parsed first, then parsed
         const sortedRides = [...nonParsedRides, ...parsedRides];
 
         const searchResults = document.getElementById('search-results');
@@ -105,7 +137,6 @@ async function submitSearch() {
                 const timeStr = dt.toLocaleTimeString('uk-UA', { hour: '2-digit', minute: '2-digit' });
                 const dateStr = dt.toLocaleDateString('uk-UA', { day: '2-digit', month: '2-digit' });
                 const isParsed = ride.is_parsed;
-                // Лог для діагностики
                 console.log(`Ride ID: ${ride.id}, is_parsed: ${isParsed}, additional_info: ${ride.additional_info}, description: ${ride.description}`);
                 return `
                     <div class="ride-item">
@@ -139,11 +170,17 @@ async function submitSearch() {
         subtitle.textContent = `${formatShortDate(date)}, ${seatsNumber} ${seatWord}`;
         titleBox.appendChild(subtitle);
 
-        // Зберігаємо дані пошуку в історію
         saveSearchHistory({ departure, arrival, date, seats });
 
         navigate('search-results');
     } catch (err) {
         alert('Помилка при пошуку поїздок: ' + err.message);
     }
+}
+
+function updateSwapButtonVisibility() {
+    const departure = document.getElementById('departure-text').textContent.trim();
+    const arrival = document.getElementById('arrival-text').textContent.trim();
+    const swapButton = document.querySelector('.swap-button');
+    swapButton.classList.toggle('visible', departure !== 'Місце відправлення' || arrival !== 'Місце прибуття');
 }

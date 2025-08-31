@@ -1,7 +1,7 @@
 input, button, textarea {
     width: 100%;
     padding: 10px;
-    margin: 10px 0;
+    margin: 5px 0; /* Reduced top/bottom margin to lower inputs */
     font-size: 16px;
     box-sizing: border-box;
     border-radius: 5px;
@@ -19,6 +19,34 @@ button {
 
 button:hover {
     background: var(--button-hover-bg-color);
+}
+
+.location-btn {
+    text-align: left;
+    appearance: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px;
+    margin: 5px 0; /* Reduced top/bottom margin to align with h1 */
+    font-size: 16px;
+    box-sizing: border-box;
+    border-radius: 5px;
+    border: 1px solid var(--border-color);
+    background: var(--input-bg-color);
+    color: var(--text-color);
+}
+
+.location-btn:hover {
+    background: var(--input-bg-color);
+}
+
+.location-btn span {
+    flex-grow: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .suggestions {
@@ -66,6 +94,11 @@ button:hover {
 
 .input-wrapper {
     position: relative;
+    width: 100%;
+}
+
+.input-wrapper:first-child {
+    margin-top: 0; /* Remove top margin for first input-wrapper to align with h1 */
 }
 
 .input-wrapper input {
@@ -74,7 +107,7 @@ button:hover {
 
 .swap-button {
     position: absolute;
-    top: 33%;
+    top: 50%; /* Adjusted to center vertically within button */
     right: 5px;
     transform: translateY(-50%);
     width: 30px;
@@ -115,11 +148,84 @@ button:hover {
     color: var(--button-hover-bg-color);
 }
 
+/* Modal styles */
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: var(--modal-bg-color);
+    z-index: 1005;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    max-width: 600px;
+    margin: 0 auto;
+    box-sizing: border-box;
+}
+
+.modal-content {
+    background: var(--modal-bg-color);
+    border-radius: 0;
+    padding: 20px;
+    width: 100%;
+    height: 100%;
+    position: relative;
+    box-shadow: none;
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box;
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+    width: 100%;
+}
+
+.modal-header h2 {
+    margin: 0;
+    font-size: 18px;
+    color: var(--text-color);
+}
+
+.close-modal {
+    font-size: 24px;
+    color: var(--text-color);
+    cursor: pointer;
+}
+
+.close-modal:hover {
+    color: var(--link-color);
+}
+
 @media (max-width: 600px) {
+    .modal {
+        width: 100%;
+        max-width: 100%;
+    }
+
+    .modal-content {
+        width: 100%;
+        padding: 15px;
+    }
+
+    .modal-header {
+        width: 100%;
+    }
+
+    .input-wrapper {
+        width: 100%;
+    }
+
     #date, #create-date, #create-time {
         padding: 12px;
         font-size: 16px;
     }
+
     .flatpickr-calendar {
         z-index: 1003 !important;
         position: fixed !important;
@@ -133,6 +239,7 @@ button:hover {
         border-radius: 5px !important;
         box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1) !important;
     }
+
     .flatpickr-day {
         display: block !important;
     }
