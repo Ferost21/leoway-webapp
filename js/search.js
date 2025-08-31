@@ -55,8 +55,8 @@ function setupSuggestions(inputId, suggestionsId) {
 function swapLocations() {
     const departureText = document.getElementById('departure-text').textContent;
     const arrivalText = document.getElementById('arrival-text').textContent;
-    document.getElementById('departure-text').textContent = arrivalText === 'Місце прибуття' ? 'Місце відправлення' : arrivalText;
-    document.getElementById('arrival-text').textContent = departureText === 'Місце відправлення' ? 'Місце прибуття' : departureText;
+    document.getElementById('departure-text').textContent = arrivalText === 'Куди' ? 'Звідки' : arrivalText;
+    document.getElementById('arrival-text').textContent = departureText === 'Звідки' ? 'Куди' : departureText;
     updateSwapButtonVisibility();
 }
 
@@ -66,7 +66,7 @@ function openLocationModal(fieldType) {
     const modalTitle = document.getElementById('modal-title');
     modalInput.value = '';
     modalInput.dataset.fieldType = fieldType;
-    modalTitle.textContent = fieldType === 'departure' ? 'Місце відправлення' : 'Місце прибуття';
+    modalTitle.textContent = fieldType === 'departure' ? 'Звідки' : 'Куди';
     modal.style.display = 'flex';
     modalInput.focus();
     // Show BackButton to close modal
@@ -91,7 +91,7 @@ async function submitSearch() {
     const dateInput = document.getElementById('date').value.trim();
     const seats = document.getElementById('seats').value.trim();
 
-    if (departure === 'Місце відправлення' || arrival === 'Місце прибуття' || !dateInput || !seats) {
+    if (departure === 'Звідки' || arrival === 'Куди' || !dateInput || !seats) {
         return alert('Заповніть усі поля!');
     }
     if (departure.length > 255 || arrival.length > 255) {
@@ -182,5 +182,5 @@ function updateSwapButtonVisibility() {
     const departure = document.getElementById('departure-text').textContent.trim();
     const arrival = document.getElementById('arrival-text').textContent.trim();
     const swapButton = document.querySelector('.swap-button');
-    swapButton.classList.toggle('visible', departure !== 'Місце відправлення' || arrival !== 'Місце прибуття');
+    swapButton.classList.toggle('visible', departure !== 'Звідки' || arrival !== 'Куди');
 }

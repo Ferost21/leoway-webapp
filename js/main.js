@@ -141,7 +141,7 @@ document.addEventListener('DOMContentLoaded', () => {
             locale: "uk",
             onReady: () => {
                 const dateInput = document.getElementById('date');
-                dateInput.placeholder = "Дата (ДД-ММ-РРРР)";
+                dateInput.placeholder = "Дата";
                 if (webApp.requestFullscreen && window.innerWidth <= 600) {
                     webApp.requestFullscreen().catch(() => {});
                 }
@@ -171,7 +171,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const departure = document.getElementById('departure-text').textContent.trim();
         const arrival = document.getElementById('arrival-text').textContent.trim();
         const swapButton = document.querySelector('.swap-button');
-        swapButton.classList.toggle('visible', departure !== 'Місце відправлення' || arrival !== 'Місце прибуття');
+        swapButton.classList.toggle('visible', departure !== 'Звідки' || arrival !== 'Куди');
     }
 
     ['departure-btn', 'arrival-btn'].forEach(id => {

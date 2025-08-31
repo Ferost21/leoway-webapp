@@ -56,22 +56,22 @@
         <div id="search-page" class="page active">
             <!-- Блок з позначкою про бета-версію -->
             <div class="beta-badge">
-                Це бета-версія додатку
+                Бета-версія додатку
             </div>
             <div class="scrollable-content">
                 <h1>Пошук поїздки</h1>
                 <div class="input-wrapper">
                     <button id="departure-btn" class="location-btn" onclick="openLocationModal('departure')">
-                        <span id="departure-text">Місце відправлення</span>
+                        <span id="departure-text">Звідки</span>
                     </button>
                     <button class="swap-button" onclick="swapLocations()" aria-label="Змінити місця"></button>
                 </div>
                 <div class="input-wrapper">
                     <button id="arrival-btn" class="location-btn" onclick="openLocationModal('arrival')">
-                        <span id="arrival-text">Місце прибуття</span>
+                        <span id="arrival-text">Куди</span>
                     </button>
                 </div>
-                <input id="date" type="text" placeholder="Дата (ДД-ММ-РРРР)" readonly>
+                <input id="date" type="text" placeholder="Дата" readonly>
                 <input id="seats" type="number" placeholder="Кількість місць" min="1" max="10">
                 <button onclick="submitSearch()">Пошук</button>
                 <div id="search-history" class="search-history"></div>
@@ -121,14 +121,14 @@
             <div class="scrollable-content">
                 <h1>Створити поїздку</h1>
                 <div class="input-wrapper">
-                    <input id="create-departure" placeholder="Місце відправлення" autocomplete="off">
+                    <input id="create-departure" placeholder="Звідки" autocomplete="off">
                     <div id="create-departure-suggestions" class="suggestions"></div>
                 </div>
                 <div class="input-wrapper">
-                    <input id="create-arrival" placeholder="Місце прибуття" autocomplete="off">
+                    <input id="create-arrival" placeholder="Куди" autocomplete="off">
                     <div id="create-arrival-suggestions" class="suggestions"></div>
                 </div>
-                <input id="create-date" type="text" placeholder="Дата (ДД-ММ-РРРР)" readonly>
+                <input id="create-date" type="text" placeholder="Дата" readonly>
                 <input id="create-time" type="text" placeholder="Час (ГГ:ХХ)" readonly>
                 <input id="create-description" type="text" placeholder="Опис (необов’язково)">
                 <input id="create-seats" type="number" placeholder="Кількість місць" min="1" max="10">
