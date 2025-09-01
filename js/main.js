@@ -5,7 +5,7 @@ let isModalOpen = false;
 let isDriverRideModalOpen = false;
 let currentPage = 'search';
 
-const API_BASE_URL = 'https://d7a65e480f22.ngrok-free.app';
+const API_BASE_URL = 'https://2b245fb333ea.ngrok-free.app';
 
 function updateTheme() {
     const themeParams = webApp.themeParams || {};
