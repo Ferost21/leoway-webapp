@@ -126,6 +126,11 @@
     padding-bottom: 120px;
 }
 
+#location-select-page .scrollable-content {
+    margin-top: 70px;
+    padding-bottom: 20px;
+}
+
 #chat-page {
     position: fixed;
     top: 0;
@@ -390,7 +395,8 @@
 #driver-ride-details-title,
 #my-rides-title,
 #inbox-title,
-#passenger-info-title {
+#passenger-info-title,
+#location-select-title {
     font-size: 18px;
     margin: 0;
     color: var(--text-color);

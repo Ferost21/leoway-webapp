@@ -52,46 +52,46 @@
 
     <!-- Контейнер для сторінок -->
     <div class="page-container">
-        <!-- Сторінка пошуку -->
+        <!-- Search Page -->
         <div id="search-page" class="page active">
-            <!-- Блок з позначкою про бета-версію -->
-            <div class="beta-badge">
-                Бета-версія додатку
-            </div>
             <div class="scrollable-content">
+                <div class="beta-badge">Бета-версія додатку</div>
                 <h1>Пошук поїздки</h1>
                 <div class="input-wrapper">
-                    <button id="departure-btn" class="location-btn" onclick="openLocationModal('departure')">
+                    <button id="departure-btn" class="location-btn">
                         <span id="departure-text">Звідки</span>
                     </button>
-                    <button class="swap-button" onclick="swapLocations()" aria-label="Змінити місця"></button>
+                    <button class="swap-button" onclick="swapLocations()"></button>
                 </div>
                 <div class="input-wrapper">
-                    <button id="arrival-btn" class="location-btn" onclick="openLocationModal('arrival')">
+                    <button id="arrival-btn" class="location-btn">
                         <span id="arrival-text">Куди</span>
                     </button>
                 </div>
-                <input id="date" type="text" placeholder="Дата" readonly>
-                <input id="seats" type="number" placeholder="Кількість місць" min="1" max="10">
+                <div class="input-wrapper">
+                    <input type="text" id="date" placeholder="Дата" readonly>
+                </div>
+                <div class="input-wrapper">
+                    <input type="number" id="seats" placeholder="Кількість місць" min="1">
+                </div>
                 <button onclick="submitSearch()">Пошук</button>
                 <div id="search-history" class="search-history"></div>
             </div>
-            <!-- Modal for location input -->
-            <div id="location-modal" class="modal" style="display: none;">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h2 id="modal-title">Виберіть місце</h2>
-                        <span class="close-modal" onclick="closeLocationModal()">&times;</span>
-                    </div>
-                    <div class="input-wrapper">
-                        <input id="modal-input" type="text" placeholder="Введіть назву міста">
-                        <div id="modal-suggestions" class="suggestions"></div>
-                    </div>
+        </div>
+
+        <!-- Location Select Page -->
+        <div id="location-select-page" class="page">
+            <div class="scrollable-content">
+                <div class="my-rides-title-box">
+                    <h2 id="location-select-title">Виберіть місце</h2>
+                </div>
+                <div class="input-wrapper">
+                    <input type="text" id="location-select-input" placeholder="Введіть назву міста">
+                    <div id="location-select-suggestions" class="suggestions"></div>
                 </div>
             </div>
         </div>
-
-
+        
         <!-- Сторінка мої поїздки -->
         <div id="my-rides-page" class="page">
             <div class="my-rides-title-box">

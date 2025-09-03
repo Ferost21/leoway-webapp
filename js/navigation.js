@@ -1,7 +1,7 @@
 const pages = [
     'search', 'create', 'my-rides', 'profile', 'inbox',
     'chat', 'search-results', 'driver-ride-details',
-    'passenger-info', 'archived-rides'
+    'passenger-info', 'archived-rides', 'location-select'
 ];
 let isNavigating = false;
 
@@ -26,14 +26,12 @@ function navigate(page, params = {}) {
         return;
     }
 
-    // оновлення стану нижнього меню
     if (['search', 'create', 'my-rides', 'profile', 'inbox'].includes(page)) {
         document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
         const navItem = document.querySelector(`.nav-item[onclick="navigate('${page}')"]`);
         if (navItem) navItem.classList.add('active');
     }
 
-    // анімація переходу
     if (currentActivePage) {
         currentActivePage.classList.add('fade-out');
         setTimeout(() => {
@@ -55,20 +53,17 @@ function navigate(page, params = {}) {
         isNavigating = false;
     }
 
-    // формування hash та state
     let hash = `#${page}`;
     let state = { page, ...params };
 
     if (page === 'driver-ride-details' && params.rideId) {
-    hash = `#my-rides/${params.rideId}`;
-
-    // Зберігаємо, з якої сторінки зайшли
-    const lastPage = history.state?.page;
-    if (lastPage === 'archived-rides') {
-        params.previousPage = 'archived-rides';
-    } else {
-        params.previousPage = 'my-rides';
-    }
+        hash = `#my-rides/${params.rideId}`;
+        const lastPage = history.state?.page;
+        if (lastPage === 'archived-rides') {
+            params.previousPage = 'archived-rides';
+        } else {
+            params.previousPage = 'my-rides';
+        }
     } else if (page === 'search-results' && params.departure && params.arrival && params.date && params.seats) {
         hash = `#search-results/${encodeURIComponent(params.departure)}/${encodeURIComponent(params.arrival)}/${params.date}/${params.seats}`;
     } else if (page === 'passenger-info' && params.rideId && params.bookingId) {
@@ -77,29 +72,35 @@ function navigate(page, params = {}) {
         hash = `#chat/${params.chatId}`;
     } else if (page === 'archived-rides') {
         hash = '#archived-rides';
+    } else if (page === 'location-select' && params.fieldType) {
+        hash = `#location-select/${params.fieldType}`;
     }
 
     history.pushState(state, '', hash);
 
-    // показ кнопки "назад"
-    if (['search-results', 'driver-ride-details', 'passenger-info', 'chat', 'archived-rides'].includes(page)) {
+    if (['search-results', 'driver-ride-details', 'passenger-info', 'chat', 'archived-rides', 'location-select'].includes(page)) {
         Telegram.WebApp.BackButton.show();
     } else {
         Telegram.WebApp.BackButton.hide();
     }
 
-    // завантаження даних
     if (page === 'my-rides') loadMyRides();
     else if (page === 'profile') loadProfile();
     else if (page === 'inbox') loadInbox();
     else if (page === 'chat' && params.chatId) loadChat(params);
     else if (page === 'archived-rides') loadArchivedRides();
-    else if (page === 'search') loadSearchHistory(); // Додаємо завантаження історії пошуку
+    else if (page === 'search') loadSearchHistory();
+    else if (page === 'location-select') {
+        const input = document.getElementById('location-select-input');
+        const title = document.getElementById('location-select-title');
+        title.textContent = params.fieldType === 'departure' ? 'Звідки' : 'Куди';
+        input.value = '';
+        input.focus();
+    }
 
     console.log(`Navigation completed to page: ${page}, params:`, params);
 }
 
-// завантаження з hash при reload
 window.addEventListener('load', () => {
     const hash = location.hash.replace('#', '');
     if (!hash) {
@@ -115,6 +116,7 @@ window.addEventListener('load', () => {
             else if (param1) navigate('driver-ride-details', { rideId: param1 });
             else navigate('my-rides');
         } else if (page === 'archived-rides') navigate('archived-rides');
+        else if (page === 'location-select' && param1) navigate('location-select', { fieldType: param1 });
         else navigate(page);
     } else {
         navigate('search');
@@ -144,6 +146,8 @@ window.addEventListener('popstate', () => {
             }
         } else if (page === 'archived-rides') {
             navigate('archived-rides');
+        } else if (page === 'location-select' && param1) {
+            navigate('location-select', { fieldType: param1 });
         } else {
             navigate(page);
         }
@@ -154,10 +158,11 @@ window.addEventListener('popstate', () => {
 
 Telegram.WebApp.BackButton.onClick(() => {
     const state = history.state || {};
-    const currentPage = state.page;  // Use state.page instead of hash for accuracy
+    const currentPage = state.page;
 
-    if (currentPage === 'driver-ride-details') {
-        // Always go directly to 'my-rides', ignoring previousPage if it's 'archived-rides'
+    if (currentPage === 'location-select') {
+        navigate('search');
+    } else if (currentPage === 'driver-ride-details') {
         navigate('my-rides');
     } else if (currentPage === 'archived-rides') {
         navigate('my-rides');

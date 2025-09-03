@@ -35,11 +35,10 @@ function setupSuggestions(inputId, suggestionsId) {
         if (item) {
             input.value = item.dataset.name;
             suggestions.style.display = 'none';
-            if (inputId === 'modal-input') {
-                // Update the corresponding field and close modal
-                const fieldType = input.dataset.fieldType;
+            if (inputId === 'location-select-input') {
+                const fieldType = history.state?.fieldType;
                 document.getElementById(`${fieldType}-text`).textContent = item.dataset.name;
-                closeLocationModal();
+                navigate('search');
                 updateSwapButtonVisibility();
             }
         }
@@ -61,28 +60,7 @@ function swapLocations() {
 }
 
 function openLocationModal(fieldType) {
-    const modal = document.getElementById('location-modal');
-    const modalInput = document.getElementById('modal-input');
-    const modalTitle = document.getElementById('modal-title');
-    modalInput.value = '';
-    modalInput.dataset.fieldType = fieldType;
-    modalTitle.textContent = fieldType === 'departure' ? 'Звідки' : 'Куди';
-    modal.style.display = 'flex';
-    modalInput.focus();
-    // Show BackButton to close modal
-    Telegram.WebApp.BackButton.show();
-}
-
-function closeLocationModal() {
-    const modal = document.getElementById('location-modal');
-    modal.style.display = 'none';
-    document.getElementById('modal-suggestions').style.display = 'none';
-    document.getElementById('modal-input').value = '';
-    // Hide BackButton if on search page
-    if (history.state?.page === 'search') {
-        Telegram.WebApp.BackButton.hide();
-    }
-    updateSwapButtonVisibility();
+    navigate('location-select', { fieldType });
 }
 
 async function submitSearch() {

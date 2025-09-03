@@ -5,7 +5,7 @@ let isModalOpen = false;
 let isDriverRideModalOpen = false;
 let currentPage = 'search';
 
-const API_BASE_URL = 'https://2b245fb333ea.ngrok-free.app';
+const API_BASE_URL = 'https://0832c0814586.ngrok-free.app';
 
 function updateTheme() {
     const themeParams = webApp.themeParams || {};
@@ -163,7 +163,7 @@ document.addEventListener('DOMContentLoaded', () => {
         locale: "uk"
     });
 
-    setupSuggestions('modal-input', 'modal-suggestions');
+    setupSuggestions('location-select-input', 'location-select-suggestions');
     setupSuggestions('create-departure', 'create-departure-suggestions');
     setupSuggestions('create-arrival', 'create-arrival-suggestions');
 
@@ -175,7 +175,9 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     ['departure-btn', 'arrival-btn'].forEach(id => {
-        document.getElementById(id).addEventListener('click', updateSwapButtonVisibility);
+        document.getElementById(id).addEventListener('click', () => {
+            navigate('location-select', { fieldType: id === 'departure-btn' ? 'departure' : 'arrival' });
+        });
     });
 
     updateSwapButtonVisibility();
@@ -259,27 +261,25 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Обробка BackButton
         Telegram.WebApp.BackButton.onClick(() => {
-            if (isModalOpen) {
-                closeLocationModal();
-            } else {
-                const state = history.state || {};
-                const currentPage = state.page;
+            const state = history.state || {};
+            const currentPage = state.page;
 
-                if (currentPage === 'driver-ride-details') {
-                    navigate('my-rides');
-                } else if (currentPage === 'archived-rides') {
-                    navigate('my-rides');
-                } else if (currentPage === 'chat') {
-                    navigate('inbox');
-                } else if (currentPage === 'inbox') {
-                    navigate('search');
-                } else if (currentPage === 'passenger-info') {
-                    navigate('driver-ride-details', { rideId: state.rideId });
-                } else if (currentPage === 'search-results') {
-                    navigate('search');
-                } else {
-                    navigate('search');
-                }
+            if (currentPage === 'location-select') {
+                navigate('search');
+            } else if (currentPage === 'driver-ride-details') {
+                navigate('my-rides');
+            } else if (currentPage === 'archived-rides') {
+                navigate('my-rides');
+            } else if (currentPage === 'chat') {
+                navigate('inbox');
+            } else if (currentPage === 'inbox') {
+                navigate('search');
+            } else if (currentPage === 'passenger-info') {
+                navigate('driver-ride-details', { rideId: state.rideId });
+            } else if (currentPage === 'search-results') {
+                navigate('search');
+            } else {
+                navigate('search');
             }
         });
 
