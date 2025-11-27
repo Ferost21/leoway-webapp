@@ -18,6 +18,11 @@
     --status-cancelled-color: #e74c3c;
     --contact-button-bg-color: #2980b9;
     --contact-button-hover-bg-color: #2471a3;
+    --glass-bg-light: rgba(255, 255, 255, 0.25);   /* світла тема */
+    --glass-bg-dark: rgba(31, 42, 45, 0.35);       /* темна тема */
+    --glass-border-light: rgba(255, 255, 255, 0.4);
+    --glass-border-dark: rgba(100, 100, 100, 0.3);
+    --glass-blur: 12px;                            /* сила розмиття */
 }
 
 body {

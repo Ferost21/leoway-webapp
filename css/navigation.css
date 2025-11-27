@@ -3,16 +3,48 @@
     bottom: 0;
     left: 0;
     right: 0;
-    background: var(--nav-bg-color);
-    border-top: 1px solid var(--border-color);
-    box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1);
+    height: 76px;
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 8px 24px;
+
+    /* Скляний ефект */
+    background: var(--glass-bg);
+    backdrop-filter: blur(16px);           /* сильне розмиття — ключ до "скла" */
+    -webkit-backdrop-filter: blur(16px);
+
+    border-top: 1px solid var(--glass-border);
+    border-top-left-radius: 28px;
+    border-top-right-radius: 28px;
+    
+    box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.08);
+    overflow: hidden;
+    z-index: 1000;
+
     display: flex;
     justify-content: space-around;
     align-items: center;
-    height: 60px;
-    z-index: 1000;
-    max-width: 600px;
-    margin: 0 auto;
+}
+
+/* Додатково: робимо іконки та текст трохи контрастнішими у світлій темі */
+.nav-item {
+    color: var(--text-color);
+    opacity: 0.85;
+    transition: all 0.2s;
+}
+
+.nav-item.active {
+    opacity: 1;
+    color: var(--button-bg-color);
+}
+
+.nav-item svg {
+    fill: currentColor;
+    opacity: 0.9;
+}
+
+.nav-item.active svg {
+    opacity: 1;
 }
 
 .nav-item {

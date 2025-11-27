@@ -1,3 +1,51 @@
+// Mock для локального тестування (file:// протокол)
+if (location.protocol === 'file:') {
+    console.warn('Running in local test mode with mocked Telegram WebApp');
+
+    // Використовуйте згенероване initData
+    const mockedInitData = 'auth_date=1764228740&user=%7B%22id%22%3A674387089%2C%22first_name%22%3A%22%5Cu041e%5Cu043b%5Cu0435%5Cu043a%5Cu0441%5Cu0456%5Cu0439%22%2C%22last_name%22%3A%22Tester%22%2C%22username%22%3A%22testuser%22%2C%22photo_url%22%3A%22https%3A%2F%2Fexample.com%2Fphoto.jpg%22%7D&hash=6dc1ca569f93ecc8162a0844a033d1692f70391ed49fd8d44965e706bba049c7';
+    // Використовуйте user_data для initDataUnsafe
+    const mockedUser = {
+        id: 674387089,
+        first_name: 'Олексій',
+        last_name: 'Tester',
+        username: 'testuser',
+        photo_url: 'https://example.com/photo.jpg'
+    };
+
+    window.Telegram = {
+        WebApp: {
+            initData: mockedInitData,
+            initDataUnsafe: {
+                user: mockedUser,
+                start_param: '',  // Якщо потрібен deep linking, наприклад, 'chat_123'
+            },
+            themeParams: {
+                bg_color: '#ffffff',
+                text_color: '#000000',
+                button_color: '#27ae60',
+                button_text_color: '#ffffff',
+                section_bg_color: '#ffffff',
+                border_color: '#ccc',
+                link_color: '#2980b9',
+                destructive_text_color: '#e74c3c'
+            },
+            colorScheme: 'light',  // Або 'dark' для темної теми
+            ready: () => console.log('Mock WebApp ready'),
+            showAlert: (msg) => alert(msg),
+            close: () => console.log('Mock close app'),
+            setHeaderColor: () => console.log('Mock setHeaderColor'),
+            setBackgroundColor: () => console.log('Mock setBackgroundColor'),
+            requestFullscreen: () => Promise.resolve(),
+            BackButton: {
+                show: () => console.log('Mock BackButton show'),
+                hide: () => console.log('Mock BackButton hide'),
+                onClick: (cb) => console.log('Mock BackButton onClick', cb)
+            }
+        }
+    };
+}
+
 // Продовжуємо з оригінальним кодом
 const webApp = window.Telegram.WebApp;
 webApp.ready();
@@ -35,6 +83,15 @@ function updateTheme() {
     root.style.setProperty('--link-color', themeParams.link_color || (isDark ? '#3498db' : '#2980b9'));
     root.style.setProperty('--destructive-text-color', themeParams.destructive_text_color || (isDark ? '#e74c3c' : '#e74c3c'));
     root.style.setProperty('--nav-active-color', themeParams.button_color || (isDark ? '#2ecc71' : '#27ae60'));
+
+    // НОВИЙ КОД — додаємо підтримку ефекту скла для нижнього меню
+    if (isDark) {
+        root.style.setProperty('--glass-bg', 'rgba(31, 42, 45, 0.35)');        // темна тема
+        root.style.setProperty('--glass-border', 'rgba(100, 100, 100, 0.3)');
+    } else {
+        root.style.setProperty('--glass-bg', 'rgba(255, 255, 255, 0.25)');    // світла тема
+        root.style.setProperty('--glass-border', 'rgba(255, 255, 255, 0.4)');
+    }
 }
 
 updateTheme();
