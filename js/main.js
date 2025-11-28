@@ -1,4 +1,3 @@
-// Продовжуємо з оригінальним кодом
 const webApp = window.Telegram.WebApp;
 webApp.ready();
 
@@ -6,7 +5,7 @@ let isModalOpen = false;
 let isDriverRideModalOpen = false;
 let currentPage = 'search';
 
-const API_BASE_URL = 'https://570ef618b67a.ngrok-free.app';
+const API_BASE_URL = 'https://cd2b7231de23.ngrok-free.app';
 
 function updateTheme() {
     const themeParams = webApp.themeParams || {};
